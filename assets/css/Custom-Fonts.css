@@ -1,0 +1,14 @@
+@font-face {
+	font-family: 'Bodoni Moda';
+	src:    url("fonts/BodoniModa-Italic-VariableFont_opsz,wght.ttf") format("truetype"),
+                url("fonts/BodoniModa-VariableFont_opsz,wght.ttf") format("truetype")
+                
+}
+@font-face {
+	font-family: 'LCALLIG';
+	src:    url("fonts/LCALLIG.eot") format("eot"),
+                url("fonts/LCALLIG.woff") format("woff"),
+                url("fonts/LCALLIG.ttf") format("truetype")
+                
+}
+ 
