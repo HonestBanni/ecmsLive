@@ -25,6 +25,15 @@ class TestController extends AdminController {
             
              $this->load->model('CRUDModel');
           }
+          
+          public function index(){
+                        $this->db->join('student_record','student_record.student_id=fee_challan.fc_student_id');
+             $query =   $this->db->get_where('fee_challan',array('fc_ch_status_id'=>2,'s_status_id'=>1,'programe_id'=>'1'))->result();
+             
+             echo '<pre>';print_r($query);die;
+              
+          }
+          
           public function student_education(){
 //                          $this->db->join('student_record','student_record.student_id=applicant_edu_detail.student_id');
 //              $result =   $this->db->get_where('applicant_edu_detail')->result();
@@ -153,9 +162,10 @@ class TestController extends AdminController {
               
 //              
         $where = array(
-                        'student_record.s_status_id !='=>1,    // R.A
-                        'student_record.programe_id'=>1,    //Inter 
-//                        'student_record.batch_id'=>92,      // batch 2021-23 = 92
+                        'student_record.s_status_id'    =>1,    // R.A
+                        'student_record.programe_id'    =>1,    //Inter 
+                        'student_record.batch_id'       =>109,      // batch 2021-23 = 92
+                        'student_record.sub_pro_id'     =>2,      // batch 2021-23 = 92
                         );
         
         
@@ -188,6 +198,7 @@ class TestController extends AdminController {
         
         
             $result =     $this->db->get_where('student_record',$where)->result();
+          
               $count = '';
               foreach($result as $std):
                   $count++;
@@ -202,11 +213,13 @@ class TestController extends AdminController {
                                  $this->db->limit(0,1);
                                  $this->db->join('fee_actual_challan_detail','fee_actual_challan_detail.challan_id=fee_challan.fc_challan_id');
                   $lastChallan = $this->db->get_where('fee_challan',$wherebl)->row();
-                   
+                    
                   if(!empty($lastChallan)):
 //                       echo '<pre>';print_r($lastChallan); 
                   $dueDate = array(
-                      'fc_dueDate'=>'2022-06-03'
+                      'fc_dueDate'          => '2022-09-07',
+                      'fc_paid_form'        => '2022-07-01',
+                      'fc_paid_upto'        => '2022-10-31'
                   );
                   $where = array(
                       'fc_challan_id'=>$lastChallan->fc_challan_id

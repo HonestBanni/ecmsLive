@@ -614,10 +614,20 @@ class OnlineController extends AdminController {
        }
        public function save_paid_challan_info_update(){
            
+           
            $student_id      = $this->input->post('student_id');
            $fee_comments    = $this->input->post('fee_comments');
            $fee_paid_date   = $this->input->post('fee_paid_date');
-           $ChildStaff   = $this->input->post('ChildStaff');
+           $ChildStaff      = $this->input->post('ChildStaff');
+           
+            $wherechec = array(
+                's_status_id'    => '15',
+                'student_id'     => $student_id
+            );
+
+             $get_student_details = $this->CRUDModel->get_where_row('student_record',$wherechec);
+              //Update student status to application received if student status is pending
+           if(isset($get_student_details) && !empty($get_student_details)):
                               $this->db->join('mobile_network','mobile_network.net_id=student_record.std_mobile_network');  
            $currentStatus   = $this->db->get_where('student_record',array('student_id'=>$student_id))->row();
               $data = array(
@@ -638,13 +648,18 @@ class OnlineController extends AdminController {
            );
            
             $this->CRUDModel->update('prospectus_challan',$fee_details,array('student_id'=>$student_id));
+            
+            
            $set = array(
              's_status_id' =>'1'  
            );
            $where = array(
                'student_id'=>$student_id
            );
-            $this->CRUDModel->update('student_record',$set,$where);
+           
+               $this->CRUDModel->update('student_record',$set,$where);
+           endif;
+            
          
        }
        public function save_paid_challan_info(){
@@ -652,9 +667,23 @@ class OnlineController extends AdminController {
            $student_id      = $this->input->post('student_id');
            $fee_comments    = $this->input->post('fee_comments');
            $fee_paid_date   = $this->input->post('fee_paid_date');
-           $ChildStaff   = $this->input->post('ChildStaff');
+           $ChildStaff      = $this->input->post('ChildStaff');
+           
+           
+           //Update student status to application received if student status is pending
+            
+                    $wherechec = array(
+                        's_status_id'    => '15',
+                        'student_id'     => $student_id
+                    );
+                    $get_student_details = $this->CRUDModel->get_where_row('student_record',$wherechec);
+           if(isset($get_student_details) && !empty($get_student_details)):
+           
+           
                               $this->db->join('mobile_network','mobile_network.net_id=student_record.std_mobile_network');  
            $currentStatus   = $this->db->get_where('student_record',array('student_id'=>$student_id))->row();
+           
+           
               $data = array(
                'student_id'         => $student_id,
                'old_status_id'      => $currentStatus->s_status_id,
@@ -678,7 +707,11 @@ class OnlineController extends AdminController {
            $where = array(
                'student_id'=>$student_id
            );
-            $this->CRUDModel->update('student_record',$set,$where);
+          
+           
+               $this->CRUDModel->update('student_record',$set,$where);
+           endif;
+//            $this->CRUDModel->update('student_record',$set,$where);
            
            //Send SMS
            
@@ -2415,7 +2448,7 @@ public function edit_applicant_record_admin(){
         $this->data['program']      = $this->CRUDModel->dropDown('programes_info', 'Program ', 'programe_id', 'programe_name',array('program_type_id'=>1,'status'=>'Yes'));
         $this->data['section']      = $this->CRUDModel->dropDown('sections', 'Section', 'sec_id', 'name',array('status'=>'On'));
         $this->data['pay_categ']    = $this->FeeModel->payment_Cat_DropDown('fee_payment_category', 'Payment Category', 'pc_id', 'title',array('prospectus_batch.status'=>'on'));
-        $this->data['bank']         = $this->DropdownModel->bank_dropDown('bank','', 'bank_id', 'name',array('category_type'=>1));
+        $this->data['bank']         = $this->DropdownModel->bank_dropDown('bank','', 'bank_id', 'name',array('category_type'=>1,'bank_id'=>'17'));
         $this->data['default_year_fy'] = $this->db->order_by('id','desc')->get('fee_financial_year')->row()->id;
         $this->data['year']         = $this->CRUDModel->dropDown('fee_financial_year','', 'id', 'year');
         $this->data['batch']        = $this->CRUDModel->DropDown('prospectus_batch', 'Select Batch', 'batch_id', 'batch_name',array('prospectus_batch.status'=>'on'));
@@ -2427,6 +2460,12 @@ public function edit_applicant_record_admin(){
         $this->data['issuDate']     = '';
         $this->data['batch_id']     = '';
         $this->data['Section']      = '';
+        
+        $this->data['fromDate']      = '';
+        $this->data['uptoDate']      = '';
+        $this->data['dueDate']       = date('d-m-Y');
+        $this->data['issuDate']      = date('d-m-Y');
+        
         $this->data['default_bank'] = $this->DefaultFeeBank->bank_id;
         $this->data['gender_id']    = '';
                                         $this->db->order_by('obtained_marks','desc');
@@ -2455,6 +2494,8 @@ public function edit_applicant_record_admin(){
             $std_no_from    = $this->input->post("std_no_from");
             $std_no_to      = $this->input->post("std_no_to");
             $gender         = $this->input->post("gender");
+            $dueDate         = $this->input->post("dueDate");
+            $issuDate         = $this->input->post("issuDate");
         
             $where = '';
             if($batch_id):
@@ -2480,6 +2521,13 @@ public function edit_applicant_record_admin(){
             $std_no['std_no_to']            = $std_no_to;
              $this->data['std_no_from']     = $std_no_from;
             $this->data['std_no_to']        = $std_no_to;
+            
+            $this->data['fromDate']      = $fromDate;
+            $this->data['uptoDate']      = $toDate;
+            $this->data['dueDate']       = $dueDate;
+            $this->data['issuDate']      = $issuDate;
+            
+            
             $this->data['result']= $this->FeeModel->fee_challan_students_admission($where,$std_no);
             
         endif;
@@ -3760,9 +3808,9 @@ public function online_parent_general_message(){
             $reserved_seat2     = $this->input->post("reserved_seat2");
             
             
-            $where      = '';
-            $like       = '';
-            $date       = '';
+            $where      = array();
+            $like       = array();
+            $date       = array();
             $document   = '';
             
             switch ($hostel_req):
@@ -4456,6 +4504,10 @@ public function generate_pdf_only(){
         $this->data['batch_id']     = '';
         $this->data['Section']      = '';
         $this->data['gender_id']    = '';
+        
+        $this->data['entry_date_from']= '';
+        $this->data['entry_date_to']  = date('d-m-Y');
+        
         $this->data['student_status_id']    = '';
                                        $this->db->order_by('obtained_marks','desc');
                                         $this->db->limit('1','0');
@@ -4484,8 +4536,13 @@ public function generate_pdf_only(){
             $std_no_to      = $this->input->post("std_no_to");
             $gender         = $this->input->post("gender");
             $student_status = $this->input->post("student_status");
+            
+            
+            $entry_date_from    = $this->input->post("entry_date_from");
+            $entry_date_to      = $this->input->post("entry_date_to");
         
-            $where = '';
+            $where  = array();
+            $date   = array();
             if($batch_id):
                 $where['prospectus_batch.batch_id'] = $batch_id;
                 $this->data['batch_id']             = $batch_id;
@@ -4511,7 +4568,21 @@ public function generate_pdf_only(){
             $std_no['std_no_to']            = $std_no_to;
              $this->data['std_no_from']     = $std_no_from;
             $this->data['std_no_to']        = $std_no_to;
-            $this->data['result']= $this->FeeModel->fee_challan_generate_pdf_only($where,$std_no);
+            
+             if(empty($entry_date_from)):
+                $date['entry_date_to']          = $entry_date_to;
+                $this->data['entry_date_to']    = $entry_date_to;
+                
+                else:
+                $date['entry_date_from']    = $entry_date_from;
+                $date['entry_date_to']      = $entry_date_to;
+                
+                $this->data['entry_date_from']  = $entry_date_from;
+                $this->data['entry_date_to']    = $entry_date_to;
+                    
+            endif;
+            
+            $this->data['result']= $this->FeeModel->fee_challan_generate_pdf_only($where,$std_no,$date);
             
         endif;
          
@@ -4522,18 +4593,16 @@ public function generate_pdf_only(){
 //******************************************************************************************************            
 //********************            FEE CHALLAN  GENERATION                             ******************
 //******************************************************************************************************
-           
-            
+          
              //student name challan
              foreach($this->input->post('studentIds') as $row=>$student):
          
-                
                 
 //******************************************************************************************************            
 //********************            FEE CHALLAN CHECKING IF EXIST                       ******************
 //******************************************************************************************************
                             $this->db->join('fee_challan','fee_challan.fc_student_id=student_record.student_id'); 
-            $studentRow =   $this->db->get_where('student_record',array('student_id'=>$studentRow->student_id))->row();
+            $studentRow =   $this->db->get_where('student_record',array('student_id'=>$student))->row();
             if(!empty($studentRow)): 
                 
                         

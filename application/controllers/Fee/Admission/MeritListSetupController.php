@@ -38,6 +38,8 @@ class   MeritListSetupController extends AdminController {
             $this->db->join('prospectus_batch','prospectus_batch.batch_id=merit_list_conditions.batch_id');
             $this->db->join('gender','gender.gender_id=merit_list_conditions.gender');
             $this->db->join('shift','shift.shift_id=merit_list_conditions.shift');
+            $this->db->order_by('sub_programes.sp_title','asc');
+            $this->db->order_by('gender.title','asc');
             $this->data['grid'] =   $this->db->get_where('merit_list_conditions')->result();
             $this->load->view('Fee/Admission/Setup/Marks/show',$this->data); 
         endif;
@@ -81,9 +83,9 @@ class   MeritListSetupController extends AdminController {
                     'shift'             => $this->input->post('shift'),   
                 );
                 $error = '';
-                $check_dublicate = $this->db->get_where('merit_list_conditions',$where_dd)->row();
-                if(isset($check_dublicate) && !empty($check_dublicate)):
-                    $return_json['e_text']   = 'Dublicate record not allowed.';  
+                $check_duplicate = $this->db->get_where('merit_list_conditions',$where_dd)->row();
+                if(isset($check_duplicate) && !empty($check_duplicate)):
+                    $return_json['e_text']   = 'Duplicate record not allowed.';  
                     $error                  = '1';
                 endif;
                if($this->input->post('start') > $this->input->post('end')):
@@ -171,9 +173,9 @@ class   MeritListSetupController extends AdminController {
                     'id !='             => $this->input->post('pk_id'),   
                 );
                 $error = '';
-                $check_dublicate = $this->db->get_where('merit_list_conditions',$where_dd)->row();
-                if(isset($check_dublicate) && !empty($check_dublicate)):
-                    $return_json['e_text']   = 'Dublicate record not allowed.';  
+                $check_duplicate = $this->db->get_where('merit_list_conditions',$where_dd)->row();
+                if(isset($check_duplicate) && !empty($check_duplicate)):
+                    $return_json['e_text']   = 'Duplicate record not allowed.';  
                     $error                  = '1';
                 endif;
                if($this->input->post('start') > $this->input->post('end')):

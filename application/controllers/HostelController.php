@@ -1192,9 +1192,9 @@ class HostelController extends AdminController {
               endif;
             
             
-            $this->data['page_title']   = 'Hostel Fee | ECMS';
-            $this->data['page_header']  = 'Hostel Fee';
-            $this->data['page']         = 'hostel/hostel_fee';
+            $this->data['page_title']   = 'Hostel Single Challan | ECMS';
+            $this->data['page_header']  = 'Hostel Single Challan ';
+            $this->data['page']         = 'hostel/Challan/Single/hostel_challan';
             $this->load->view('common/common',$this->data);
     }
   
@@ -1202,8 +1202,8 @@ class HostelController extends AdminController {
             
             $this->data['bank']                 = $this->DropdownModel->bank_dropDown('bank','', 'bank_id', 'name',array('bank_id'=>16));  
             $this->data['per_day']              = $this->CRUDModel->get_where_row('hostel_heads',array('status'=>'1','head_type'=>2));
-             $this->data['installment_type']    = $this->CRUDModel->dropDown('fee_category_titles','Select Installment', 'cat_title_id', 'title',array('cat_title_status'=>1),array('column'=>'cat_order','order'=>'asc'));
-              $this->data['default_date']       = $this->db->get_where('hostel_defaults_dates',array('status'=>1))->row();
+            $this->data['installment_type']     = $this->CRUDModel->dropDown('fee_category_titles','Select Installment', 'cat_title_id', 'title',array('cat_title_status'=>1),array('column'=>'cat_order','order'=>'asc'));
+            $this->data['default_date']         = $this->db->get_where('hostel_defaults_dates',array('status'=>1))->row();
 //            $userInfo      = $this->getUser();
             if($this->input->post()):
                
@@ -1324,9 +1324,10 @@ class HostelController extends AdminController {
             endif;
             
             
-            $this->data['page_title']   = 'Mess Fee | ECMS';
-            $this->data['page_header']  = 'Mess Fee';
-            $this->data['page']         = 'hostel/mess_fee';
+            $this->data['page_title']   = 'Mess Single Challan | ECMS';
+            $this->data['page_header']  = 'Mess Single Challan';
+            $this->data['page']         = 'hostel/Challan/Single/mess_challan';
+//            $this->data['page']         = 'hostel/mess_fee';
             $this->load->view('common/common',$this->data);
     }
     
@@ -1367,9 +1368,10 @@ class HostelController extends AdminController {
             $this->load->view('common/common',$this->data);
     }
       public function hostel_mess(){
-            $this->data['page_title']   = 'Hostel & Mess Single Challan| ECMS';
-            $this->data['page_header']  = 'Hostel & Mess Single Challan';
-            $this->data['page'] = 'hostel/Forms/hostel_mess_single_challan_v';
+            $this->data['page_title']   = 'Hostel & Mess Challan| ECMS';
+            $this->data['page_header']  = 'Hostel & Mess Challan';
+            $this->data['page'] = 'hostel/Challan/Single/index';
+//            $this->data['page'] = 'hostel/Challan/Single/hostel_mess_single_challan_v';
             $this->load->view('common/common',$this->data);
     }
     public function hostel_mess_heads_new(){
@@ -1397,8 +1399,8 @@ class HostelController extends AdminController {
             $installment_type   = $this->input->post('installment_type');
             $head_type          = $this->input->post('head_type');
             $batch              = $this->input->post('batch_id');
-            $fromDate              = $this->input->post('fromDate');
-            $dateTo              = $this->input->post('dateTo');
+            $fromDate           = $this->input->post('fromDate');
+            $dateTo             = $this->input->post('dateTo');
             $formCode           = $this->input->post('formCode');
 //         $status            = $this->input->post('status');
          
@@ -3336,6 +3338,37 @@ class HostelController extends AdminController {
             $this->data['page_header']  = 'Hostel Fee Group Challan';
             $this->data['page']         = 'hostel/hostel_fee_group_challan';
             $this->load->view('common/common',$this->data);
+    }
+    public function hostel_challan_setup_dates(){
+//        echo '<pre>';print_r($this->input->post());die;
+        $batch_id           = $this->input->post('batch_id');
+        $type               = $this->input->post('type');
+        $installment_types  = $this->input->post('installment_types');
+        
+//        $where = array();
+//        if(!empty($batch_id)):
+//            $where['batch_id'] = $batch_id;
+//        endif;
+//        if(!empty($type)):
+//            $where['head_type'] = $type;
+//        endif;
+//        if(!empty($installment_types)):
+//            $where['cat_title_id'] = $installment_types;
+//        endif;
+        
+       
+        $where = array(
+          'batch_id'        => $batch_id,  
+//          'head_type'       => $type,  
+          'cat_title_id'    => $installment_types,  
+        );  
+      
+               
+                    $this->db->select("DATE_FORMAT(fromDate, '%d-%m-%Y') as fromDate,DATE_FORMAT(toDate, '%d-%m-%Y') as toDate"); 
+                   $this->db->order_by('id','desc'); 
+        $request = $this->db->get_where('hostel_heads',$where)->row();
+        echo json_encode($request);
+        
     }
       public function hostel_challan_print_group(){
             

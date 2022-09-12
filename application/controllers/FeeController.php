@@ -3909,8 +3909,8 @@ class FeeController extends AdminController {
                     $this->CRUDModel->update('student_record',array('s_status_id'=>5,'admission_date'=>$paid_date),array('student_id'=>$student_id));
 //                    $this->CRUDModel->update('student_record',array('s_status_id'=>5,'admission_date'=>date('Y-m-d')),array('student_id'=>$student_id));
              endif;
-//             die; 
-            endif;
+                    
+        endif;
         
      
         $this->data['challan_date'] = $this->CRUDModel->get_where_row('fee_print_date',array('status'=>1));
@@ -3920,7 +3920,222 @@ class FeeController extends AdminController {
         $this->data['page_title']   = 'Fee Payment | ECMS';
         $this->load->view('common/common',$this->data);
     }
-    public function fee_challan_payment_all(){
+          public function fee_challan_payment_all(){
+        
+        $this->data['challandId'] = '';
+        if($this->input->post('payment_challan_search')):
+            $challandId = $this->input->post('challan_no');
+            
+            $this->data['challandId']       = $challandId;
+            $this->data['challan_details']  = $this->CRUDModel->get_where_row('fee_challan',array('fc_challan_id'=>$challandId));
+            $this->data['studentInfo']      = $this->FeeModel->fee_challan_student_paid(array('student_record.student_id'=>$this->data['challan_details']->fc_student_id));
+            $this->data['result']           = $this->FeeModel->get_Student_feeDetails_search(array('fee_actual_challan_detail.challan_id'=>$challandId,'delete_head_flag'=>1));
+            $this->data['result_payment']   = $this->FeeModel->get_Student_feeDetails_search(array('fee_actual_challan_detail.challan_id'=>$challandId,'delete_head_flag'=>1,'add_new_heads_flag'=>1));
+ 
+        endif;
+        
+        if($this->input->post('payment_challan_paid')):
+           
+            $challan_amount = $this->input->post('challan_amount');
+            $challan_Id     = $this->input->post('challan_Id');
+            $student_id     = $this->input->post('student_id');
+            $challan_id_lock= $this->input->post('challan_id_lock');
+            $pdate_id       = $this->input->post('pdate_id');
+            $paid_date      = date('Y-m-d',strtotime($this->input->post('challan_date')));
+            $a_chln_detl    = $this->CRUDModel->get_where_result('fee_actual_challan_detail',array('challan_id'=>$challan_Id));
+            $userInfo       = json_decode(json_encode($this->getUser()), FALSE);
+            $date_fix       = $this->input->post('date_fix');
+            $challan_comment= $this->input->post('challan_comments');
+            
+            if($date_fix === 'on'):
+                
+                $oldDate = $this->CRUDModel->get_where_row('fee_print_date',array('status'=>1));
+                if($oldDate->print_date != $paid_date):
+                    
+                  $update_date_data = array(
+                    'status'  =>0,
+                    'up_timestamp' =>date('Y-m-d H:i:s'),
+                    'up_userId'    => $userInfo->user_id 
+                  );          
+                $this->CRUDModel->update('fee_print_date',$update_date_data,array('printDate_id'=>$pdate_id));
+                $insert_newDate = array(
+                        'status'       =>1,
+                        'print_date'   =>$paid_date,
+                        'timestamp'    =>date('Y-m-d H:i:s'),
+                        'userId'       => $userInfo->user_id 
+                  );    
+                $this->CRUDModel->insert('fee_print_date',$insert_newDate);
+                endif;
+                
+            endif;
+            
+             // Check if Bank Reconciliation Report Lock 
+            
+            $BRRL = $this->db->get_where('fee_brr_lock',array('lock_date'=>$paid_date,'status'=>1))->row();
+//            echo '<pre>';print_r($BRRL);die;
+            if(empty($BRRL)):
+               
+             $student_status = $this->db->get_where('student_record',array('student_id'=>$student_id))->row();
+            if($challan_id_lock==0):
+                
+           //Update actual Challan 
+            $add_new_heads_flag = 0;
+            $gBalance = '';
+            foreach($a_chln_detl as $ACDRow):
+                $balancestd         = '';
+                $where_detail_data  = array(
+                   'challan_id'     => $challan_Id, 
+                   'fee_id'         => $ACDRow->fee_id, 
+                );
+                
+                if($ACDRow->add_new_heads_flag == 2):
+                  $add_new_heads_flag += $ACDRow->paid_amount;
+                 endif;
+                 
+                 //Check If challan have concession.
+                $concession_where_check = array(
+                  'challan_id'=>$challan_Id  
+                );
+                $concession_challan_check = $this->db->get_where('fee_concession_challan',$concession_where_check)->row();
+                
+                if(empty($concession_challan_check)):
+                    $balancestd = $ACDRow->balance-$ACDRow->paid_amount;
+                    $challan_detai_data = array(
+                   'challan_status'     => 2,
+                   'balance'            => $balancestd,
+                   'up_timestamp'       => date('Y-m-d H:i:s'),
+                   'up_userId'          => $userInfo->user_id
+                    );
+                else:
+                    
+                    $concessionDetails_where_check = array(
+                        'concession_id'     => $concession_challan_check->concession_id,  
+                        'fh_id'             => $ACDRow->fee_id,   
+                    );
+                $concession_challan_details_check = $this->db->get_where('fee_concession_detail',$concessionDetails_where_check)->row();
+                
+                 if(!empty($concession_challan_details_check)): //Check If a head have concession then concession will subtract from head.
+                       $remove_concession_amount   = $ACDRow->paid_amount+$concession_challan_details_check->concession_amount;
+                        $balancestd                 = $ACDRow->actual_amount -$remove_concession_amount;
+                    else:
+                        $balancestd                 = $ACDRow->balance-$ACDRow->paid_amount;
+                 endif; 
+                  
+                    $challan_detai_data = array(
+                   'challan_status'     => 2,
+                   'balance'            => $balancestd,
+                   'up_timestamp'       => date('Y-m-d H:i:s'),
+                   'up_userId'          => $userInfo->user_id
+                    );
+                    
+                endif;
+                
+               
+                $this->CRUDModel->update('fee_actual_challan_detail',$challan_detai_data,$where_detail_data);
+                $gBalance += $balancestd;
+            endforeach;
+           
+            //Remove Extra Head Amount from Annual and installment ..
+
+            $challan_amount =  $challan_amount-$add_new_heads_flag;
+            $challan_history = array(
+                    'challan_id'    => $challan_Id,
+                    'student_id'    => $student_id,
+                    'ch_status_id'  => 2,
+                    'date'          => date('Y-m-d'),
+                    'timestamp'     => date('Y-m-d H:i:s'),
+                    'userId'        => $userInfo->user_id
+            );
+            $this->CRUDModel->insert('fee_challan_history',$challan_history);
+            
+            $fee_extra = $this->CRUDModel->get_where_row('fee_challan',array('fc_challan_id'=>$challan_Id));
+            $update_balance = array(
+                'r_amount'          => $gBalance,
+                'up_timestamp'      => date('Y-m-d H:i:s'),
+                'up_userId'         => $userInfo->user_id 
+            );
+            $this->CRUDModel->update('fee_balance',$update_balance,array('student_id'=>$student_id,'pay_cat_id'=>$fee_extra->fc_pay_cat_id));
+     
+            $this->CRUDModel->update('fee_challan',array('fc_ch_status_id'=>2,'fc_paiddate'=>$paid_date,'fc_comments'=>$challan_comment),array('fc_challan_id'=>$challan_Id));
+        
+            endif;
+                  else:
+             
+                      
+                      
+                $this->data['error_msg'] = array(
+                    'date'      => $BRRL->lock_date                   
+                );   
+               
+                  
+                $challandId = $this->input->post('challan_no');
+            
+                $this->data['challandId']       = $challandId;
+                $this->data['challan_details']  = $this->CRUDModel->get_where_row('fee_challan',array('fc_challan_id'=>$challandId));
+                $this->data['studentInfo']      = $this->FeeModel->fee_challan_student(array('student_record.student_id'=>$this->data['challan_details']->fc_student_id));
+                $this->data['result']           = $this->FeeModel->get_Student_feeDetails_search(array('fee_actual_challan_detail.challan_id'=>$challandId));
+                $this->data['result_payment']   = $this->FeeModel->get_Student_feeDetails_search(array('fee_actual_challan_detail.challan_id'=>$challandId,'add_new_heads_flag'=>1));
+
+                  
+                  
+                  
+            endif;
+            
+            
+              if($student_status->s_status_id == 1): //if student status = Application recevied
+//                 $default_batch = $this->CRUDModel->get_where_row('prospectus_batch',array('programe_id'=>1,'inter_default_flag'=>1));
+//              if($student_status->programe_id == '1' && $student_status->batch_id == '74' ):
+// 
+//                      
+//                          //Send SMS
+//           
+                            $clearNumber  =  $this->CRUDModel->clean_number($student_status->applicant_mob_no1);
+                            $message      = 'Congratulations! Your first installment challan for admission in Edwardes College has been confirmed.';
+// 
+                            $network = $this->db->get_where('mobile_network',array('net_id'=>$student_status->std_mobile_network))->row();
+//                            
+                             $sms_info = $this->send_message_bulk($clearNumber,$message,$network->send_format);
+                              $return_resp = '';
+                                if(!empty($sms_info)):
+                                      $return_resp = $sms_info;
+                                else:
+                                      $return_resp = 'null';
+                                endif;     
+                             $sms_log = array(
+                                          'student_id'        => $student_status->student_id,
+                                          'program_id'        => $student_status->programe_id,
+                                          'sub_pro_id'        => $student_status->sub_pro_id,
+                                          'batch_id'          => $student_status->batch_id,
+                                          'sms_type'          => 1,
+                                          'message'           => $message,
+                                          'network'           => $network->send_format,
+                                          'sender_number'     => $this->CRUDModel->clean_number($student_status->applicant_mob_no1),
+                                          'comments'          => $return_resp,
+                                          'create_datetime'   => date('Y-m-d H:i:s'),
+                                          'send_date'         => date('Y-m-d'),  
+                                          'create_by'         => $this->userInfo->user_id, 
+                                        );
+
+                                $this->CRUDModel->insert('sms_students',$sms_log);
+//                         
+//                      
+//                  endif;
+                    $this->CRUDModel->update('student_record',array('admission_date'=>$paid_date),array('student_id'=>$student_id));
+//                    $this->CRUDModel->update('student_record',array('s_status_id'=>5,'admission_date'=>$paid_date),array('student_id'=>$student_id));
+
+             endif;
+                    
+        endif;
+        
+     
+        $this->data['challan_date'] = $this->CRUDModel->get_where_row('fee_print_date',array('status'=>1));
+        
+        $this->data['page']         = 'Fee/fee_payment_all';
+        $this->data['page_header']  = 'Fee Payment All';
+        $this->data['page_title']   = 'Fee Payment All | ECMS';
+        $this->load->view('common/common',$this->data);
+    }
+    public function fee_challan_payment_all_xx(){
         
         $this->data['challandId'] = '';
         if($this->input->post('payment_challan_search')):
@@ -4209,10 +4424,7 @@ class FeeController extends AdminController {
             $this->CRUDModel->update('fee_challan',array('fc_ch_status_id'=>2,'fc_paiddate'=>$paid_date,'fc_comments'=>$challan_comment),array('fc_challan_id'=>$challan_Id));
            endif;
                   else:
-             
-                      
-                      
-                $this->data['error_msg'] = array(
+                    $this->data['error_msg'] = array(
                     'date'      => $BRRL->lock_date                   
                 );   
                
@@ -4229,11 +4441,10 @@ class FeeController extends AdminController {
                   
                   
             endif;
-            
-            
-              if($student_status->s_status_id == 1): //if student status = Application recevied
-              $this->CRUDModel->update('student_record',array('s_status_id'=>5,'admission_date'=>date('Y-m-d')),array('student_id'=>$student_id));
-             endif;
+                if($student_status->s_status_id == 1): //if student status = Application recevied
+                    $this->CRUDModel->update('student_record',array('admission_date'=>date('Y-m-d')),array('student_id'=>$student_id));
+//                  $this->CRUDModel->update('student_record',array('s_status_id'=>5,'admission_date'=>date('Y-m-d')),array('student_id'=>$student_id));
+                endif;
             
         endif;
         
@@ -4241,8 +4452,8 @@ class FeeController extends AdminController {
         $this->data['challan_date'] = $this->CRUDModel->get_where_row('fee_print_date',array('status'=>1));
         
         $this->data['page']         = 'Fee/fee_payment_all';
-        $this->data['page_header']  = 'Fee Payment';
-        $this->data['page_title']   = 'Fee Payment | ECMS';
+        $this->data['page_header']  = 'Fee Payment All';
+        $this->data['page_title']   = 'Fee Payment All | ECMS';
         $this->load->view('common/common',$this->data);
     }
  
@@ -5403,7 +5614,6 @@ class FeeController extends AdminController {
              $where = array(
                        'fc_student_id '=> $this->data['feeComments'] ->fc_student_id,
                        'fc_paid_form <='=> $this->data['feeComments'] ->fc_paid_form,
-                       
                    );
      
         $this->data['result']       = $this->FeeModel->feeDetails_head_print($where);
@@ -13220,7 +13430,8 @@ public function student_envelope_print_page(){
                     'update_by'         => $this->userInfo->user_id,
                 ));
             
-                redirect('ProspectusChallanUpdate');
+                redirect('ChallanPDFu/'.$this->input->post('student_id'));
+//                redirect('ProspectusChallanUpdate');
             endif;
    }
     public function fee_defaulter_message(){

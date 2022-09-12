@@ -1775,9 +1775,9 @@ class AdmissionController extends AdminController {
                     
                     $this->CRUDModel->update('student_record',$data,$where);
                     $this->CRUDModel->insert('student_add_picture_log',$log_data);
-                redirect('UploadPictureSearch'); 
+                redirect('StudentsForIDCards'); 
                 else:
-                 redirect('UploadPictureSearch');      
+                 redirect('StudentsForIDCards');      
         endif;
     }
     public function  student_record_bba(){

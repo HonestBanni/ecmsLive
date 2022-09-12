@@ -84,9 +84,10 @@ class DropdownController extends AdminController {
                 $labels         = array();
                     foreach ($result_set as $row_set) {
                         $labels[]       = array( 
-                            'label'     =>$row_set->student_name.' S/D '.$row_set->father_name.' ,Form# '.$row_set->form_no.' ', 
-                            'code'     =>$row_set->hostel_id, 
+                            'label'     =>$row_set->student_name.' S/D '.$row_set->father_name.' ,Form# '.$row_set->form_no.' , '.$row_set->batch_name, 
+                            'code'      =>$row_set->hostel_id, 
                             'value'     =>$row_set->student_name, 
+                            'batch_id'  =>$row_set->batch_id, 
                               
                     );
                 }
@@ -95,6 +96,8 @@ class DropdownController extends AdminController {
                     $label['value']     = $label['value'];
                     $label['code']      = $label['code'];
                     $label['label']     = $label['label']; 
+                    $label['batch_id']     = $label['batch_id'];
+                    
                     
                     $matches[]          = $label;
             }
@@ -106,9 +109,10 @@ class DropdownController extends AdminController {
                 $labels                 = array();
                     foreach ($result_set as $row_set) {
                     $labels[]           = array( 
-                          'label'     =>$row_set->student_name.' S/D '.$row_set->father_name.' ,Form# '.$row_set->form_no.' ', 
+                          'label'     =>$row_set->student_name.' S/D '.$row_set->father_name.' ,Form# '.$row_set->form_no.' , '.$row_set->batch_name, 
                             'code'     =>$row_set->hostel_id, 
                             'value'     =>$row_set->student_name,
+                         'batch_id'  =>$row_set->batch_id, 
                     );
              }
             $matches                = array();
@@ -116,6 +120,7 @@ class DropdownController extends AdminController {
                      $label['value']    = $label['value'];
                     $label['code']      = $label['code'];
                     $label['label']     = $label['label']; 
+                    $label['batch_id']     = $label['batch_id']; 
                    
                     $matches[]          = $label;
             }
@@ -1416,6 +1421,7 @@ public function getSection(){
                echo '<option value="'.$secRow->contract_type_id.'">'.$secRow->title.'</option>';
         endforeach;
     }
+
     }
 
 

@@ -80,7 +80,7 @@ $db['default'] = array(
 	'username' => 'root',
 	'password' => '',
 	
-	'database' => 'ecms',
+	'database' => 'ecms11',
 //	'database' => 'ecmslive_6_11_2017',
 //	'database' => 'ecmslive_5_11_2017',
 //	'database' => 'ecms_30_10_2017',

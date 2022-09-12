@@ -4466,11 +4466,7 @@ class FinanceController extends AdminController {
         $this->data['amount']            = '';
         $this->data['statusid']         = '';
         
-        $where = array(
-          'vocher_status'       =>1,  
-          'fn_account_type_id'  =>1  
-        );
-        $this->data['result'] =$this->FinanceModel->search_date_range_limit($where);
+        $this->data['result'] =$this->FinanceModel->search_date_range_limit(array('vocher_status'=>1,'fn_account_type_id'=>1));
         
         if($this->input->post('search')):
            
@@ -4488,11 +4484,12 @@ class FinanceController extends AdminController {
             $amount                     = $this->input->post('amount');
             $vocher_status              = $this->input->post('voucher_status');
             
-            $where                      =  '';
-            $processdate                =  '';
-            $payDate                    =  '';
-            $like                       =  '';
-             $deposit_amount            = '';
+//            $where['sfn_account_type_id']    =  '1';
+            $where['fn_account_type_id']    =  '1';
+            $processdate                    =  '';
+            $payDate                        =  '';
+            $like                           =  '';
+            $deposit_amount                 =  '';
             
              
             if($from_date):

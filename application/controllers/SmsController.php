@@ -1376,7 +1376,7 @@ class SmsController extends AdminController {
             redirect('admin/admin_home','refresh');
            
          endif;
-        $this->data['page']         = 'sms/staff_sms';
+        $this->data['page']         = 'sms/staff/staff_sms';
         $this->data['page_header']  = 'Staff SMS';
         $this->data['page_title']   = 'Staff SMS | ECMS';
         $this->load->view('common/common',$this->data); 
