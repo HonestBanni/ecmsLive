@@ -4786,6 +4786,7 @@ class HostelController extends AdminController {
         $this->data['admission_in']     = $this->CRUDModel->dropDown('reserved_seat', 'Admission In', 'rseat_id', 'name');
         $this->data['section']          = $this->CRUDModel->dropDown('sections', 'Section', 'sec_id', 'name',array('status'=>'On'));
         
+         
         
         $where                          = "";
         $this->data['student_id']       = ""; 
@@ -4800,6 +4801,7 @@ class HostelController extends AdminController {
         $this->data['college_no']       = "";
         $this->data['admission_in_id']  = "";
         $this->data['sectionId']        = "";
+        $this->data['statuss_id']       = "";
         
         
         if($this->input->post('search')): 
@@ -4815,10 +4817,15 @@ class HostelController extends AdminController {
             $college_no         = $this->input->post('college_no');
             $admission_in       = $this->input->post('admission_in');
             $section            = $this->input->post('section');
+            $statuss            = $this->input->post('statuss');
         
             $where['hostel_status.hostel_status_id']    = '1'; 
-            $where['student_status.s_status_id']        = '5'; 
+            // $where['student_status.s_status_id']        = '5'; 
             
+        if(!empty($statuss)):
+            $where['student_status.s_status_id'] = $statuss;
+            $this->data['statuss_id']           = $statuss;
+        endif;
         if(!empty($student_id)):
             $where['student_record.student_id'] = $student_id;
             $this->data['student_id'] =$student_id;
@@ -4950,6 +4957,7 @@ class HostelController extends AdminController {
         $this->data['room_id']          = ""; 
         $this->data['college_no']       = "";
         $this->data['admission_in_id']  = "";
+        $this->data['statuss_id']       = "";
         
             $admission_in      = $this->input->post('admission_in');
             $shift_id           = $this->input->post('shift_id');
@@ -4963,9 +4971,15 @@ class HostelController extends AdminController {
             $h_batch_id         = $this->input->post('h_batch_id');
             $college_no         = $this->input->post('college_no');
              $section            = $this->input->post('section');
-           $where['hostel_status.hostel_status_id']    = '1'; 
-            $where['student_status.s_status_id']        = '5'; 
+             $statuss            = $this->input->post('statuss');
+        
+            $where['hostel_status.hostel_status_id']    = '1'; 
+            // $where['student_status.s_status_id']        = '5'; 
             
+        if(!empty($statuss)):
+            $where['student_status.s_status_id'] = $statuss;
+            $this->data['statuss_id']           = $statuss;
+        endif;
         if(!empty($student_id)):
             $where['student_record.student_id'] = $student_id;
             $this->data['student_id'] =$student_id;

@@ -26,10 +26,29 @@ class TestController extends AdminController {
              $this->load->model('CRUDModel');
           }
           
-          public function index(){
-                        $this->db->join('student_record','student_record.student_id=fee_challan.fc_student_id');
-             $query =   $this->db->get_where('fee_challan',array('fc_ch_status_id'=>2,'s_status_id'=>1,'programe_id'=>'1'))->result();
-             
+          public function change_admission_date(){
+                        // $this->db->join('student_record','student_record.student_id=fee_challan.fc_student_id');
+             $query =   $this->db->get_where('student_record',array('batch_id'=>'74','s_status_id'=>'9','admission_date'=>'1970-01-01','programe_id'=>'1'))->result();
+            //  $query =   $this->db->get_where('fee_challan',array('fc_ch_status_id'=>2,'s_status_id'=>1,'batch_id'=>'92','programe_id'=>'1'))->result();
+           
+             if($query):
+                foreach($query as $row):
+
+                    $where = array(
+                        'fc_student_id'     => $row->student_id,
+                        'fc_ch_status_id'   => '2',
+                    );
+
+                                $this->db->order_by('fc_challan_id','asc');
+                  $fee_info =   $this->db->get_where('fee_challan',$where)->row();
+                    //    $this->CRUDModel->update('student_record',
+                    //             array('admission_date'=>date('Y-m-d',strtotime($fee_info->fc_paiddate))),
+                    //             array('student_id'=>$row->student_id)
+                    // );
+                   
+                endforeach;
+
+             endif;
              echo '<pre>';print_r($query);die;
               
           }

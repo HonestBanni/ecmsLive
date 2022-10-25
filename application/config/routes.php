@@ -178,10 +178,22 @@ $route['ShowSubjectAllottment']         = 'DropdownController/show_subjct_allott
 
 
 
-$route['ArtsSubject1st']                = 'SubjectAllottmentController/arts_students_1st';
-$route['AssignSubjects1st']             = 'SubjectAllottmentController/assign_arts_subjects_1st';
-$route['AssignSubjects1st/:num/:num']   = 'SubjectAllottmentController/assign_arts_subjects_1st/:num/:num';
-$route['ArtSubject1st/:num']            = 'SubjectAllottmentController/arts_students_1st/:num';
+$route['ArtsSubject1st']                    = 'SubjectAllottmentController/arts_students_1st';
+$route['AssignSubjects1st']                 = 'SubjectAllottmentController/assign_arts_subjects_1st';
+$route['AssignSubjects1st/:num/:num']       = 'SubjectAllottmentController/assign_arts_subjects_1st/:num/:num';
+$route['StudentGroups1st']                  = 'admin/student_group_inter_1st';
+$route['UpdateStudentGroups1st']            = 'admin/update_group_inter_1st';
+$route['UpdateStudentGroupSingle1st/:num']  = 'admin/update_student_by_group_1st/:num';
+$route['PracticalGroups1st']                = 'AttendanceController/practical_group_inter_1st';
+
+
+$route['ArtsSubject2nd']                    = 'SubjectAllottmentController/arts_students_2nd';
+$route['AssignSubjects2nd']                 = 'SubjectAllottmentController/assign_arts_subjects_2nd';
+$route['AssignSubjects2nd/:num/:num']       = 'SubjectAllottmentController/assign_arts_subjects_2nd/:num/:num';
+$route['StudentGroups2nd']                  = 'admin/student_group_inter_2nd';
+$route['UpdateStudentGroups2nd']            = 'admin/update_group_inter_2nd';
+$route['UpdateStudentGroupSingle2nd/:num']  = 'admin/update_student_by_group_2nd/:num';
+$route['PracticalGroups2nd']                = 'AttendanceController/practical_group_inter_2nd';
 
 
 /***********************
@@ -1350,5 +1362,12 @@ $route['Attendance/List/Percentage/:any/:num/:num']          = 'Attendance/Allot
 $route['Attendance/List/Percentage/:any/:num/:num/:num']     = 'Attendance/Allotted/Group/ReportsController/teacher_alloted_groups_details';
 
 
+$route['Attendance/Setup/TimeTable']                    = 'Attendance/Setup/TimeTable/SetupController/index';
+$route['Attendance/Setup/TimeTable/Create']             = 'Attendance/Setup/TimeTable/SetupController/create';
+$route['Attendance/Setup/TimeTable/Show']               = 'Attendance/Setup/TimeTable/SetupController/show';
+$route['Attendance/Setup/TimeTable/Update/:num']        = 'Attendance/Setup/TimeTable/SetupController/update/:num';
+$route['Attendance/Setup/TimeTable/Delete/:num']        = 'Attendance/Setup/TimeTable/SetupController/delete/:num';
 
 
+$route['AutoComplete/Employee/Teacher/Serving']         = 'DropdownController/auto_employee_teachers_serving';
+$route['AutoComplete/Sections']                         = 'DropdownController/auto_section_active';

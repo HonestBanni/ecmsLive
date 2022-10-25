@@ -171,9 +171,9 @@
 
 
                                     if($subject_checks):
-                                        echo '<a class="btn btn-success btn-sm" href="AssignSubjects1st/'.$rec->student_id.'/'.$rec->sub_pro_id.'">Update Subjects</a>';
+                                        echo '<a class="btn btn-success btn-sm" href="AssignSubjects2nd/'.$rec->student_id.'/'.$rec->sub_pro_id.'">Update Subjects</a>';
                                     else:
-                                        echo '<a class="btn btn-primary btn-sm" href="AssignSubjects1st/'.$rec->student_id.'/'.$rec->sub_pro_id.'">Assign Subjects</a>';
+                                        echo '<a class="btn btn-primary btn-sm" href="AssignSubjects2nd/'.$rec->student_id.'/'.$rec->sub_pro_id.'">Assign Subjects</a>';
                                     endif;
 
                             echo '</td></tr>';    

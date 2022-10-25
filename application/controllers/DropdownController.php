@@ -25,7 +25,7 @@ class DropdownController extends AdminController {
     public function __construct() {
              parent::__construct();
              $this->userInfo = json_decode(json_encode($this->getUser()), FALSE);
- 
+             $this->load->model('AttendanceModel');
           }
           
           //Hostel Student Auto compelete 
@@ -1411,6 +1411,122 @@ public function getSection(){
             }
     }
     
+     public function group_allotment_inter_1st(){ 
+        $term = $this->input->get('term');
+        $where = array(
+            's_status_id'       => 5,
+            'flag'              => 0,
+            'programe_id'       => 1
+        );
+        
+        if( $term == ''):  
+            $result_set = $this->DropdownModel->group_allotment_inter_1st($where, array(), 'sub_pro_id', array(1,2,4,5));
+            $data_array = array();
+
+            foreach ($result_set as $row_set):
+                $data_array[]   = array( 
+                    'value'     =>$row_set->student_name.'('.$row_set->college_no.')',
+                    'label'     =>$row_set->student_name.'('.$row_set->college_no.')',
+                    'id'        =>$row_set->student_id,
+                    'college_no' =>$row_set->college_no
+                );  
+            endforeach;
+
+            $matches = array();
+
+            foreach($data_array as $data_row):
+                $data_row['value']  = $data_row['value'];
+                $data_row['id']     = $data_row['id'];
+                $data_row['label']  = "{$data_row['label']}"; 
+                $matches[]          = $data_row;
+            endforeach;
+            $matches = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            
+        elseif($term != ''):
+            
+            $like   = $term;
+            $result_set = $this->DropdownModel->group_allotment_inter_1st($where, $like, 'sub_pro_id', array(1,2,4,5));
+            $labels          = array();
+            foreach ($result_set as $row_set):
+                $labels[]        = array( 
+                    'value' => $row_set->student_name.'('.$row_set->college_no.')',
+                    'label' => $row_set->student_name.'('.$row_set->college_no.')',
+                    'id'    => $row_set->student_id,
+                    'college_no' => $row_set->college_no
+                );
+            endforeach;
+            $matches = array();
+            foreach($labels as $lbl_row){
+                $lbl_row['value']   = $lbl_row['value'];
+                $lbl_row['id']      = $lbl_row['id'];
+                $lbl_row['label']   = "{$lbl_row['label']}"; 
+                $matches[]          = $lbl_row;
+            }
+        $matches = array_slice($matches, 0, 10);
+        echo  json_encode($matches); 
+        
+        endif;
+    }
+    
+     public function group_allotment_inter_2nd(){ 
+        $term = $this->input->get('term');
+        $where = array(
+            's_status_id'   => 5,
+            'flag'          => 0,
+            'programe_id'   => 1
+        );
+        
+        if( $term == ''):  
+            $result_set = $this->DropdownModel->group_allotment_inter_1st($where, array(), 'sub_pro_id', array(24,25,26,27));
+            $data_array = array();
+
+            foreach ($result_set as $row_set):
+                $data_array[]   = array( 
+                    'value'     =>$row_set->student_name.'('.$row_set->college_no.')',
+                    'label'     =>$row_set->student_name.'('.$row_set->college_no.')',
+                    'id'        =>$row_set->student_id,
+                    'college_no' =>$row_set->college_no
+                );  
+            endforeach;
+
+            $matches = array();
+
+            foreach($data_array as $data_row):
+                $data_row['value']  = $data_row['value'];
+                $data_row['id']     = $data_row['id'];
+                $data_row['label']  = "{$data_row['label']}"; 
+                $matches[]          = $data_row;
+            endforeach;
+            $matches = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            
+        elseif($term != ''):
+            
+            $like   = $term;
+            $result_set = $this->DropdownModel->group_allotment_inter_1st($where, $like, 'sub_pro_id', array(24,25,26,27));
+            $labels          = array();
+            foreach ($result_set as $row_set):
+                $labels[]        = array( 
+                    'value' => $row_set->student_name.'('.$row_set->college_no.')',
+                    'label' => $row_set->student_name.'('.$row_set->college_no.')',
+                    'id'    => $row_set->student_id,
+                    'college_no' => $row_set->college_no
+                );
+            endforeach;
+            $matches = array();
+            foreach($labels as $lbl_row){
+                $lbl_row['value']   = $lbl_row['value'];
+                $lbl_row['id']      = $lbl_row['id'];
+                $lbl_row['label']   = "{$lbl_row['label']}"; 
+                $matches[]          = $lbl_row;
+            }
+        $matches = array_slice($matches, 0, 10);
+        echo  json_encode($matches); 
+        
+        endif;
+    }
+    
     
      public function hr_contract_type(){
         
@@ -1421,7 +1537,70 @@ public function getSection(){
                echo '<option value="'.$secRow->contract_type_id.'">'.$secRow->title.'</option>';
         endforeach;
     }
-
+    public function auto_section_active(){ 
+        
+        $sections = $this->input->post('sections'); 
+        
+            $return = array();
+            if(isset($sections) && !empty($sections)):
+                
+            $result_set    = $this->DropdownModel->auto_section_active('sections');
+            
+            foreach ($result_set as $row_set) {
+                $return[]   = array( 
+                    'value' => $row_set->name,
+                    'label' => $row_set->name,
+                    'id'    => $row_set->sec_id
+                );  
+            }
+     
+            else:
+                $like               = array('name'=>$sections);
+                $result_set         = $this->DropdownModel->auto_section_active('sections',$like);
+                foreach ($result_set as $row_set) {
+                $return[]        = array( 
+                      'value'=>$row_set->name,
+                      'label'=>$row_set->name,
+                      'id'=>$row_set->sec_id
+                        );
+                }
+           endif;
+            $return                = array_slice($return, 0, 20);
+            echo  json_encode($return); 
+        }
+    public function auto_employee_teachers_serving(){ 
+          $employee_name = $this->input->post('employee_name');
+          
+          $return_array          = array();
+           if( $employee_name == ''):   
+                $result_set             = $this->AttendanceModel->getdesig('hr_emp_record');
+                    foreach ($result_set as $row_set) {
+                    $return_array[]     = array( 
+                        'value'         => $row_set->emp_name.'('.$row_set->designation.')',
+                        'label'         => $row_set->emp_name.'('.$row_set->designation.')',
+                        'id'            => $row_set->emp_id
+                    );  
+            }
+           
+           else:
+                $like       = array('emp_name'=>$employee_name);
+                $result_set = $this->AttendanceModel->getdesig('hr_emp_record',$like);
+            
+            foreach ($result_set as $row_set) {
+            $return_array[]        = array( 
+                  'value'=>$row_set->emp_name.'('.$row_set->designation.')',
+                    'label'=>$row_set->emp_name.'('.$row_set->designation.')',
+                    'id'=>$row_set->emp_id
+                    );
+            } 
+//            echo  json_encode($matches); 
+            endif;
+              
+             echo  json_encode(array_slice($return_array, 0, 10)); 
+    }
+    
+    
+    
     }
 
 

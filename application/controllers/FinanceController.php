@@ -372,7 +372,7 @@ class FinanceController extends AdminController {
             $coa_parent_id      = $this->input->post('coa_parent_id');
             $coa_id_type        = $this->input->post('coa_id_type');
             $result             = $this->CRUDModel->get_where_result('fn_coa_master_child',array('fn_coa_m_pId'=>$coa_parent_id,'fn_account_type_id'=>$coa_id_type,'fn_coa_m_status'=>1));
-               echo '<option>Select Head</option>';
+               echo '<option value="" >Select Head</option>';
                 foreach($result as $row):
                     echo '<option value="'.$row->fn_coa_m_cId.'">'.$row->fn_coa_m_title.'('.$row->fn_coa_m_code.')</option>';
                 endforeach;

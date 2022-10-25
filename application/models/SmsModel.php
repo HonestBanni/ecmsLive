@@ -344,7 +344,8 @@ class SmsModel extends CI_Model
                         prospectus_batch.batch_name,
                     ');
                 $this->db->join('applicant_edu_detail','applicant_edu_detail.student_id=student_record.student_id','left outer');     
-                $this->db->join('student_group_allotment','student_group_allotment.student_id=student_record.student_id','left outer');
+                // $this->db->join('student_group_allotment','student_group_allotment.student_id=student_record.student_id','left outer');
+                $this->db->join('student_group_allotment','student_group_allotment.student_id=student_record.student_id');
                 $this->db->join('sections','sections.sec_id=student_group_allotment.section_id','left outer');
                 $this->db->join('programes_info','programes_info.programe_id=student_record.programe_id');
                 $this->db->join('sub_programes','sub_programes.sub_pro_id=student_record.sub_pro_id');
@@ -406,8 +407,8 @@ class SmsModel extends CI_Model
                 $fy_id = $this->db->get_where('whitecard_financial_year',array('status'=>1))->row();
                 $time = strtotime($fy_id->year_start);
                     if($classSubjects):
-                        $netPresent = '';
-                        $netTotal   = '';
+                        $netPresent     = '';
+                        $netTotal       = '';
                         foreach($classSubjects as $rowCS):
                          $GrandTotal = 0;
                          $granPresent = 0;
@@ -421,7 +422,7 @@ class SmsModel extends CI_Model
 
                                     $where = array(
                                         'subject_id'                => $rowCS->subject_id,
-                                        'sec_id'                    => $stdRow->section_id,
+                                        // 'sec_id'                    => $stdRow->section_id,
                                         'student_id'                =>$result->student_id,
                                         'month(attendance_date)'    =>$month,
                                         'year(attendance_date)'     =>$year,
@@ -464,12 +465,12 @@ class SmsModel extends CI_Model
                             $netTotal += $GrandTotal;
 
                         endforeach;
-                    if($netPresent):
+                    if($netTotal):
 
 
-                                    $gPresent       = $netPresent;
-                                    $Persantage       = ($netPresent/$netTotal)*100;
-                                    $gAbsent        =   $netTotal-$netPresent;
+                        $gPresent       = $netPresent;
+                        $Persantage       = ($netPresent/$netTotal)*100;
+                        $gAbsent        =   $netTotal-$netPresent;
 
                        else:
                         $gPresent       = '0';

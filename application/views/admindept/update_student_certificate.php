@@ -285,13 +285,13 @@ color:red;
                 <label for="usr">Leaving Date (<small>DD-MM-YYYY</small>):</label>
                 <?php
                 $ldate = $result->leaving_date;
-                if($ldate === '0000-00-00' || $ldate == '1970-01-01' || $ldate == 'NULL'){
+                if($ldate == '0000-00-00' || $ldate == '1970-01-01' || $ldate == 'NULL'){
                     $ldate = '';
                     } else {
                     $ldate = date("d-m-Y", strtotime($ldate));
                     }
             ?>
-                <input type="text" name="leaving_date" value="<?php echo $ldate; ?>" class="form-control date_format_d_m_yy">      
+                <input type="text" name="leaving_date" value="30-04-2022" class="form-control date_format_d_m_yy">      
                 </div>    
     <div class="form-group col-md-8">
         <?php

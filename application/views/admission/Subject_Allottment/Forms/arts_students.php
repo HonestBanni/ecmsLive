@@ -210,7 +210,7 @@
 
                                     if($subject_checks):
                                         echo '<a class="btn btn-success btn-sm" href="admin/student_updassign_subjects/'.$rec->student_id.'/'.$rec->sub_pro_id.'">Update Subjects</a>';
-                                        else:
+                                    else:
                                         echo '<a class="btn btn-primery btn-sm" href="admin/student_assign_subjects/'.$rec->student_id.'/'.$rec->sub_pro_id.'">Assign Subjects</a>';
                                     endif;
 

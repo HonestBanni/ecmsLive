@@ -529,17 +529,21 @@ public function daily_performance_report()
     {
         $session = $this->session->all_userdata();
         $user_id =$session['userData']['user_id'];
+        
         $department_id = array('department_id'=>11, 'emp_status_id'=>1);
         $this->data['emp'] = $this->CRUDModel->dropDown('hr_emp_record', ' Select Employee ', 'emp_id', 'emp_name',$department_id);
-           $this->data['emp_id'] = ""; 
-            $this->data['from_date'] = ""; 
-            $this->data['to_date'] = ""; 
+        
+        $this->data['emp_id'] = ""; 
+        $this->data['from_date'] = ""; 
+        $this->data['to_date'] = "";
+        
         if($this->input->post('search')): 
             $emp_id = $this->input->post('emp_id');
             $from_date = date('Y-m-d', strtotime($this->input->post('from_date')));
             $to_date = date('Y-m-d', strtotime($this->input->post('to_date')));
             
-            $where = "";
+        $where = "";
+        
         if(!empty($emp_id)):
                 $where['emp_id'] = $emp_id;
                 $this->data['emp_id'] =$emp_id;
@@ -550,10 +554,12 @@ public function daily_performance_report()
         if(!empty($to_date)):
                 $this->data['to_date'] =$to_date;
         endif;
+        
             $this->data['result'] = $this->LibraryModel->getBooks_List($where,$this->data['from_date'],$this->data['to_date']);
         else:
             $this->data['result'] = $this->LibraryModel->getbookRecord($user_id);
         endif;
+        
         $this->data['page_title']   = 'Daily Performance Report | ECMS';
         $this->data['page']         = 'library/daily_performance_report';
         $this->load->view('common/common',$this->data);
@@ -929,23 +935,27 @@ public function daily_performance_report()
 //        $this->load->view('common/common',$this->data);
 //    }
     
-public function books_record()
-    {
-           $where = '';
-            $like = '';
-            $this->data['book_id'] = '';   
-            $this->data['author_name'] = '';
-            $this->data['subject_name'] = '';
-            $this->data['accession_from'] = '';
-            $this->data['old_accession'] = '';
-            $this->data['book_category'] = '';
+    public function books_record(){
+        $where  = array();
+        $like   = array();
+        $this->data['book_id']      = '';   
+        $this->data['author_name']  = '';
+        $this->data['subject_name'] = '';
+        $this->data['accession_from'] = '';
+        $this->data['old_accession'] = '';
+        $this->data['book_category'] = '';
+        
+        $this->data['book_status'] = $this->CRUDModel->dropDown('lib_book_availability_status', 'Book Status', 'availability_status_id', 'title', '', array('column'=>'title','order'=>'asc'));
+        
         if($this->input->post()):
-            $book_id   =  $this->input->post('book_id');      
-            $author_name =  $this->input->post('author_name');   
-            $subject_name =  $this->input->post('subject_name');   
+            $book_id        =  $this->input->post('book_id');      
+            $author_name    =  $this->input->post('author_name');   
+            $subject_name   =  $this->input->post('subject_name');   
             $accession_from =  $this->input->post('accession_from');   
-            $old_accession =  $this->input->post('old_accession'); 
-            $book_category =  $this->input->post('book_category_id'); 
+            $old_accession  =  $this->input->post('old_accession'); 
+            $book_category  =  $this->input->post('book_category_id'); 
+            $verify_status  =  $this->input->post('verified_status'); 
+            $book_status    =  $this->input->post('book_status'); 
             
             if(!empty($book_id)):
                 $where['lib_books_record.book_id'] = $book_id;
@@ -975,8 +985,14 @@ public function books_record()
                 $where['lib_book_code.old_accession_number'] = $old_accession;
                 $this->data['old_accession'] =$old_accession;
             endif;
+            if(!empty($verify_status)):
+                $where['lib_books_record.book_verified'] = $verify_status;
+            endif;
+            if(!empty($book_status)):
+                $where['lib_book_code.book_availablity_status_id'] = $book_status;
+            endif;
             $this->data['books'] = $this->LibraryModel->searchbooksResults('lib_book_code',$where,$like);
-            else:
+        else:
             $config['base_url']         = base_url('LibraryController/books_record');
             $config['total_rows']       = count($this->LibraryModel->view_bookRecord());  
             $config['per_page']         = 50;
@@ -1005,47 +1021,49 @@ public function books_record()
             $this->data['pages']        = $this->pagination->create_links();
             $custom['column']    ='emp_id';
             $custom['order']     ='desc';          
-        $this->data['books']=$this->LibraryModel->viewBookPg($config['per_page'], $page,null,$custom);
+            $this->data['books']=$this->LibraryModel->viewBookPg($config['per_page'], $page,null,$custom);
             $this->data['count']     =$config['total_rows']; 
-            endif;
-if($this->input->post('export')):
-                $this->load->library('excel');
-                $this->excel->setActiveSheetIndex(0);
-                $this->excel->getActiveSheet()->setTitle('Library Books Record');
+        endif;
         
-                $this->excel->getActiveSheet()->setCellValue('A1', 'New Accession #');          
-                $this->excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(16);
-                
-                $this->excel->getActiveSheet()->setCellValue('B1','Old Accession #');
-                $this->excel->getActiveSheet()->getStyle('B1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('B1')->getFont()->setSize(16);
-                           
-                $this->excel->getActiveSheet()->setCellValue('C1', 'Book Title');
-                $this->excel->getActiveSheet()->getStyle('C1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('C1')->getFont()->setSize(16);
-        
-                $this->excel->getActiveSheet()->setCellValue('D1', 'Sub Book Title');
-                $this->excel->getActiveSheet()->getStyle('D1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('D1')->getFont()->setSize(16);
+        if($this->input->post('export')):
             
-                $this->excel->getActiveSheet()->setCellValue('E1', 'ISBN #');
-                $this->excel->getActiveSheet()->getStyle('E1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('E1')->getFont()->setSize(16);
-        
-                $this->excel->getActiveSheet()->setCellValue('F1', 'Author Name');
-                $this->excel->getActiveSheet()->getStyle('F1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('F1')->getFont()->setSize(16);
+            $this->load->library('excel');
+            $this->excel->setActiveSheetIndex(0);
+            $this->excel->getActiveSheet()->setTitle('Library Books Record');
 
-                $this->excel->getActiveSheet()->setCellValue('G1', 'Book Status');
-                $this->excel->getActiveSheet()->getStyle('G1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('G1')->getFont()->setSize(16);
+            $this->excel->getActiveSheet()->setCellValue('A1', 'New Accession #');          
+            $this->excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('B1','Old Accession #');
+            $this->excel->getActiveSheet()->getStyle('B1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('B1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('C1', 'Book Title');
+            $this->excel->getActiveSheet()->getStyle('C1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('C1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('D1', 'Sub Book Title');
+            $this->excel->getActiveSheet()->getStyle('D1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('D1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('E1', 'ISBN #');
+            $this->excel->getActiveSheet()->getStyle('E1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('E1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('F1', 'Author Name');
+            $this->excel->getActiveSheet()->getStyle('F1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('F1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('G1', 'Book Status');
+            $this->excel->getActiveSheet()->getStyle('G1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('G1')->getFont()->setSize(16);
     
             for($col = ord('A'); $col <= ord('G'); $col++){
                 $this->excel->getActiveSheet()->getColumnDimension(chr($col))->setAutoSize(true);
                 $this->excel->getActiveSheet()->getStyle(chr($col))->getFont()->setSize(10);               
                 $this->excel->getActiveSheet()->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-                }
+            }
                 
                     
             $book_id   =  $this->input->post('book_id');      
@@ -1054,9 +1072,11 @@ if($this->input->post('export')):
             $accession_from =  $this->input->post('accession_from');   
             $old_accession =  $this->input->post('old_accession'); 
             $book_category =  $this->input->post('book_category_id'); 
+            $verify_status  =  $this->input->post('verified_status'); 
+            $book_status    =  $this->input->post('book_status'); 
             
-            $where = '';
-            $like = '';
+            $where = array();
+            $like = array();
             $this->data['book_id'] = '';   
             $this->data['author_name'] = '';
             $this->data['subject_name'] = '';
@@ -1085,6 +1105,12 @@ if($this->input->post('export')):
             if(!empty($old_accession)):
                 $where['lib_book_code.old_accession_number'] = $old_accession;
                 $this->data['old_accession'] =$old_accession;
+            endif;
+            if(!empty($verify_status)):
+                $where['lib_books_record.book_verified'] = $verify_status;
+            endif;
+            if(!empty($book_status)):
+                $where['lib_book_code.book_availablity_status_id'] = $book_status;
             endif;
             $result = $this->LibraryModel->booksResults_excel('lib_book_code',$where,$like);
             $exceldata="";
@@ -1195,6 +1221,58 @@ if($this->input->post('export')):
         $this->data['page']         = 'library/view_book';
         $this->load->view('common/common',$this->data);
         
+    }
+    
+    public function verify_books(){
+        
+//        echo '<pre>'; print_r($this->input->post()); die;
+        $book_id = $this->input->post('book_id');
+        $status  = $this->input->post('status');
+        
+        if($status == 1): $v_slc = 'selected="selected"'; $u_slc = ''; else: $v_slc = ''; $u_slc = 'selected="selected"'; endif;
+        
+        echo '<div class="modal-body">
+            <section class="course-finder">
+                <div class="col-md-12 subject form-group">
+                    <p>&nbsp;</p>
+                    <label style="text-indent: 3px">Applicant Status<span style="color:red">*</span></label>
+                    <select class="form-control" name="status_val" id="status_val">
+                        <option '.$u_slc.' value="0">Unverified</option>
+                        <option '.$v_slc.' value="1">Verified</option>
+                    </select>
+                    <input type="hidden" name="bk_id" id="bk_id" class="form-control" value="'.$book_id.'">
+                    <br>
+               </div>
+            </section> 
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal" >Cancel</button>
+            <button type="button" class="btn btn-success saveStatus" >Save</button>
+        </div>';
+        
+        ?>
+        <script>
+            $(document).ready(function(){
+                $('.saveStatus').on('click', function(){
+                    $.ajax({
+                        'type'  : 'post',
+                        'url'   : 'LibraryController/verify_book_status',
+                        data    : { 'id' : $('#bk_id').val(), 'st' : $('#status_val').val() },
+                        success : function(response){
+                            console.log(response);
+                            window.location.reload();
+                        }
+                    });
+                });
+            });
+        </script>
+        <?php
+        
+    }
+    
+    public function verify_book_status(){
+//        echo '<pre>'; print_r($this->input->post()); die;
+        $this->CRUDModel->update('lib_books_record', array('book_verified' => $this->input->post('st')), array('book_id' => $this->input->post('id')));
     }
     
     public function search_old_accession()
@@ -1462,29 +1540,32 @@ if($this->input->post('export')):
         $this->load->view('common/common',$this->data); 
     }
     
-    public function add_issuance_book()
-    {
+    public function add_issuance_book(){
+        
         $session = $this->session->all_userdata();
         $user_id =$session['userData']['user_id'];
+        
         if($this->input->post()):
-            $student_id   = $this->input->post('student_id');
-            $book_id   = $this->input->post('book_id');
-            $accession_no  = $this->input->post('accession_no');
-            $form_Code  = $this->input->post('form_Code');
-            $where_check = array('student_id'=>$student_id);
+            $student_id     = $this->input->post('student_id');
+            $book_id        = $this->input->post('book_id');
+            $accession_no   = $this->input->post('accession_no');
+            $form_Code      = $this->input->post('form_Code');
+            $where_check    = array('student_id'=>$student_id);
             
             $check_std = $this->CRUDModel->get_wherein_row_order('lib_book_issuance_details', array('accession_no'=>$accession_no), 'availablity_status_id', array(1,3,4,6), 'serial_no', 'desc');
             $check_stf = $this->CRUDModel->get_wherein_row_order('lib_book_staff_issuance_details', array('accession_no'=>$accession_no), 'availablity_status_id', array(1,3,4,6), 'serial_no', 'desc');
+            
             if(empty($check_std) && empty($check_stf)):
                 $q = $this->CRUDModel->get_where_row('student_record',$where_check);
                 $book_rec = $this->LibraryModel->count_books('lib_book_issuance',array('student_record.student_id'=>$student_id,'lib_book_issuance_details.availablity_status_id'=>1));
                 $book_recdemo = $this->LibraryModel->countdemo_books('lib_book_issuance_details_demo',array('form_Code'=>$form_Code));
 
-                $total = "";
+                $total      = "";
                 $total_demo = "";
-                $gTotal = "";
-                $msg_n = "";
-                $msg ='';
+                $gTotal     = "";
+                $msg_n      = "";
+                $msg        = '';
+                
                 if(!empty($book_rec)):
                     $total = $book_rec->total_books;
                 endif;
@@ -1492,158 +1573,165 @@ if($this->input->post('export')):
                 if(!empty($book_recdemo)):
                     $total_demo = count($book_recdemo);
                 endif;
+                
                  $gTotal = $total + $total_demo;
+                 
                 if($q->programe_id == 1):
                     if($gTotal >= 2):
                         $msg_n = '<p style="color:red">Just Two Books are Allowed for FA/FSc Level<p/>';     
                     else:
                    // echo 'insert ';
                         $checked = array(
-                    'book_id' => $book_id,
-                    'accession_no' =>$accession_no,
-                    );
-                     $qry = $this->CRUDModel->get_where_row('lib_book_issuance_details_demo',$checked);
+                            'book_id' => $book_id,
+                            'accession_no' =>$accession_no,
+                        );
+                        $qry = $this->CRUDModel->get_where_row('lib_book_issuance_details_demo',$checked);
+                        
                         if($qry):
-                             $msg = '<p style="color:red">Sorry! This Book Already Exist in List..<p/>'; 
-                            else:  
+                            $msg = '<p style="color:red">Sorry! This Book Already Exist in List..<p/>'; 
+                        else:  
                             $data  = array(
                                 'book_id' => $book_id,
                                 'accession_no' =>$accession_no,
                                 'form_Code' =>$form_Code,
                                 'date' => date('Y-m-d'),
                                 'user_id' => $user_id
-                                );
+                            );
                             $this->CRUDModel->insert('lib_book_issuance_details_demo',$data);
                         endif;
-                      endif;
+                        
                     endif;
+                endif;
+                
                 if($q->programe_id != 1):
                     if($gTotal >= 3):
-                    $msg_n = '<p style="color:red">Just Three Books are Allowed for Degree / BS(Hons) Level<p/>';
+                        $msg_n = '<p style="color:red">Just Three Books are Allowed for Degree / BS(Hons) Level<p/>';
                     else:
                    // echo 'insert ';
                         $checked = array(
-                    'book_id' => $book_id,
-                    'accession_no' =>$accession_no,
-                    );
-                     $qry = $this->CRUDModel->get_where_row('lib_book_issuance_details_demo',$checked);
+                            'book_id' => $book_id,
+                            'accession_no' =>$accession_no,
+                        );
+                        $qry = $this->CRUDModel->get_where_row('lib_book_issuance_details_demo',$checked);
                         if($qry):
                              $msg = '<p style="color:red">Sorry! This Book Already Exist in List..<p/>'; 
-                            else:  
+                        else:  
                             $data  = array(
                                 'book_id' => $book_id,
                                 'accession_no' =>$accession_no,
                                 'form_Code' =>$form_Code,
                                 'date' => date('Y-m-d'),
                                 'user_id' => $user_id
-                                );
+                            );
                             $this->CRUDModel->insert('lib_book_issuance_details_demo',$data);
                         endif;
-                      endif;
                     endif;
-                else:
-                    
-                    $this->db->join('lib_book_issuance', 'lib_book_issuance.issuance_id=lib_book_issuance_details.issuance_id');
-                    $this->db->join('student_record', 'student_record.student_id=lib_book_issuance.student_id');
-                    $this->db->join('sub_programes', 'sub_programes.sub_pro_id=student_record.sub_pro_id');
-                    $this->db->SELECT('
-                        student_record.college_no,
-                        student_record.student_name,
-                        lib_book_issuance.issued_date,
-                        lib_book_issuance_details.availablity_status_id,
-                        sub_programes.name,
-                    ');
-                    $this->db->order_by('serial_no', 'desc');
-                    $get_std_iss = $this->db->get_where('lib_book_issuance_details', array('accession_no'=>$accession_no))->row();
-                    if(!empty($get_std_iss)):
-                        if($get_std_iss->availablity_status_id == '1'):
-                            echo '<div class="col-md-12">
-                                <p style="color:#d00;">This book is already issued.</p>
-                                <table cellpadding="0" cellspacing="0" border="0" class="table table-bordered display">
-                                    <tr>
-                                        <th>College No</th>
-                                        <th>Student Nama</th>
-                                        <th>Program</th>
-                                        <th>Issued Date No</th>
-                                    </tr>
-                                    <tr>
-                                        <td>'.$get_std_iss->college_no.'</td>
-                                        <td>'.$get_std_iss->student_name.'</td>
-                                        <td>'.$get_std_iss->name.'</td>
-                                        <td>'.date('d-m-Y', strtotime($get_stf_iss->issued_date)).'</td>
-                                    </tr>
-                                </table>
-                            </div>';
-                        else:
-                            $bk_status = $this->CRUDModel->get_where_row('lib_book_availability_status', array('availability_status_id'=> $get_std_iss->availablity_status_id));
-                            echo '<div class="col-md-12">
-                                <p style="color:#d00;">This book is '.$bk_status->title.'.</p>
-                            </div>';
-                        endif;
-                    endif;
-                        
-                    
-                    $this->db->join('lib_staff_book_issuance', 'lib_staff_book_issuance.iss_id=lib_book_staff_issuance_details.iss_id');
-                    $this->db->join('hr_emp_record', 'hr_emp_record.emp_id=lib_staff_book_issuance.emp_id');
-                    $this->db->join('department', 'department.department_id=hr_emp_record.department_id');
-                    $this->db->SELECT('
-                        hr_emp_record.emp_name,
-                        lib_staff_book_issuance.issued_date,
-                        lib_book_staff_issuance_details.availablity_status_id,
-                        department.title,
-                    ');
-                    $this->db->order_by('serial_no', 'desc');
-                    $get_stf_iss = $this->db->get_where('lib_book_staff_issuance_details', array('accession_no'=>$accession_no))->row();
-                    if(!empty($get_stf_iss)):
-                        if($get_stf_iss->availablity_status_id == '1'):
-                            echo '<div class="col-md-12">
-                                <p style="color:#d00;">This book is already issued.</p>
-                                <table cellpadding="0" cellspacing="0" border="0" class="table table-bordered display">
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Department</th>
-                                        <th>Issued Date</th>
-                                    </tr>
-                                    <tr>
-                                        <td>'.$get_stf_iss->emp_name.'</td>
-                                        <td>'.$get_stf_iss->title.'</td>
-                                        <td>'.date('d-m-Y', strtotime($get_stf_iss->issued_date)).'</td>
-                                    </tr>
-                                </table>
-                            </div>';
-                        else:
-                            $bk_status = $this->CRUDModel->get_where_row('lib_book_availability_status', array('availability_status_id'=> $get_stf_iss->availablity_status_id));
-                            echo '<div class="col-md-12">
-                                <p style="color:#d00;">This book is '.$bk_status->title.'.</p>
-                            </div>';
-                        endif;
-                    endif;
-                        
                 endif;
+            else:
+                    
+                $this->db->join('lib_book_issuance', 'lib_book_issuance.issuance_id=lib_book_issuance_details.issuance_id');
+                $this->db->join('student_record', 'student_record.student_id=lib_book_issuance.student_id');
+                $this->db->join('sub_programes', 'sub_programes.sub_pro_id=student_record.sub_pro_id');
+                $this->db->SELECT('
+                    student_record.college_no,
+                    student_record.student_name,
+                    lib_book_issuance.issued_date,
+                    lib_book_issuance_details.availablity_status_id,
+                    sub_programes.name,
+                ');
+                $this->db->order_by('serial_no', 'desc');
+                $get_std_iss = $this->db->get_where('lib_book_issuance_details', array('accession_no'=>$accession_no))->row();
+                    
+                if(!empty($get_std_iss)):
+                    if($get_std_iss->availablity_status_id == '1'):
+                        echo '<div class="col-md-12">
+                            <p style="color:#d00;">This book is already issued.</p>
+                            <table cellpadding="0" cellspacing="0" border="0" class="table table-bordered display">
+                                <tr>
+                                    <th>College No</th>
+                                    <th>Student Nama</th>
+                                    <th>Program</th>
+                                    <th>Issued Date No</th>
+                                </tr>
+                                <tr>
+                                    <td>'.$get_std_iss->college_no.'</td>
+                                    <td>'.$get_std_iss->student_name.'</td>
+                                    <td>'.$get_std_iss->name.'</td>
+                                    <td>'.date('d-m-Y', strtotime($get_stf_iss->issued_date)).'</td>
+                                </tr>
+                            </table>
+                        </div>';
+                    else:
+                        $bk_status = $this->CRUDModel->get_where_row('lib_book_availability_status', array('availability_status_id'=> $get_std_iss->availablity_status_id));
+                        echo '<div class="col-md-12">
+                            <p style="color:#d00;">This book is '.$bk_status->title.'.</p>
+                        </div>';
+                    endif;
+                endif;
+                        
+                    
+                $this->db->join('lib_staff_book_issuance', 'lib_staff_book_issuance.iss_id=lib_book_staff_issuance_details.iss_id');
+                $this->db->join('hr_emp_record', 'hr_emp_record.emp_id=lib_staff_book_issuance.emp_id');
+                $this->db->join('department', 'department.department_id=hr_emp_record.department_id');
+                $this->db->SELECT('
+                    hr_emp_record.emp_name,
+                    lib_staff_book_issuance.issued_date,
+                    lib_book_staff_issuance_details.availablity_status_id,
+                    department.title,
+                ');
+                $this->db->order_by('serial_no', 'desc');
+                $get_stf_iss = $this->db->get_where('lib_book_staff_issuance_details', array('accession_no'=>$accession_no))->row();
+                
+                if(!empty($get_stf_iss)):
+                    if($get_stf_iss->availablity_status_id == '1'):
+                        echo '<div class="col-md-12">
+                            <p style="color:#d00;">This book is already issued.</p>
+                            <table cellpadding="0" cellspacing="0" border="0" class="table table-bordered display">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Issued Date</th>
+                                </tr>
+                                <tr>
+                                    <td>'.$get_stf_iss->emp_name.'</td>
+                                    <td>'.$get_stf_iss->title.'</td>
+                                    <td>'.date('d-m-Y', strtotime($get_stf_iss->issued_date)).'</td>
+                                </tr>
+                            </table>
+                        </div>';
+                    else:
+                        $bk_status = $this->CRUDModel->get_where_row('lib_book_availability_status', array('availability_status_id'=> $get_stf_iss->availablity_status_id));
+                        echo '<div class="col-md-12">
+                            <p style="color:#d00;">This book is '.$bk_status->title.'.</p>
+                        </div>';
+                    endif;
+                endif;
+                        
+            endif;
             
-    $where = array('form_Code' =>$form_Code,'date' => date('Y-m-d'),'lib_book_issuance_details_demo.user_id' => $user_id);        
-    $result = $this->LibraryModel->getbooks_issuance($where);  
-    if($result):
-    echo $msg.$msg_n;    
-        echo '<table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped display">
-                    <thead>
-                        <tr>
-                            <th>Book Title</th>
-                            <th>Accesson Number</th>
-                            <th>Delete</th>
-                        </tr>
-                    </thead>
-                    <tbody>';        
-                        foreach($result as $eRow):
-                        echo '<tr id="'.$eRow->serial_no.'Delete">
-                                <td>'.$eRow->book_title.'</td>
-                                <td>'.$eRow->accession_no.'</td>                          
-                                <td><a href="javascript:void(0)" id="'.$eRow->serial_no.'" class="deleteIssu"><i class="fa fa-trash"></i></a></td>                          
-                           </tr>';                      
-                        endforeach;                        
-                        endif;                      
-                    echo '</tbody>
-                </table> ';
+        $where = array('form_Code' =>$form_Code,'date' => date('Y-m-d'),'lib_book_issuance_details_demo.user_id' => $user_id);        
+        $result = $this->LibraryModel->getbooks_issuance($where);  
+        if($result):
+            echo $msg.$msg_n;    
+            echo '<table cellpadding="0" cellspacing="0" border="0" class="table table-bordered table-striped display">
+                <thead>
+                    <tr>
+                        <th>Book Title</th>
+                        <th>Accesson Number</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>';        
+                    foreach($result as $eRow):
+                    echo '<tr id="'.$eRow->serial_no.'Delete">
+                            <td>'.$eRow->book_title.'</td>
+                            <td>'.$eRow->accession_no.'</td>                          
+                            <td><a href="javascript:void(0)" id="'.$eRow->serial_no.'" class="deleteIssu"><i class="fa fa-trash"></i></a></td>                          
+                       </tr>';                      
+                    endforeach;                        
+                    endif;                      
+                echo '</tbody>
+            </table> ';
         endif;
     ?>
         <script>
@@ -2663,8 +2751,10 @@ public function get_Studentsbook_issued(){
                 $issuedDate = date("d-m-Y", strtotime($issued_date));
                 $dueDate = date("d-m-Y", strtotime($due_date));
                 
-                $date1 = new DateTime($due_date);
-                $date2 = new DateTime(date('Y-m-d'));    
+                $earlier = new DateTime($urRow->due_date);
+                $later = new DateTime(date("Y-m-d"));
+                $abs_diff = $later->diff($earlier)->format("%a"); //3die;
+                $fine = $abs_diff*5;
                     
              $sn++;    
              echo '<tr>
@@ -2673,12 +2763,13 @@ public function get_Studentsbook_issued(){
                     <td>'.$urRow->accession_no.'</td>
                     <td>'.$issuedDate.'</td>
                     <td>'.$dueDate.'</td>
-                    <td>';if($date2 > $date1):
-                    $interval = $date2->diff($date1);
-                    $days_fine = $interval->d * 5;
-                    echo "<strong style='color:red'>".$interval->d." days ("."Rs.".$days_fine. ")</strong>";
-                else: echo '';
-                endif; echo '</td>';
+                    <td>';
+                        if($fine != 0):
+                            echo "<strong style='color:red'>".$abs_diff." Days ("."Rs.".$fine. ")</strong>";
+                        else: 
+                            echo '';
+                        endif; 
+                echo '</td>';
                     echo '</tr>';    
             endforeach;
                 echo '</tbody>

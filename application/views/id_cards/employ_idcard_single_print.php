@@ -145,7 +145,7 @@ h1, h2,h3,h4,h5,h6 { margin: 0; padding: 0}
                                 </td>
                                 <td class="card_detail">
                                     <h2>'.$employ_name.'</h2>
-                                    <h5>College No. '.$emp_cnic.'</h5>
+                                    <h5>CNIC: '.$emp_cnic.'</h5>
                                     <h5 style="margin-bottom: 5px;">Designation: '.$emp_design.'</h5>
                                     <h5>Issue Date: '.$issue_date.'</h5>
                                     <h5>Expiry Date: <span style="color:#c00;">'.$expiry_date.'</span></h5>

@@ -484,6 +484,30 @@ class CRUDModel extends CI_Model{
 			return $data;
 		}
 	} 
+        function dropDown_where_in_order($table, $option=NULL, $value,$show,$column=NULL,$array=NULL,$where=NULL, $order=NULL)
+	{
+            
+                $this->db->where_in($column,$array);
+                if($where):
+                   $this->db->where($where); 
+                endif;
+                
+                $this->db->order_by($order,'asc');
+                $query = $this->db->get($table);
+		
+		if($query->num_rows() > 0) 
+		{
+                    if($option):
+                        $data[''] = $option;
+                    endif;
+			
+			foreach($query->result() as $row) 
+			{
+				$data[$row->$value] = $row->$show;
+			}
+			return $data;
+		}
+	} 
         function dropDown_where_not_in($table, $option=NULL, $value,$show,$column=NULL,$array=NULL,$where=NULL)
 	{
             

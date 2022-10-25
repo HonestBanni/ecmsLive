@@ -2261,11 +2261,14 @@ public function sub_program_a_level(){
         $session    = $this->session->all_userdata();
         $user_id    = $session['userData']['user_id'];
         $emp_id     = $session['userData']['emp_id'];
-        $where      = array('class_alloted.emp_id'=>$emp_id, 'class_alloted.flag'=>'1');
-        $subwhere   = array('class_alloted.emp_id'=>$emp_id, 'class_alloted.flag'=>'2');
+        $where      = array('class_alloted.emp_id'=>$emp_id, 'class_alloted.flag'=>'1', 'class_alloted.ca_merge_id'=>'0');
+        $subwhere   = array('class_alloted.emp_id'=>$emp_id, 'class_alloted.flag'=>'2', 'class_alloted.ca_merge_id'=>'0');
+        $merge_where    = array('class_alloted.emp_id' => $emp_id, 'class_alloted.ca_merge_id !=' => '0');
         
         $this->data['result']       = $this->AttendanceModel->get_alloted_sections('class_alloted',$where);
         $this->data['subjectbase']  = $this->AttendanceModel->get_alloted_subjects('class_alloted',$subwhere);
+        $this->data['emp_merg_ids'] = $this->CRUDModel->get_where_result('class_alloted', array('class_alloted.emp_id' => $emp_id));
+        $this->data['merged_show']  = $this->AttendanceModel->get_alloted_merged_group_by('class_alloted',$merge_where);
         
         $this->data['page_title']   = 'Monthly Test | ECMS';
         $this->data['page']         = 'attendance/monthly_test';
@@ -2298,6 +2301,93 @@ public function sub_program_a_level(){
         $this->data['count']       = $this->AttendanceModel->view_test_marks_list('monthly_test_details',$where);
         $this->data['page_title']   = 'Print Student Test Marks List | ECMS';
         $this->data['page']         = 'attendance/print_test_marks_list';
+        $this->load->view('common/common',$this->data);
+    }
+    
+    public function students_merged_monthly_marks(){  
+        $user_id    = $this->userInfo->user_id;
+        $this->data['merged_id']    = $this->uri->segment(3);
+        $this->data['subj_id']      = $this->uri->segment(4);
+        
+//        $where = array('student_subject_alloted.subject_id'=>$subject_id,'student_subject_alloted.section_id'=>$sec_id);
+//        $this->data['result'] = $this->AttendanceModel->get_students_subjectAtts('student_subject_alloted',$where);
+         $this->data['monthId']  = date("m",strtotime(date('d-m-y')));
+        $this->data['yearId']  = date("Y",strtotime(date('d-m-Y')));
+        
+        $this->data['month']     = $this->CRUDModel->dropDown('month', 'Select Month', 'mth_num', 'mth_title');
+        $this->data['year']      = $this->CRUDModel->dropDown('year', '', 'yr_num', 'yr_title');
+        
+        if($this->input->post()):
+            
+//        echo '<pre>'; print_r($this->input->post()); die;
+            $mergeId = $this->input->post('mergeId');
+            $merg_detail = $this->db->get_where('class_alloted',array('ca_merge_id'=>$mergeId))->result();
+//            echo '<pre>'; print_r($merg_detail); die;
+            foreach($merg_detail as $mRow):
+                
+                $class_id       = '';
+                $sec_id         = '';
+                $subject_id     = '';
+                $attendance_date = '';   
+                   
+                $class_id        = $mRow->class_id;
+                $sec_id          = $mRow->sec_id;
+                $subject_id      = $mRow->subject_id;
+                
+                $test_date  = $this->input->post('year').'-'.$this->input->post('month').'-'.date("d",strtotime(date('d-m-Y')));
+                $tdate      = $this->input->post('test_date');
+                $student_id = $this->input->post('student_id');
+                $cls_id     = $this->input->post('cls_id');
+                $tmarks     = $this->input->post('tmarks');
+                $omarks     = $this->input->post('omarks');
+                $month      = $this->input->post('month');
+                $year       =  $this->input->post('year');
+
+                $checked     = array(
+                    'class_id'          => $class_id,
+                    'month(test_date)'  => $month,
+                    'year(test_date)'   => $year
+                );
+                $qry = $this->CRUDModel->get_where_row('monthly_test',$checked);
+
+                if(!empty($qry)):
+                    $this->session->set_flashdata('msg', 'Sorry! Test Record Already Exist, if you want to update then go to "Monthly Test History" page');
+                    redirect('AttendanceController/monthly_test');
+                else:     
+                    
+                    foreach($student_id as $low=>$lkey):
+                        $return_arr[$cls_id[$low]][] = array(
+                            'student_id' => $student_id[$low],
+                            'obtain_id' => $omarks[$low]
+                        );
+                    endforeach;
+                    
+                    foreach($return_arr as $kow=>$key):
+                        $data  = array(
+                            'class_id'  => $kow,
+                            'test_date' => $test_date,
+                            'user_id'   => $user_id
+                         );
+                        if(isset($key) && !empty($key)):
+                            $test_id = $this->CRUDModel->insert('monthly_test',$data);
+                            foreach($key as $new_row):
+                                $test_data = array(
+                                    'test_id'   => $test_id,
+                                    'student_id' => $new_row['student_id'],
+                                    'tmarks'    => $tmarks,
+                                    'omarks'    => $new_row['obtain_id']
+                                );
+                                $this->CRUDModel->insert('monthly_test_details',$test_data);
+                            endforeach;
+                        endif;
+                    endforeach;
+                endif;
+            endforeach;
+            $this->session->set_flashdata('msg', 'Successfully Submitted.');
+            redirect('AttendanceController/monthly_test_history'); 
+        endif;
+        $this->data['page_title']   = 'Subject Base Test | ECMS';
+        $this->data['page']         = 'attendance/student_merged_monthly_marks';
         $this->load->view('common/common',$this->data);
     }
     
@@ -7746,8 +7836,8 @@ public function update_assign_practical_groups()
         $group_id     = $this->input->post('group_id');
         $attendance_date = $this->input->post('attendance_date');
         $checked = array(
-               'prac_class_id'=>$prac_class_id,
-               'attendance_date'=>$attendance_date
+               'prac_class_id'      => $prac_class_id,
+               'attendance_date'    => date('Y-m-d',strtotime($attendance_date))
             );
         $qry = $this->CRUDModel->get_where_row('practical_attendance',$checked);
         if($qry):
@@ -11404,7 +11494,8 @@ $this->data['result']       = $this->AttendanceModel->view_attendance('student_a
         $this->load->view('common/common',$this->data);
     }
     
-    public function exam_bs_history(){       
+    public function exam_bs_history(){  
+        
         $session = $this->session->all_userdata();
         $emp_id =$session['userData']['emp_id'];
         
@@ -11413,13 +11504,18 @@ $this->data['result']       = $this->AttendanceModel->view_attendance('student_a
         $test_date            =  $this->input->post('test_date');
 
         $where['class_alloted.emp_id'] = $emp_id;
+        $where['exb_class_status'] = 1;
+        
         $this->data['sec_id'] = '';
         $this->data['subject_id'] = '';
         $this->data['test_date'] = '';
-        $where = array(
-            'hr_emp_record.emp_id'=>$emp_id,
-            'exb_class_status'=>1
-        );
+        if($this->userInfo->user_id != '1'):
+            $where = array(
+                'hr_emp_record.emp_id'=>$emp_id
+            );
+        else:
+            $where = array();
+        endif;
 
         if(!empty($sec_id)):
             $where['sections.sec_id'] = $sec_id;
@@ -12525,6 +12621,432 @@ $this->data['result']       = $this->AttendanceModel->view_attendance('student_a
             
         endif;
         
+    }
+    
+    public function practical_group_inter_1st(){
+        
+	$like   = array();
+        $where  = array();
+        
+        $this->data['college_no']   = "";
+        $this->data['student_name'] = "";
+        $this->data['group_id']     = "";
+        
+        if($this->input->post('search')):
+            $college_no     =  $this->input->post('college_no');
+            $student_name   =  $this->input->post('student_name');
+            $group_id       =  $this->input->post('group_id');
+        
+            if(!empty($college_no)):
+                $where['student_record.college_no'] = $college_no;
+                $this->data['college_no'] = $college_no;
+            endif;
+            if(!empty($student_name)):
+                $like['student_name'] = $student_name;
+                $this->data['student_name'] = $student_name;
+            endif;
+            if(!empty($group_id)):
+                $where['group_id'] = $group_id;
+                $this->data['group_id'] =$group_id;
+            endif;
+            
+           $this->data['result'] = $this->AttendanceModel->get_practicalData_wherein($where, $like, 'practical_group.sub_pro_id', array(1,2,4));
+        endif;
+        
+        if($this->input->post('export')):    
+            $this->load->library('excel');
+            $this->excel->setActiveSheetIndex(0);
+            $this->excel->getActiveSheet()->setTitle('Teacher Base Subject');
+
+            $this->excel->getActiveSheet()->setCellValue('A1', 'College #');
+            $this->excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('B1', 'Student Name');
+            $this->excel->getActiveSheet()->getStyle('B1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('B1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('C1', 'Group Name');
+            $this->excel->getActiveSheet()->getStyle('C1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('C1')->getFont()->setSize(16);
+        
+            for($col = ord('A'); $col <= ord('C'); $col++){
+                $this->excel->getActiveSheet()->getColumnDimension(chr($col))->setAutoSize(true);
+                $this->excel->getActiveSheet()->getStyle(chr($col))->getFont()->setSize(12);
+                $this->excel->getActiveSheet()->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+            }
+            
+//            $student_id =  $this->input->post('student_id');
+//            $sec_id     =  $this->input->post('sec_id');
+//            $subject_id =  $this->input->post('subject_id');
+    
+            $like   = array();
+            $where  = array();
+            
+            $this->data['college_no']   = "";
+            $this->data['student_name'] = "";
+            $this->data['group_id']     = "";
+        
+            $college_no     =  $this->input->post('college_no');
+            $student_name   =  $this->input->post('student_name');
+            $group_id       =  $this->input->post('group_id');
+        
+            if(!empty($college_no)):
+                $where['college_no'] = $college_no;
+                $this->data['college_no'] = $college_no;
+            endif;
+            if(!empty($student_name)):
+                $like['student_name'] = $student_name;
+                $this->data['student_name'] = $student_name;
+            endif;
+            if(!empty($group_id)):
+                $where['group_id'] = $group_id;
+                $this->data['group_id'] =$group_id;
+            endif;
+            $result = $this->AttendanceModel->get_practicalData_excel($where,$like);
+                
+            $exceldata= array();
+            foreach ($result as $row){
+                $exceldata[] = $row;
+            }      
+            $this->excel->getActiveSheet()->fromArray($exceldata, null, 'A2');        
+            $filename='student_Practical_group.xls'; 
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Disposition: attachment;filename="'.$filename.'"');
+            header('Cache-Control: max-age=0'); 
+            $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');  
+            $objWriter->save('php://output');
+        endif;
+        
+        $this->data['page']     =   "admission/inter/practical_groups_1st";
+        $this->data['title']    =   'Practical Group Inter Level | ECMS';
+        $this->load->view('common/common',$this->data);        
+       
+    }
+    
+    public function auto_practicalgroup_1st(){
+        
+        $term = trim(strip_tags($_GET['term']));
+        
+            if( $term == ''){
+                
+            $result_set             = $this->CRUDModel->get_where_result('practical_group',array('status'=>'On'), 'sub_pro_id', array(1,2,4));
+            $makkah_hotels          = array();
+            foreach ($result_set as $row_set) {
+                $makkah_hotels[]   = array( 
+                    'value'=>$row_set->group_name,
+                    'label'=>$row_set->group_name,
+                    'prcId'=>$row_set->prac_group_id
+                );  
+            }
+            $matches = array();
+            foreach($makkah_hotels as $makkah_hotel) { 
+            $makkah_hotel['value']  = $makkah_hotel['value'];
+            $makkah_hotel['prcId']  = $makkah_hotel['prcId'];
+            $makkah_hotel['label']  = "{$makkah_hotel['label']}"; 
+            $matches[]              = $makkah_hotel; }
+            $matches                = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            }else if($term != ''){
+                
+            $like   = array('group_name'=>$term);
+                                      $this->db->where_in('sub_pro_id', array(1,2,4));
+                                      $this->db->where('status','On');
+                                      $this->db->like($like);
+            $result_set             = $this->db->get('practical_group')->result();
+            
+            $labels          = array();
+            foreach ($result_set as $row_set) {
+            $labels[]        = array( 
+                    'value'=>$row_set->group_name,
+                    'label'=>$row_set->group_name,
+                    'prcId'=>$row_set->prac_group_id
+                    );
+            }
+            $matches                = array();
+            foreach($labels as $makkah_hotel){
+            $makkah_hotel['value']  = $makkah_hotel['value'];
+            $makkah_hotel['prcId']  = $makkah_hotel['prcId'];
+            $makkah_hotel['label']  = "{$makkah_hotel['label']}"; 
+            $matches[]              = $makkah_hotel;
+            }
+            $matches                = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            }
+    }
+     
+    public function add_prac_group_1st(){
+        
+        if($this->input->post()):
+            $college_no      = $this->input->post('college_no');
+            $student_name      = $this->input->post('student_name');
+            $group_id      = $this->input->post('group_id');
+            $checked = array(
+               'college_no' =>$college_no
+            );
+            $qry = $this->CRUDModel->get_where_row('student_prac_group_allottment',$checked);
+            if($qry):
+                $this->session->set_flashdata('msg', 'Sorry! This College Number Already Exist');
+                redirect('AttendanceController/add_prac_group_1st');       
+            else:
+                $data       = array(
+                    'college_no' =>$college_no,
+                    'student_name' =>$student_name,
+                    'group_id' =>$group_id
+                );
+                $this->CRUDModel->insert('student_prac_group_allottment',$data);
+                redirect('PracticalGroups1st');
+            endif;
+        endif;
+        $this->data['page_title']  = 'Add Student Group | ECMS';
+        $this->data['page']        = 'admission/inter/add_student_group_practical_1st';
+        $this->load->view('common/common',$this->data);
+    }
+    
+    public function update_prac_group_1st($id)
+    {   
+        $id = $this->uri->segment(3);
+        if($this->input->post()):
+            $college_no      = $this->input->post('college_no');
+            $student_name      = $this->input->post('student_name');
+            $group_id      = $this->input->post('group_id');
+            $data       = array(
+                'college_no' =>$college_no,
+                'student_name' =>$student_name,
+                'group_id' =>$group_id
+            );
+            $where = array('student_prac_group_allottment.serial_no'=>$id);
+            $this->CRUDModel->update('student_prac_group_allottment',$data,$where);
+            $this->data['page_title']   = 'Update Student Group | ECMS';
+            redirect('PracticalGroups1st');
+        endif;
+        if($id):
+                $where = array('student_prac_group_allottment.serial_no'=>$id);
+                $this->data['result'] = $this->AttendanceModel->get_PracDataRow($where);
+                $this->data['page_title']  = 'Update Student Group | ECMS';
+                $this->data['page']        =  'admission/inter/update_student_group_practical_1st';
+                $this->load->view('common/common',$this->data);
+        endif;
+    }
+    
+    public function delete_prac_group_1st(){	    
+        $id    = $this->uri->segment(3);
+        $where = array('serial_no'=>$id);
+        $this->CRUDModel->deleteid('student_prac_group_allottment',$where);
+        redirect('PracticalGroups1st');
+    }
+    
+    public function practical_group_inter_2nd(){
+        
+	$like   = array();
+        $where  = array();
+        
+        $this->data['college_no']   = "";
+        $this->data['student_name'] = "";
+        $this->data['group_id']     = "";
+        
+        if($this->input->post('search')):
+            $college_no     =  $this->input->post('college_no');
+            $student_name   =  $this->input->post('student_name');
+            $group_id       =  $this->input->post('group_id');
+        
+            if(!empty($college_no)):
+                $where['student_record.college_no'] = $college_no;
+                $this->data['college_no'] = $college_no;
+            endif;
+            if(!empty($student_name)):
+                $like['student_name'] = $student_name;
+                $this->data['student_name'] = $student_name;
+            endif;
+            if(!empty($group_id)):
+                $where['group_id'] = $group_id;
+                $this->data['group_id'] =$group_id;
+            endif;
+            
+           $this->data['result'] = $this->AttendanceModel->get_practicalData_wherein($where, $like, 'practical_group.sub_pro_id', array(24,25,26));
+        endif;
+        
+        if($this->input->post('export')):    
+            $this->load->library('excel');
+            $this->excel->setActiveSheetIndex(0);
+            $this->excel->getActiveSheet()->setTitle('Teacher Base Subject');
+
+            $this->excel->getActiveSheet()->setCellValue('A1', 'College #');
+            $this->excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('B1', 'Student Name');
+            $this->excel->getActiveSheet()->getStyle('B1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('B1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('C1', 'Group Name');
+            $this->excel->getActiveSheet()->getStyle('C1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('C1')->getFont()->setSize(16);
+        
+            for($col = ord('A'); $col <= ord('C'); $col++){
+                $this->excel->getActiveSheet()->getColumnDimension(chr($col))->setAutoSize(true);
+                $this->excel->getActiveSheet()->getStyle(chr($col))->getFont()->setSize(12);
+                $this->excel->getActiveSheet()->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+            }
+            
+//            $student_id =  $this->input->post('student_id');
+//            $sec_id     =  $this->input->post('sec_id');
+//            $subject_id =  $this->input->post('subject_id');
+    
+            $like   = array();
+            $where  = array();
+            
+            $this->data['college_no']   = "";
+            $this->data['student_name'] = "";
+            $this->data['group_id']     = "";
+        
+            $college_no     =  $this->input->post('college_no');
+            $student_name   =  $this->input->post('student_name');
+            $group_id       =  $this->input->post('group_id');
+        
+            if(!empty($college_no)):
+                $where['college_no'] = $college_no;
+                $this->data['college_no'] = $college_no;
+            endif;
+            if(!empty($student_name)):
+                $like['student_name'] = $student_name;
+                $this->data['student_name'] = $student_name;
+            endif;
+            if(!empty($group_id)):
+                $where['group_id'] = $group_id;
+                $this->data['group_id'] =$group_id;
+            endif;
+            $result = $this->AttendanceModel->get_practicalData_excel($where,$like);
+                
+            $exceldata= array();
+            foreach ($result as $row){
+                $exceldata[] = $row;
+            }      
+            $this->excel->getActiveSheet()->fromArray($exceldata, null, 'A2');        
+            $filename='student_Practical_group.xls'; 
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Disposition: attachment;filename="'.$filename.'"');
+            header('Cache-Control: max-age=0'); 
+            $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');  
+            $objWriter->save('php://output');
+        endif;
+        
+        $this->data['page']     =   "admission/inter/practical_groups_2nd";
+        $this->data['title']    =   'Practical Group Inter Level | ECMS';
+        $this->load->view('common/common',$this->data);        
+       
+    }
+    
+    public function auto_practicalgroup_2nd(){
+        
+        $term = trim(strip_tags($_GET['term']));
+        
+            if( $term == ''){
+                
+            $result_set             = $this->CRUDModel->get_where_result('practical_group',array('status'=>'On'), 'sub_pro_id', array(24,25,26));
+            $makkah_hotels          = array();
+            foreach ($result_set as $row_set) {
+                $makkah_hotels[]   = array( 
+                    'value'=>$row_set->group_name,
+                    'label'=>$row_set->group_name,
+                    'prcId'=>$row_set->prac_group_id
+                );  
+            }
+            $matches = array();
+            foreach($makkah_hotels as $makkah_hotel) { 
+            $makkah_hotel['value']  = $makkah_hotel['value'];
+            $makkah_hotel['prcId']  = $makkah_hotel['prcId'];
+            $makkah_hotel['label']  = "{$makkah_hotel['label']}"; 
+            $matches[]              = $makkah_hotel; }
+            $matches                = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            }else if($term != ''){
+                
+            $like   = array('group_name'=>$term);
+                                      $this->db->where_in('sub_pro_id', array(24,25,26));
+                                      $this->db->where('status','On');
+                                      $this->db->like($like);
+            $result_set             = $this->db->get('practical_group')->result();
+            
+            $labels          = array();
+            foreach ($result_set as $row_set) {
+            $labels[]        = array( 
+                    'value'=>$row_set->group_name,
+                    'label'=>$row_set->group_name,
+                    'prcId'=>$row_set->prac_group_id
+                    );
+            }
+            $matches                = array();
+            foreach($labels as $makkah_hotel){
+            $makkah_hotel['value']  = $makkah_hotel['value'];
+            $makkah_hotel['prcId']  = $makkah_hotel['prcId'];
+            $makkah_hotel['label']  = "{$makkah_hotel['label']}"; 
+            $matches[]              = $makkah_hotel;
+            }
+            $matches                = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            }
+    }
+     
+    public function add_prac_group_2nd(){
+        
+        if($this->input->post()):
+            $college_no      = $this->input->post('college_no');
+            $student_name      = $this->input->post('student_name');
+            $group_id      = $this->input->post('group_id');
+            $checked = array(
+               'college_no' =>$college_no
+            );
+            $qry = $this->CRUDModel->get_where_row('student_prac_group_allottment',$checked);
+            if($qry):
+                $this->session->set_flashdata('msg', 'Sorry! This College Number Already Exist');
+                redirect('AttendanceController/add_prac_group_2nd');       
+            else:
+                $data       = array(
+                    'college_no' =>$college_no,
+                    'student_name' =>$student_name,
+                    'group_id' =>$group_id
+                );
+                $this->CRUDModel->insert('student_prac_group_allottment',$data);
+                redirect('PracticalGroups2nd');
+            endif;
+        endif;
+        $this->data['page_title']  = 'Add Student Group | ECMS';
+        $this->data['page']        = 'admission/inter/add_student_group_practical_2nd';
+        $this->load->view('common/common',$this->data);
+    }
+    
+    public function update_prac_group_2nd($id)
+    {   
+        $id = $this->uri->segment(3);
+        if($this->input->post()):
+            $college_no      = $this->input->post('college_no');
+            $student_name      = $this->input->post('student_name');
+            $group_id      = $this->input->post('group_id');
+            $data       = array(
+                'college_no' =>$college_no,
+                'student_name' =>$student_name,
+                'group_id' =>$group_id
+            );
+            $where = array('student_prac_group_allottment.serial_no'=>$id);
+            $this->CRUDModel->update('student_prac_group_allottment',$data,$where);
+            $this->data['page_title']   = 'Update Student Group | ECMS';
+            redirect('PracticalGroups2nd');
+        endif;
+        if($id):
+                $where = array('student_prac_group_allottment.serial_no'=>$id);
+                $this->data['result'] = $this->AttendanceModel->get_PracDataRow($where);
+                $this->data['page_title']  = 'Update Student Group | ECMS';
+                $this->data['page']        =  'admission/inter/update_student_group_practical_2nd';
+                $this->load->view('common/common',$this->data);
+        endif;
+    }
+    
+    public function delete_prac_group_2nd(){	    
+        $id    = $this->uri->segment(3);
+        $where = array('serial_no'=>$id);
+        $this->CRUDModel->deleteid('student_prac_group_allottment',$where);
+        redirect('PracticalGroups2nd');
     }
     
 }

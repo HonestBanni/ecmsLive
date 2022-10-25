@@ -225,7 +225,7 @@
                                                              );
                                                       ?>
                                              
-                                          <p><span id="remaining">160 characters remaining</span> <span id="messages">1 message(s)</span></p>                                           
+                                          <p><span id="remaining">148 characters remaining</span> <span id="messages">1 message(s)</span></p>                                           
                                      </div>
                                  
                             </div>
@@ -237,8 +237,8 @@
                                 <div class="col-md-5 pull-right">
                                     
                                     <button type="submit" class="btn btn-theme" name="search" id="search"  value="search" ><i class="fa fa-search"></i> Search</button>
-                                    <button type="submit" class="btn btn-theme" name="sendSMS" id="sendSMS"   value="sendSMS" ><i class="fa fa-search"></i> Send SMS</button>
-                                     
+                                    <!-- <button type="submit" class="btn btn-theme" name="sendSMS" id="sendSMS"   value="sendSMS" ><i class="fa fa-search"></i> Send SMS</button> -->
+                                    <button type="button" class="btn btn-theme" id="MessagePopup"  data-toggle="modal" data-target="#OpenPopUp" ><i class="fa fa-send"></i> Send SMS</button>  
      
                                 </div>
                             </div>
@@ -250,7 +250,29 @@
                         
                         
                     </section>
-           
+                    <div class="modal fade" id="OpenPopUp" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                <div class="modal-dialog modal-lg" role="document">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                      <h2 class="modal-title" id="myModalLabel">Message</h2>
+                                    </div>
+                                    <div class="modal-body">
+                                        <h3 class="modal-title" id="transitionDetails" style="text-align: justify;font-size: 32px;"></h3>
+<!--                                        <div id="transitionDetails" >
+                                        
+                                        </div>-->
+                                    </div>
+                                    <div class="modal-footer">
+                                        
+                                        <button type="submit" class="btn btn-theme" name="sendSMS" id="sendSMS"  value="sendSMS" ><i class="fa fa-send"></i> Send SMS</button>
+                                      <button type="button" class="btn btn-theme" data-dismiss="modal">Close</button>
+
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>   
+
                              <?php
                            
                           
@@ -358,6 +380,13 @@
    
 
  <script>
+ jQuery('#MessagePopup').on('click',function(){
+//            alert('sdds');
+            var message = jQuery('#message').val();
+            jQuery('#transitionDetails').html(message);
+          }); 
+
+
  $(function() {
             $('.datepicker').datepicker( {
                changeMonth: true,
@@ -380,8 +409,7 @@
     $messages = $remaining.next();
 
 $('#message').keyup(function(){
-    
-     var chk_msg = jQuery(this).val();
+    var chk_msg = jQuery(this).val();
     var msg = chk_msg.includes("'");
     if(msg){
        alert('Please remove special character....');
@@ -389,10 +417,9 @@ $('#message').keyup(function(){
     }else{
         jQuery('#sendSMS').show();
     }
-    
     var chars = this.value.length,
-        messages = Math.ceil(chars / 160),
-        remaining = messages * 160 - (chars % (messages * 160) || messages * 160);
+        messages = Math.ceil(chars / 148),
+        remaining = messages * 148 - (chars % (messages * 148) || messages * 148);
 
     $remaining.text(remaining + ' characters remaining');
     $messages.text(messages + ' message(s)');

@@ -410,9 +410,11 @@
                                     <div class="col-md-4 subject form-group">
                                         <label style="text-indent: 3px">Total Marks in DMC</label>
                                         <select id="total_marks"  name="total_marks" class="form-control" autocomplete="off">
-                                            <?php echo '<option value="'.$acad_row->total_marks.'">'.$acad_row->total_marks.'</option>'; ?>
-                                            <option value="1100">1100</option>
-                                            <option value="1050">1050</option>
+                                             
+                                            <option value="1100" <?php if($acad_row->total_marks == '1100'): echo 'selected'; endif; ?>>1100</option>
+                                            <option value="1050" <?php if($acad_row->total_marks == '1050'): echo 'selected'; endif; ?>>1050</option>
+                                            <option value="850" <?php if($acad_row->total_marks == '850'): echo 'selected'; endif; ?>>850</option>
+                                         
                                         </select>
                                         <br>
                                     </div>    

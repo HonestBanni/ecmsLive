@@ -1373,7 +1373,7 @@ class SmsController extends AdminController {
          
             endforeach;
              
-            redirect('admin/admin_home','refresh');
+            redirect('staffSms','refresh');
            
          endif;
         $this->data['page']         = 'sms/staff/staff_sms';

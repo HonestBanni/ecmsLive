@@ -1,6 +1,9 @@
 <div class="clearfix"></div>		
     </div>
+
     <script>
+  
+                  
     var toggle = true;
 
     $(".sidebar-icon").click(function() {                
@@ -20,6 +23,8 @@
                     toggle = !toggle;
                 });
     </script>
+ 
+    
 <!--js -->
 <script src="student_portal/js/jquery.nicescroll.js"></script>
 <script src="student_portal/js/scripts.js"></script>

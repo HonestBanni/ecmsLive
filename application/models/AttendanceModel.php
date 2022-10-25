@@ -3116,6 +3116,28 @@ $this->db->join('practical_subject','practical_subject.prac_subject_id=practical
         endif;
     }
     
+     public function get_practicalData_wherein($where=NULL,$like=NULL,$column=NULL,$array=NULL)
+    {
+        $this->db->select('*'); 
+        $this->db->FROM('student_prac_group_allottment');
+        $this->db->join('practical_group','practical_group.prac_group_id=student_prac_group_allottment.group_id', 'left outer');
+        $this->db->join('student_record','student_record.college_no=student_prac_group_allottment.college_no'); 
+        $this->db->where('s_status_id',5);
+        if($where):
+            $this->db->where($where);
+        endif;
+        if($column):
+            $this->db->where_in($column,$array);
+        endif;
+        if($like):
+            $this->db->like($like);
+        endif;
+        $query =  $this->db->get();
+        if($query):
+            return $query->result();
+        endif;
+    }
+    
     public function get_whiteCard_practical($where=NULL){
        
          $this->db->select(

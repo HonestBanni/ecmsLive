@@ -13088,6 +13088,101 @@ public function student_record_log()
             $this->load->view('common/common',$this->data);        
         
     }
+	
+    public function student_group_inter_1st(){
+        
+        if($this->input->post('save_students')):   
+		
+            $form_Code  = $this->input->post('form_Code');
+            $sec_id     = $this->input->post('sec_id');
+            $where      = array( 'users_id'  =>$this->userInfo->user_id,'form_Code' =>$form_Code); 
+
+            $res =  $this->CRUDModel->get_where_result('student_group_allotment_demo', $where);
+            foreach($res as $isRow):
+           
+                                    $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId');
+                $user_details   =   $this->db->get_where('users',array('id'=>$this->userInfo->user_id))->row()->emp_name;
+
+                $data = array(   
+                    'student_id'    => $isRow->student_id,
+                    'section_id'    => $sec_id,
+                    'comment'      => 'First Time Alloted By '.$user_details.' Id :'.$this->userInfo->user_id,
+                    'date'          => date('Y-m-d'),
+                    'timestamp'     => date('Y-m-d H:i:s'),
+                    'user_id'       => $this->userInfo->user_id,
+                 );
+                $this->CRUDModel->insert('student_group_allotment',$data);
+
+                $datalog = array(   
+                    'student_id'    => $isRow->student_id,
+                    'section_id'    => $sec_id,
+                    'comments'      => 'First Time Alloted By '.$user_details.' Id :'.$this->userInfo->user_id,
+                    'timestamp'     => date('Y-m-d H:i:s'),
+                    'date'          => date('Y-m-d'),
+                    'user_id'       => $this->userInfo->user_id,
+                );
+                $this->CRUDModel->insert('student_group_allotment_log',$datalog); 
+                
+                $whereDelete = array('users_id'=>$this->userInfo->user_id); 
+                $this->CRUDModel->deleteid('student_group_allotment_demo',$whereDelete);
+                $this->CRUDModel->update('student_record',array('flag'=>1),array('student_id'=>$isRow->student_id));
+            endforeach; 
+		
+        redirect('StudentGroups1st');
+        endif;
+        $this->data['page']     =   "admission/inter/student_group_1st";
+        $this->data['title']    =   'Student Group Inter Level| ECMS';
+        $this->load->view('common/common',$this->data);        
+        
+    }
+    
+    public function student_group_inter_2nd(){
+        
+        if($this->input->post('save_students')):   
+		
+            $form_Code  = $this->input->post('form_Code');
+            $sec_id     = $this->input->post('sec_id');
+            $where      = array( 'users_id'  =>$this->userInfo->user_id,'form_Code' =>$form_Code); 
+
+            $res =  $this->CRUDModel->get_where_result('student_group_allotment_demo', $where);
+            foreach($res as $isRow):
+           
+                                    $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId');
+                $user_details   =   $this->db->get_where('users',array('id'=>$this->userInfo->user_id))->row()->emp_name;
+
+                $data = array(   
+                    'student_id'    => $isRow->student_id,
+                    'section_id'    => $sec_id,
+                    'comment'      => 'First Time Alloted By '.$user_details.' Id :'.$this->userInfo->user_id,
+                    'date'          => date('Y-m-d'),
+                    'timestamp'     => date('Y-m-d H:i:s'),
+                    'user_id'       => $this->userInfo->user_id,
+                 );
+                $this->CRUDModel->insert('student_group_allotment',$data);
+
+                $datalog = array(   
+                    'student_id'    => $isRow->student_id,
+                    'section_id'    => $sec_id,
+                    'comments'      => 'First Time Alloted By '.$user_details.' Id :'.$this->userInfo->user_id,
+                    'timestamp'     => date('Y-m-d H:i:s'),
+                    'date'          => date('Y-m-d'),
+                    'user_id'       => $this->userInfo->user_id,
+                );
+                $this->CRUDModel->insert('student_group_allotment_log',$datalog); 
+                
+                $whereDelete = array('users_id'=>$this->userInfo->user_id); 
+                $this->CRUDModel->deleteid('student_group_allotment_demo',$whereDelete);
+                $this->CRUDModel->update('student_record',array('flag'=>1),array('student_id'=>$isRow->student_id));
+            endforeach; 
+		
+        redirect('StudentGroups2nd');
+        endif;
+        $this->data['page']     =   "admission/inter/student_group_2nd";
+        $this->data['title']    =   'Student Group Inter Level| ECMS';
+        $this->load->view('common/common',$this->data);        
+        
+    }
+    
 	public function student_group_alevel(){
             
 //        $session    = $this->session->all_userdata();
@@ -20428,6 +20523,189 @@ public function update_degree_migrated_student()
         
     }
     
+    public function update_group_inter_1st(){
+        
+        $this->data['sections'] = $this->CRUDModel->dropDown_where_in_order('sections', 'Select Section', 'sec_id', 'name','sub_pro_id', array(1,2,4,5), array('status'=>'On'), 'name');
+
+        $this->data['sec_id'] = '';
+        $this->data['student_name'] = '';
+        $this->data['father_name'] = '';
+        $this->data['college_no'] = '';
+
+        if($this->input->post('search')):
+            $sec_id         =  $this->input->post('sec_id');
+            $student_name   =  $this->input->post('student_name');
+            $father_name    =  $this->input->post('father_name');
+            $college_no     =  $this->input->post('college_no');
+            
+            $like = '';
+            $where = '';
+
+            if(!empty($sec_id)):
+                $where['sections.sec_id']   = $sec_id;
+                $this->data['sec_id']       = $sec_id;
+            endif;
+            if(!empty($student_name)):
+                $like['student_record.student_name']   = $student_name;
+                $this->data['student_name']       = $student_name;
+            endif;
+            if(!empty($father_name)):
+                $like['student_record.father_name']   = $father_name;
+                $this->data['father_name']       = $father_name;
+            endif;
+            if(!empty($college_no)):
+                $where['student_record.college_no']   = $college_no;
+                $this->data['college_no']       = $college_no;
+            endif;
+            $this->data['result']       = $this->get_model->get_by_group_student('student_group_allotment',$where,$like);   
+        endif;	
+        
+       $this->data['page_title']   = 'Update Groups Inter Level | ECMS';
+       $this->data['page']         = 'admission/inter/update_groups_inter_1st';
+       $this->load->view('common/common',$this->data);    
+    }
+    
+    public function update_student_by_group_1st()
+    {
+        $id = $this->uri->segment(2);
+        
+        if($this->input->post()):
+            
+                              $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId');
+            $user_details   = $this->db->get_where('users',array('id'=>$this->userInfo->user_id))->row()->emp_name;
+            
+            $section_id     = $this->input->post('section_id');
+            $old_section_id = $this->input->post('old_section_id');
+            $student_id     = $this->input->post('student_id');
+            $sub_pro_id     = $this->input->post('sub_pro_id');
+            
+            $data = array(
+                'section_id'    => $section_id,
+                'up_timestamp'  => date('Y-m-d H:i:'),
+                'up_user_id'    => $this->userInfo->user_id
+            );
+            
+            $where = array('serial_no'=>$id);
+            $this->CRUDModel->update('student_group_allotment',$data,$where);
+              
+            if($section_id != $old_section_id): $old_s = $old_section_id; else: $old_s = 'NULL'; endif;
+            
+            $data_log = array(
+                'student_id'    => $student_id,
+                'section_id'    => $old_s,
+                'date'          => date('Y-m-d'),
+                'comments'      => 'Update From admin/update_student_by_group_inter By '.$user_details.' Id :'.$this->userInfo->user_id,
+                'timestamp'     => date('Y-m-d H:i:'),
+                'user_id'       => $this->userInfo->user_id
+             );
+            $this->CRUDModel->insert('student_group_allotment_log',$data_log);
+
+            redirect('UpdateStudentGroups1st'); 
+            
+        endif; 
+         
+        if($id):
+            
+            $where = array('student_group_allotment.serial_no'=>$id);
+            $this->data['result'] = $this->get_model->get_Studentgroup_row('student_group_allotment',$where);
+                
+            $this->data['page_title'] = 'Update Student Group | ECMS';
+            $this->data['page']       = 'admission/inter/update_student_by_group_1st';
+            $this->load->view('common/common',$this->data);
+        endif;
+    }
+    
+    public function update_group_inter_2nd(){
+        
+        $this->data['sections'] = $this->CRUDModel->dropDown_where_in_order('sections', 'Select Section', 'sec_id', 'name','sub_pro_id', array(24,25,26,27), array('status'=>'On'), 'name');
+
+        $this->data['sec_id'] = '';
+        $this->data['student_name'] = '';
+        $this->data['father_name'] = '';
+        $this->data['college_no'] = '';
+
+        if($this->input->post('search')):
+            $sec_id         =  $this->input->post('sec_id');
+            $student_name   =  $this->input->post('student_name');
+            $father_name    =  $this->input->post('father_name');
+            $college_no     =  $this->input->post('college_no');
+            
+            $like = '';
+            $where = '';
+
+            if(!empty($sec_id)):
+                $where['sections.sec_id']   = $sec_id;
+                $this->data['sec_id']       = $sec_id;
+            endif;
+            if(!empty($student_name)):
+                $like['student_record.student_name']   = $student_name;
+                $this->data['student_name']       = $student_name;
+            endif;
+            if(!empty($father_name)):
+                $like['student_record.father_name']   = $father_name;
+                $this->data['father_name']       = $father_name;
+            endif;
+            if(!empty($college_no)):
+                $where['student_record.college_no']   = $college_no;
+                $this->data['college_no']       = $college_no;
+            endif;
+            $this->data['result']       = $this->get_model->get_by_group_student('student_group_allotment',$where,$like);   
+        endif;	
+        
+       $this->data['page_title']   = 'Update Groups Inter Level | ECMS';
+       $this->data['page']         = 'admission/inter/update_groups_inter_2nd';
+       $this->load->view('common/common',$this->data);    
+    }
+    
+    public function update_student_by_group_2nd()
+    {
+        $id = $this->uri->segment(2);
+        
+        if($this->input->post()):
+            
+                              $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId');
+            $user_details   = $this->db->get_where('users',array('id'=>$this->userInfo->user_id))->row()->emp_name;
+            
+            $section_id     = $this->input->post('section_id');
+            $old_section_id = $this->input->post('old_section_id');
+            $student_id     = $this->input->post('student_id');
+            $sub_pro_id     = $this->input->post('sub_pro_id');
+            
+            $data = array(
+                'section_id'    => $section_id,
+                'up_timestamp'  => date('Y-m-d H:i:'),
+                'up_user_id'    => $this->userInfo->user_id
+            );
+            
+            $where = array('serial_no'=>$id);
+            $this->CRUDModel->update('student_group_allotment',$data,$where);
+              
+            if($section_id != $old_section_id): $old_s = $old_section_id; else: $old_s = 'NULL'; endif;
+            
+            $data_log = array(
+                'student_id'    => $student_id,
+                'section_id'    => $old_s,
+                'date'          => date('Y-m-d'),
+                'comments'      => 'Update From admin/update_student_by_group_inter By '.$user_details.' Id :'.$this->userInfo->user_id,
+                'timestamp'     => date('Y-m-d H:i:'),
+                'user_id'       => $this->userInfo->user_id
+             );
+            $this->CRUDModel->insert('student_group_allotment_log',$data_log);
+
+            redirect('UpdateStudentGroups2nd'); 
+            
+        endif; 
+         
+        if($id):
+            
+            $where = array('student_group_allotment.serial_no'=>$id);
+            $this->data['result'] = $this->get_model->get_Studentgroup_row('student_group_allotment',$where);
+                
+            $this->data['page_title'] = 'Update Student Group | ECMS';
+            $this->data['page']       = 'admission/inter/update_student_by_group_2nd';
+            $this->load->view('common/common',$this->data);
+        endif;
+    }
     
 }
 

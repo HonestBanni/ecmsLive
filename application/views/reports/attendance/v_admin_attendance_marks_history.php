@@ -255,7 +255,7 @@ return false;
                                         $year       = date("Y", strtotime($monthi, $time));
                                         $where = array(
                                             'subject_id'                => $rowCS->subject_id,
-                                            'sec_id'                    => $secId,
+                                            // 'sec_id'                    => $secId,
                                             'student_id'                =>$result->student_id,
                                             'month(attendance_date)'    =>$month,
                                             'year(attendance_date)'     =>$year,
@@ -310,7 +310,7 @@ return false;
                                         $month      = date("m", strtotime($monthi, $time));
                                         $year       = date("Y", strtotime($monthi, $time));
                                         $wheret = array(
-                                            'sec_id'                    => $secId,
+                                            // 'sec_id'                    => $secId,
                                             'student_id'                =>$result->student_id,
                                             'month(attendance_date)'    =>$month,
                                             'year(attendance_date)'     =>$year,

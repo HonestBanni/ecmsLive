@@ -286,7 +286,7 @@ color:red;
                     $ldate = date("d-m-Y", strtotime($ldate));
                     }
             ?>
-                <input type="text" name="leaving_date" value="30-04-2018" class="form-control date_format_d_m_yy">      
+                <input type="text" name="leaving_date" value="30-04-2022" class="form-control date_format_d_m_yy">      
                 </div>    
     <div class="form-group col-md-8">
         <?php

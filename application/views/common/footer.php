@@ -48,10 +48,23 @@
 
     <script src="assets/plugins/jquery.mask.min.js"></script>
     
-    
+           <!--Dropdown search-->
+    <link rel="stylesheet" href="assets/css/choices.min.css">
+    <script src="assets/js/choices.min.js"></script>
   
     <script type="text/javascript">
         jQuery(document).ready(function(){
+                  
+        
+         var multipleCancelButton = new Choices('.dropdown-search', {
+                    removeItemButton: true,
+                    maxItemCount:20,
+                    searchResultLimit:20,
+                    renderChoiceLimit:20
+                  });
+            
+            
+            
             jQuery(function() {
                 jQuery('.date').mask('99-99-9999');
                 jQuery('.date_time').mask('9999-99-99 99:99:99');

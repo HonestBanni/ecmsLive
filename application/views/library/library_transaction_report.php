@@ -83,22 +83,15 @@
                     <td><?php echo $row->title;?></td>      
                     <td><?php echo $row->student_name;?> - <?php echo $row->college_no;?></td>
                     <td><?php echo $row->issued_date;?></td>      
-                    <td><?php echo $row->due_date;?></td>      
-                    <td style="color:red"><?php 
-                        if($date2 > $date1):
-                            $interval = $date2->diff($date1);
-                            echo $interval->d." days ";
-                        endif;    
-                        ?>
-                    </td>
-                    <td>
-                        <?php
-                        if($date2 > $date1):
-                            $interval = $date2->diff($date1);
-                            $days_fine = $interval->d * 5;
-                            echo "Rs.".$days_fine;
-                        endif; ?>
-                    </td>
+                    <td><?php echo $row->due_date;?></td>    
+                    <?php
+                        $earlier = new DateTime($row->due_date);
+                        $later = new DateTime(date("Y-m-d"));
+                        $abs_diff = $later->diff($earlier)->format("%a"); //3die;
+                        $fine = $abs_diff*5;
+                    ?>
+                    <td style="color:red"><?php echo $abs_diff." Days "; ?></td>
+                    <td><?php echo "Rs.".$fine; ?> </td>
                 </tr>  
                   <?php
                   else:
@@ -111,22 +104,14 @@
                     <td><?php echo $row->student_name;?> (<?php echo $row->college_no;?>)</td>
                     <td><?php echo $row->issued_date;?></td>
                     <td><?php echo $row->due_date;?></td>
-                   <td style="color:red">
-                       <?php 
-                        if($date2 > $date1):
-                            $interval = $date2->diff($date1);
-                            echo $interval->d." days ";
-                        endif;
-                        ?>
-                    </td>
-                    <td>
-                        <?php
-                        if($date2 > $date1):
-                            $interval = $date2->diff($date1);
-                            $days_fine = $interval->d * 5;
-                            echo "Rs.".$days_fine;
-                        endif; ?>
-                    </td>  
+                   <?php
+                        $earlier = new DateTime($row->due_date);
+                        $later = new DateTime(date("Y-m-d"));
+                        $abs_diff = $later->diff($earlier)->format("%a"); //3die;
+                        $fine = $abs_diff*5;
+                    ?>
+                    <td style="color:red"><?php echo $abs_diff." Days "; ?></td>
+                    <td><?php echo "Rs.".$fine; ?> </td> 
                 </tr>  
                   <?php
                   endif;

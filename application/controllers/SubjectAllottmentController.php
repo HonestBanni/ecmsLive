@@ -485,94 +485,311 @@ public function group_alloted_demo_subject_delete_js(){
     
     public function arts_students_1st(){
             
-            $this->data['collegeNo']        = '';
-            $this->data['stdName']          = '';
-            $this->data['fatherName']       = '';
-            $this->data['gender_id']        = '';
-            $this->data['programe_id']      = '';
-            $this->data['sub_pro_id']       = '';
-            $this->data['reg_no']           = ''; 
-            $this->data['form_no']          = ''; 
-            $this->data['batch_id']          = ''; 
-          
-            if($this->input->post('search')):
-                
-                $college_no     =  $this->input->post('college_no');
-                $student_name   =  $this->input->post('student_name');
-                $father_name    =  $this->input->post('father_name');
-                $gender         =  $this->input->post('gender');
-                $reg_no         =  $this->input->post('reg_no');
-                $form_no        =  $this->input->post('form_no');
-               
-                $like = array();
-                $where['student_record.s_status_id']    = '5';
-                $where['student_record.sub_pro_id']     = '5';
-                
-                 if(!empty($college_no)):
-                    $where['college_no'] = $college_no;
-                    $this->data['collegeNo'] =$college_no;
-                endif;
-                 if(!empty($form_no)):
-                    $where['form_no'] = $form_no;
-                    $this->data['form_no'] =$form_no;
-                endif;
-                if(!empty($student_name)):
-                    $like['student_name'] = $student_name;
-                    $this->data['stdName'] =$student_name;
-                endif;
-                if(!empty($father_name)):
-                    $like['father_name'] = $father_name;
-                $this->data['fatherName'] =$father_name;
-                endif;
-                if(!empty($reg_no)):
-                    $like['board_regno'] = $reg_no;
-                    $this->data['reg_no'] = $reg_no;
-                endif;
-                if(!empty($gender)):
-                    $where['gender.gender_id'] = $gender;
-                    $this->data['gender_id'] =$gender;
-                endif;
-                 
-                $this->data['result']   = $this->SubjectAllottmentModel->art_subject_search_yr($where,$like); //get user data from db 
-                $this->data['count']    = count($this->data['result']);
-                
+        $this->data['collegeNo']        = '';
+        $this->data['stdName']          = '';
+        $this->data['fatherName']       = '';
+        $this->data['gender_id']        = '';
+        $this->data['programe_id']      = '';
+        $this->data['sub_pro_id']       = '';
+        $this->data['reg_no']           = ''; 
+        $this->data['form_no']          = ''; 
+        $this->data['batch_id']          = ''; 
+
+        if($this->input->post('search')):
+
+            $college_no     =  $this->input->post('college_no');
+            $student_name   =  $this->input->post('student_name');
+            $father_name    =  $this->input->post('father_name');
+            $gender         =  $this->input->post('gender');
+            $reg_no         =  $this->input->post('reg_no');
+            $form_no        =  $this->input->post('form_no');
+
+            $like = array();
+            $where['student_record.s_status_id']    = '5';
+            $where['student_record.sub_pro_id']     = '5';
+
+             if(!empty($college_no)):
+                $where['college_no'] = $college_no;
+                $this->data['collegeNo'] =$college_no;
+            endif;
+             if(!empty($form_no)):
+                $where['form_no'] = $form_no;
+                $this->data['form_no'] =$form_no;
+            endif;
+            if(!empty($student_name)):
+                $like['student_name'] = $student_name;
+                $this->data['stdName'] =$student_name;
+            endif;
+            if(!empty($father_name)):
+                $like['father_name'] = $father_name;
+            $this->data['fatherName'] =$father_name;
+            endif;
+            if(!empty($reg_no)):
+                $like['board_regno'] = $reg_no;
+                $this->data['reg_no'] = $reg_no;
+            endif;
+            if(!empty($gender)):
+                $where['gender.gender_id'] = $gender;
+                $this->data['gender_id'] =$gender;
+            endif;
+
+            $this->data['result']   = $this->SubjectAllottmentModel->art_subject_search_yr($where,$like); //get user data from db 
+            $this->data['count']    = count($this->data['result']);
+
 //                echo '<pre>';print_r($this->data['result']);die;
-           
-            else:
-                
-                $where['student_record.s_status_id']    = '5';
-                $where['student_record.sub_pro_id']     = '5';
-                
-                $this->data['result']   = $this->SubjectAllottmentModel->art_subject_search_yr($where); //get user data from db 
-                $this->data['count']    = count($this->data['result']);
-          
-             endif;
-         
-            $this->data['gender']       = $this->CRUDModel->dropDown('gender', 'Select Gender', 'gender_id', 'title');
-            
-            $this->data['page_header']  = 'Inter Subject Allottment (Arts)';
-            $this->data['page_title']   = 'Inter Subject Allottment (Arts)| ECMS';
-            $this->data['page']         = 'admission/Subject_Allottment/Forms/arts_students_1st';
-            $this->load->view('common/common',$this->data);
+
+        else:
+
+            $where['student_record.s_status_id']    = '5';
+            $where['student_record.sub_pro_id']     = '5';
+
+            $this->data['result']   = $this->SubjectAllottmentModel->art_subject_search_yr($where); //get user data from db 
+            $this->data['count']    = count($this->data['result']);
+
+        endif;
+
+        $this->data['gender']       = $this->CRUDModel->dropDown('gender', 'Select Gender', 'gender_id', 'title');
+
+        $this->data['page_header']  = 'Inter Subject Allottment (Arts)';
+        $this->data['page_title']   = 'Inter Subject Allottment (Arts)| ECMS';
+        $this->data['page']         = 'admission/Subject_Allottment/Forms/arts_students_1st';
+        $this->load->view('common/common',$this->data);
              
-        }
-    
-        public function assign_arts_subjects_1st(){
-            $id                 = $this->uri->segment(2);
-            $sub_pro_id         = $this->uri->segment(3);
-            $where              = array('student_id'=>$id);
-            $subpro_where       = array('sub_pro_id'=>$sub_pro_id);
-            
-            $this->data['result']           = $this->CRUDModel->get_where_row('student_record', $where);
-            $this->data['section']          = $this->CRUDModel->get_where_row('student_group_allotment', $where);
-            $this->data['selectsubjects']   = $this->CRUDModel->get_where_result('student_subject_alloted', $where);
-            $this->data['subjects']         = $this->CRUDModel->get_where_result('subject', $subpro_where);
+    }
+
+    public function assign_arts_subjects_1st(){
+        $id                 = $this->uri->segment(2);
+        $sub_pro_id         = $this->uri->segment(3);
+        $where              = array('student_id'=>$id);
+        $subpro_where       = array('sub_pro_id'=>$sub_pro_id);
+
+        $this->data['result']           = $this->CRUDModel->get_where_row('student_record', $where);
+        $this->data['section']          = $this->CRUDModel->get_where_row('student_group_allotment', $where);
+        $this->data['selectsubjects']   = $this->CRUDModel->get_where_result('student_subject_alloted', $where);
+        $this->data['subjects']         = $this->CRUDModel->get_where_result('subject', $subpro_where);
 
 //            echo '<pre>'; print_r($this->data['subjects']); die;
-            
-            $this->data['page_title']   = 'Student Assign Subjects  | ECMS';
-           $this->data['page']          = 'admission/Subject_Allottment/Forms/assign_arts_subjects_1st';
-           $this->load->view('common/common',$this->data);
-        }
+
+        $this->data['page_title']   = 'Student Assign Subjects  | ECMS';
+       $this->data['page']          = 'admission/Subject_Allottment/Forms/assign_arts_subjects_1st';
+       $this->load->view('common/common',$this->data);
+    }
 	
+    public function allot_arts_subjects_1st(){
+
+        if($this->input->post()):
+            $ides           = $this->input->post('checked');
+            $student_id     = $this->input->post('student_id');
+            $checked_log    = $this->CRUDModel->get_where_result('student_subject_alloted', array('student_id'=>$student_id));
+            
+                               $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId');
+            $user_details   =  $this->db->get_where('users',array('id'=>$this->userInfo->user_id))->row()->emp_name;
+            $GroupInfo      =  $this->db->get_where('student_group_allotment',array('student_id'=>$student_id))->row();
+            
+            if(!empty($GroupInfo)):
+                $where_std = array('student_id' => $student_id);
+                $check_sub = $this->CRUDModel->get_where_row('student_subject_alloted', $where_std);
+                
+                if(!empty($check_sub)):
+                    if(empty($ides)):
+                        foreach($checked_log as $log_row):
+                            $data =  array(
+                                'subject_id'    => $log_row->subject_id,
+                                'student_id'    => $student_id,
+                                'comment'       => 'Delete Subjects By '.$user_details.' Id :'.$this->userInfo->user_id,
+                                'user_id'       => $this->userInfo->user_id,
+                                'date'          => date('Y-m-d'),
+                                'timestamp'     => date('Y-m-d H:i:s'),
+                            );
+                            $this->CRUDModel->insert('student_subject_alloted_logs',$data );
+                        endforeach;
+                        $this->CRUDModel->deleteid('student_subject_alloted', $where_std);
+
+                    else:
+                        foreach($checked_log as $log_row):
+                            $data =  array(
+                                'subject_id'    => $log_row->subject_id,
+                                'student_id'    => $student_id,
+                                'comment'       => 'Update Subjects By '.$user_details.' Id :'.$this->userInfo->user_id,
+                                'user_id'       => $this->userInfo->user_id,
+                                'date'          => date('Y-m-d'),
+                                'timestamp'     => date('Y-m-d H:i:s'),
+                            );
+                            $this->CRUDModel->insert('student_subject_alloted_logs',$data );
+                        endforeach;
+                        $this->CRUDModel->deleteid('student_subject_alloted', $where_std);
+                    endif;
+                endif;
+                
+                foreach($ides as $row=>$value):
+                    $data =  array(
+                        'subject_id' => $value,
+                        'student_id' => $student_id,
+                        'section_id' => $GroupInfo->section_id,
+                        'user_id'    => $this->userInfo->user_id,
+                        'timestamp'  => date('Y-m-d H:i:s'),
+                    );
+                    $this->CRUDModel->insert('student_subject_alloted',$data );
+                endforeach;
+            endif;
+            
+            redirect('ArtsSubject1st');
+        endif;
+    }
+    
+    public function arts_students_2nd(){
+            
+        $this->data['collegeNo']        = '';
+        $this->data['stdName']          = '';
+        $this->data['fatherName']       = '';
+        $this->data['gender_id']        = '';
+        $this->data['programe_id']      = '';
+        $this->data['sub_pro_id']       = '';
+        $this->data['reg_no']           = ''; 
+        $this->data['form_no']          = ''; 
+        $this->data['batch_id']          = ''; 
+
+        if($this->input->post('search')):
+
+            $college_no     =  $this->input->post('college_no');
+            $student_name   =  $this->input->post('student_name');
+            $father_name    =  $this->input->post('father_name');
+            $gender         =  $this->input->post('gender');
+            $reg_no         =  $this->input->post('reg_no');
+            $form_no        =  $this->input->post('form_no');
+
+            $like = array();
+            $where['student_record.s_status_id']    = '5';
+            $where['student_record.sub_pro_id']     = '27';
+
+             if(!empty($college_no)):
+                $where['college_no'] = $college_no;
+                $this->data['collegeNo'] =$college_no;
+            endif;
+             if(!empty($form_no)):
+                $where['form_no'] = $form_no;
+                $this->data['form_no'] =$form_no;
+            endif;
+            if(!empty($student_name)):
+                $like['student_name'] = $student_name;
+                $this->data['stdName'] =$student_name;
+            endif;
+            if(!empty($father_name)):
+                $like['father_name'] = $father_name;
+            $this->data['fatherName'] =$father_name;
+            endif;
+            if(!empty($reg_no)):
+                $like['board_regno'] = $reg_no;
+                $this->data['reg_no'] = $reg_no;
+            endif;
+            if(!empty($gender)):
+                $where['gender.gender_id'] = $gender;
+                $this->data['gender_id'] =$gender;
+            endif;
+
+            $this->data['result']   = $this->SubjectAllottmentModel->art_subject_search_yr($where,$like); //get user data from db 
+            $this->data['count']    = count($this->data['result']);
+
+//                echo '<pre>';print_r($this->data['result']);die;
+
+        else:
+
+            $where['student_record.s_status_id']    = '5';
+            $where['student_record.sub_pro_id']     = '27';
+
+            $this->data['result']   = $this->SubjectAllottmentModel->art_subject_search_yr($where); //get user data from db 
+            $this->data['count']    = count($this->data['result']);
+
+        endif;
+
+        $this->data['gender']       = $this->CRUDModel->dropDown('gender', 'Select Gender', 'gender_id', 'title');
+
+        $this->data['page_header']  = 'Inter Subject Allottment (Arts)';
+        $this->data['page_title']   = 'Inter Subject Allottment (Arts)| ECMS';
+        $this->data['page']         = 'admission/Subject_Allottment/Forms/arts_students_2nd';
+        $this->load->view('common/common',$this->data);
+             
+    }
+
+    public function assign_arts_subjects_2nd(){
+        $id                 = $this->uri->segment(2);
+        $sub_pro_id         = $this->uri->segment(3);
+        $where              = array('student_id'=>$id);
+        $subpro_where       = array('sub_pro_id'=>$sub_pro_id);
+
+        $this->data['result']           = $this->CRUDModel->get_where_row('student_record', $where);
+        $this->data['section']          = $this->CRUDModel->get_where_row('student_group_allotment', $where);
+        $this->data['selectsubjects']   = $this->CRUDModel->get_where_result('student_subject_alloted', $where);
+        $this->data['subjects']         = $this->CRUDModel->get_where_result('subject', $subpro_where);
+
+//            echo '<pre>'; print_r($this->data['subjects']); die;
+
+        $this->data['page_title']   = 'Student Assign Subjects  | ECMS';
+       $this->data['page']          = 'admission/Subject_Allottment/Forms/assign_arts_subjects_2nd';
+       $this->load->view('common/common',$this->data);
+    }
+	
+    public function allot_arts_subjects_2nd(){
+
+        if($this->input->post()):
+            $ides           = $this->input->post('checked');
+            $student_id     = $this->input->post('student_id');
+            $checked_log    = $this->CRUDModel->get_where_result('student_subject_alloted', array('student_id'=>$student_id));
+            
+                               $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId');
+            $user_details   =  $this->db->get_where('users',array('id'=>$this->userInfo->user_id))->row()->emp_name;
+            $GroupInfo      =  $this->db->get_where('student_group_allotment',array('student_id'=>$student_id))->row();
+            
+            if(!empty($GroupInfo)):
+                $where_std = array('student_id' => $student_id);
+                $check_sub = $this->CRUDModel->get_where_row('student_subject_alloted', $where_std);
+                
+                if(!empty($check_sub)):
+                    if(empty($ides)):
+                        foreach($checked_log as $log_row):
+                            $data =  array(
+                                'subject_id'    => $log_row->subject_id,
+                                'student_id'    => $student_id,
+                                'comment'       => 'Delete Subjects By '.$user_details.' Id :'.$this->userInfo->user_id,
+                                'user_id'       => $this->userInfo->user_id,
+                                'date'          => date('Y-m-d'),
+                                'timestamp'     => date('Y-m-d H:i:s'),
+                            );
+                            $this->CRUDModel->insert('student_subject_alloted_logs',$data );
+                        endforeach;
+                        $this->CRUDModel->deleteid('student_subject_alloted', $where_std);
+
+                    else:
+                        foreach($checked_log as $log_row):
+                            $data =  array(
+                                'subject_id'    => $log_row->subject_id,
+                                'student_id'    => $student_id,
+                                'comment'       => 'Update Subjects By '.$user_details.' Id :'.$this->userInfo->user_id,
+                                'user_id'       => $this->userInfo->user_id,
+                                'date'          => date('Y-m-d'),
+                                'timestamp'     => date('Y-m-d H:i:s'),
+                            );
+                            $this->CRUDModel->insert('student_subject_alloted_logs',$data );
+                        endforeach;
+                        $this->CRUDModel->deleteid('student_subject_alloted', $where_std);
+                    endif;
+                endif;
+                
+                foreach($ides as $row=>$value):
+                    $data =  array(
+                        'subject_id' => $value,
+                        'student_id' => $student_id,
+                        'section_id' => $GroupInfo->section_id,
+                        'user_id'    => $this->userInfo->user_id,
+                        'timestamp'  => date('Y-m-d H:i:s'),
+                    );
+                    $this->CRUDModel->insert('student_subject_alloted',$data );
+                endforeach;
+            endif;
+            
+            redirect('ArtsSubject2nd');
+        endif;
+    }
+    
+ 
     }

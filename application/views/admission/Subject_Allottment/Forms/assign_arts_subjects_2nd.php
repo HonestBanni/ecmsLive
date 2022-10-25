@@ -12,13 +12,14 @@
             <h4 style="color:green; text-align:center;"><?php print_r($this->session->flashdata('insert_msg'));?></h4>
             <h4 style="color:red; text-align:center;"><?php print_r($this->session->flashdata('msg'));?></h4>
         </div>
+
         <?php
         if(empty($section)):
             echo '<h1 style="text-align:center;color:#c00;"><strong>Section Allotement is required to allot Subject to Arts student.<br>Please first allot section then allot subjects</strong></h1>';
         else:
             $on_sec = $this->CRUDModel->get_where_row('sections', array('sec_id' => $section->section_id));
             if(!empty($on_sec)):
-                if($on_sec->sub_pro_id != 5):
+                if($on_sec->sub_pro_id != 27):
             echo '<h1 style="text-align:center;color:#c00;"><strong>Section Allotement is required to allot Subject to Arts student.<br>Please first allot section then allot subjects</strong></h1>';
                 else:
         ?>

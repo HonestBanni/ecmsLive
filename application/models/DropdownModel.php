@@ -518,4 +518,28 @@ public function std_sec_allotment_alevel($table,$like=NULL){
         
         
     }    
+    
+    public function group_allotment_inter_1st($where=NULL, $like=NULL, $column=NULL, $array=NULL ){
+        $this->db->where($where);
+        if($column):
+            $this->db->where_in($column, $array);
+        endif;
+        if($like):
+            $this->db->like('college_no',$like);       
+            $this->db->or_like('student_name',$like);        
+        endif;   
+        return $this->db->get('student_record')->result();
+        
+        
+    }
+    public function auto_section_active($table,$like=NULL){
+        $this->db->SELECT('*');
+        $this->db->FROM($table);
+        if($like):
+            $this->db->like($like);  
+        endif;
+        $this->db->where('status','On');
+        $query = $this->db->get();
+        return $query->result();
+    }    
 }

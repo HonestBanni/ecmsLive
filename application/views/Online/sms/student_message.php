@@ -407,14 +407,35 @@
                                 <div class="col-md-3 pull-right">
                                     
                                     <button type="submit" class="btn btn-theme" name="search" id="search"  value="search" ><i class="fa fa-search"></i> Search</button>
-                                    <button type="submit" class="btn btn-theme" name="sendSMS" id="sendSMS"  value="sendSMS" ><i class="fa fa-search"></i> Send SMS</button>
+                                    <button type="button" class="btn btn-theme" id="MessagePopup"  data-toggle="modal" data-target="#OpenPopUp" ><i class="fa fa-send"></i> Send SMS</button>
                                      
      
                                 </div>
                             </div>
                                  
                                 
-                           
+                       <div class="modal fade" id="OpenPopUp" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                                <div class="modal-dialog modal-lg" role="document">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                      <h2 class="modal-title" id="myModalLabel">Message</h2>
+                                    </div>
+                                    <div class="modal-body">
+                                        <h3 class="modal-title" id="transitionDetails" style="text-align: justify;font-size: 32px;"></h3>
+<!--                                        <div id="transitionDetails" >
+                                        
+                                        </div>-->
+                                    </div>
+                                    <div class="modal-footer">
+                                        
+                                        <button type="submit" class="btn btn-theme" name="sendSMS" id="sendSMS"  value="sendSMS" ><i class="fa fa-send"></i> Send SMS</button>
+                                      <button type="button" class="btn btn-theme" data-dismiss="modal">Close</button>
+
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>     
                             
                         
                         
@@ -566,6 +587,11 @@
     jQuery(document).ready(function(){
         
         
+        jQuery('#MessagePopup').on('click',function(){
+//            alert('sdds');
+            var message = jQuery('#message').val();
+            jQuery('#transitionDetails').html(message);
+          }); 
         jQuery('#Programe').on('click',function(){
             var programId = jQuery('#Programe').val();
 

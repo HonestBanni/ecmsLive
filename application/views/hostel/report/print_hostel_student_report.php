@@ -32,83 +32,78 @@ return false;
     </header> 
       
     <div class="page-content">
+
+        <section class="course-finder" style="padding-bottom: 2%;">
+            <h1 class="section-heading text-highlight">
+                <span class="line">Hostel Student Report Search Panel</span>
+            </h1>
+            <div class="section-content">
+            <form method="post" class="course-finder-form" action="HostelController/print_hostel_student_report">
+                <div class="col-md-3">
+                    <label for="name">Name or College No.</label>
+                    <?php        
+                        if(!empty($student_id)){
+                            $empres = $this->HostelModel->get_by_id('student_record',array('student_id'=>$student_id));
+                            foreach($empres as $emprec)
+                            { ?>          
+                            <input type="text" name="student_id" value="<?php echo $emprec->student_name; ?>" placeholder="Student Name" class="form-control" id="std_names">
+                            <input type="hidden" name="student_id" id="student_id" value="<?php echo $emprec->student_id; ?>">      
+                            <?php 
+                            }     
+                        }else{?>
+                            <input type="text" name="student_id" class="form-control" placeholder="Student Name" id="std_names">
+                            <input type="hidden" name="student_id" id="student_id">
+                            <?php
+                            }    
+                        ?>                  
+                </div>
+                <div class="col-md-3">
+                    <label for="name">Program</label>
+                    <?php
+                        echo form_dropdown('programe_id', $program, $programe_id, 'class="form-control" id="feeProgrameId"');
+                        ?>
+                </div>
+                <div class="col-md-3">
+                    <label for="name">Sup Program</label>
+                        <?php echo form_dropdown('sub_pro_id', $sub_program, $sub_pro_id, 'class="form-control" id="showFeeSubPro"');?>
+                </div>
+                <div class="col-md-3">
+                    <label for="name">Batch</label>
+                    <?php echo form_dropdown('batch_id', $batch_name, $batch_id, 'class="form-control" id="batch_id"');?>
+                </div>
+                <div class="col-md-3">
+                    <label for="name">Section</label> 
+                    <?php   echo form_dropdown('section', $section,$sectionId,  'class="form-control section" id="showSections"');  ?>
+
+                </div>
+                <div class="col-md-3">
+                    <label for="name">Admission In</label>
+                        <?php echo form_dropdown('admission_in', $admission_in, $admission_in_id, 'class="form-control" ');   ?>
+                </div>
+                <div class="col-md-3">
+                    <label for="name">Student Status</label>
+                        <?php  echo form_dropdown('statuss', $statuss, $statuss_id, 'class="form-control" '); ?>
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="name" style="visibility:hidden;">Student Statu sdfsd f asdf asdfs</label>
+                    <input type="submit" name="search" class="btn btn-theme" value="Search">
+                    <input type="submit" name="export" class="btn btn-theme" value="Export">
+                    <button type="button" name="print" value="print" onclick="printdiv('div_print');" class="btn btn-theme"><i class="fa fa-print"></i> Print </button>
+                </div>
+
+
+            </form>
+
+            </div>
+        </section>
+       
+
+
       <div class="row">
         <article class="contact-form col-md-12 col-sm-7">   
-<!--              <h2 align="left">Hostel Students Record<span style="float:right"><a href="HostelController/add_hostel_student" class="btn btn-large btn-primary">Add Hostel Student</a></span><hr></h2>-->
-           
             
-            <form method="post" action="HostelController/print_hostel_student_report">
-                <div class="form-group col-md-2">
-                    <label for="name">Name or College No.</label>
-            <?php        
-                if(!empty($student_id)){
-                    $empres = $this->HostelModel->get_by_id('student_record',array('student_id'=>$student_id));
-                    foreach($empres as $emprec)
-                    { ?>          
-                    <input type="text" name="student_id" value="<?php echo $emprec->student_name; ?>" placeholder="Student Name" class="form-control" id="std_names">
-                    <input type="hidden" name="student_id" id="student_id" value="<?php echo $emprec->student_id; ?>">      
-                    <?php 
-                    }     
-                }else{?>
-                    <input type="text" name="student_id" class="form-control" placeholder="Student Name" id="std_names">
-                    <input type="hidden" name="student_id" id="student_id">
-                    <?php
-                    }    
-                ?>                  
-            </div>
-            
-            <div class="form-group col-md-2">
-                <label for="name">Program</label>
-               <?php
-                  echo form_dropdown('programe_id', $program, $programe_id, 'class="form-control" id="feeProgrameId"');
-                   ?>
-            </div>
-            
-            <div class="form-group  col-md-2">
-                <label for="name">Sup Program</label>
-<!--                    <select name="sub_pro_id" class="form-control" id="showFeeSubPro">
-                    <option value="">Sub Program</option>
-                    </select>-->
-                    <?php
-                            echo form_dropdown('sub_pro_id', $sub_program, $sub_pro_id, 'class="form-control" id="showFeeSubPro"');
-                   ?>
-                
-            </div>
-           <div class="form-group col-md-2">
-               <label for="name">Batch</label>
-<!--                <select name="batch_id" class="form-control" id="batch_id">
-                <option value="">Select Batch</option>
-                </select>-->
-               <?php
-                  echo form_dropdown('batch_id', $batch_name, $batch_id, 'class="form-control" id="batch_id"');
-                   ?>
-               
-            </div>
-            <div class="col-md-2">
-                <label for="name">Section</label>
-
-                    <?php 
-//                                        $Section = array('Section'=>"Section");
-                            echo form_dropdown('section', $section,$sectionId,  'class="form-control section" id="showSections"');
-                    ?>
-
-            </div>
-           <div class="form-group col-md-2">
-               <label for="name">Admission In</label>
-<!--                <select name="batch_id" class="form-control" id="batch_id">
-                <option value="">Select Batch</option>
-                </select>-->
-               <?php
-                  echo form_dropdown('admission_in', $admission_in, $admission_in_id, 'class="form-control" ');
-                   ?>
-               
-            </div>     
-        <div class="form-group col-md-4">        
-            <input type="submit" name="search" class="btn btn-theme" value="Search">
-            <input type="submit" name="export" class="btn btn-theme" value="Export">
-            <button type="button" name="print" value="print" onclick="printdiv('div_print');" class="btn btn-theme"><i class="fa fa-print"></i> Print </button>
-        </div>        
-            </form>
+          
             
              <h4 style="color:red; text-align:center;">
             <?php print_r($this->session->flashdata('msg'));?>
@@ -122,7 +117,7 @@ return false;
                 <i class="fa fa-check-circle"></i>Total Records: <?php echo count(@$result);?>
             </button>
             </p>
-            </div>
+        </div>
     <div id="div_print">        
     <table class="table table-boxed" style="font-size:10px;">
         <thead>
@@ -145,7 +140,7 @@ return false;
                 <th>T.Marks</th>
                 <th width="90">Admission In</th>
                 <th>Approved By</th>
-                <th>Status</th>
+                <th>Hostel Status</th>
             </tr>
         </thead>
         <tbody>

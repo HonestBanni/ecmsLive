@@ -16,6 +16,14 @@
         </h4>
                 </div>
 
+        <?php
+        if(empty($section)):
+            echo '<h1 style="text-align:center;color:#c00;"><strong>Section Allotement is required to allot Subject to Arts student.<br>Please first allot section then allot subjects</strong></h1>';
+        else:
+            $on_sec = $this->CRUDModel->get_where_row('sections', array('sec_id' => $section->section_id));
+            if(!empty($on_sec)):
+                if($on_sec->sub_pro_id == 27 || $on_sec->sub_pro_id == 5):
+        ?>
 <form method="post" enctype="multipart/form-data" action="<?php echo base_url();?>admin/updateassigning_subject">
     <div class="form-group col-md-3">
             <label for="usr">Student Name</label>
@@ -36,22 +44,22 @@
 <!--    <div class="form-group col-md-2">
         <label>Section</label>
         <?php
-            $gres = $this->get_model->get_by_id('sections',array('sec_id'=>@$section->section_id));
+//            $gres = $this->get_model->get_by_id('sections',array('sec_id'=>@$section->section_id));
            
-            if($gres){
-                foreach($gres as $grec)
-                { ?>          
-                <input type="text" required="required" name="sec_Name" value="<?php echo $grec->name; ?>" placeholder="Section" class="form-control" id="section_art_id">
-                <input type="hidden" name="sec_id" id="sec_id" value="<?php echo $grec->sec_id; ?>">      
-                <input type="hidden" name="log_sec_id" value="<?php echo $grec->sec_id; ?>">      
+//            if($gres){
+//                foreach($gres as $grec)
+//                { ?>          
+                <input type="text" required="required" name="sec_Name" value="<?php // echo $grec->name; ?>" placeholder="Section" class="form-control" id="section_art_id">
+                <input type="hidden" name="sec_id" id="sec_id" value="<?php // echo $grec->sec_id; ?>">      
+                <input type="hidden" name="log_sec_id" value="<?php // echo $grec->sec_id; ?>">      
                 <?php 
-                }     
-            }else{?>
+//                }     
+//            }else{?>
             <input type="text" name="sec_Name" placeholder="Section" class="form-control" id="section_art_id" required="required">
             <input type="text" name="sec_Name" placeholder="Section" class="form-control" id="section_art_id" >
             <input type="hidden" name="log_sec_Name" placeholder="Section" class="form-control" id="section_art_id" >     
                 <?php
-                }    
+//                }    
             ?>                  
     </div>-->
    <div class="form-group col-md-6"> 
@@ -124,7 +132,14 @@
         <input type="submit" class="btn btn-theme" name="submit" value="Update Record">
     </div>
     </form>
-            
+           
+        <?php 
+        else:
+            echo '<h1 style="text-align:center;color:#c00;"><strong>Section Allotement is required to allot Subject to Arts student.<br>Please first allot section then allot subjects</strong></h1>';
+        endif; 
+        endif; 
+        endif; 
+        ?> 
 							 </div><!--//col-md-3-->
                 
             </div><!--//cols-wrapper-->

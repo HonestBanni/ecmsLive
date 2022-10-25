@@ -3,43 +3,40 @@
     <div class="page-content">
       <div class="row">
         <article class="contact-form col-md-12 col-sm-7">                          
-              <h2 align="left">Books  List<span  style="float:right"><a href="LibraryController/add_book" class="btn btn-large btn-primary">Add Books</a></span><hr></h2>
-            <h4 style="color:red; text-align:center;">
-                <?php print_r($this->session->flashdata('msg'));?>
-            </h4>
-<form method="post">
-        <div class="col-md-12">
-        <div class="form-group col-md-2">
-            <?php       
+            <h2 align="left">Books  List<span  style="float:right"><a href="LibraryController/add_book" class="btn btn-large btn-primary">Add Books</a></span><hr></h2>
+            <h4 style="color:red; text-align:center;"><?php print_r($this->session->flashdata('msg'));?></h4>
+            <form method="post">
+                <div class="form-group col-md-2">
+                <?php       
                 if(!empty($book_id)){
                     $rooms = $this->LibraryModel->get_by_id('lib_books_record',array('book_id'=>$book_id));
                     foreach($rooms as $roomrec)
                     { ?>          
-        <input type="text" name="book_id" value="<?php echo $roomrec->book_title; ?>" placeholder="Book Name" class="form-control" id="book">
+                    <input type="text" name="book_id" value="<?php echo $roomrec->book_title; ?>" placeholder="Book Name" class="form-control" id="book">
                     <input type="hidden" name="book_id" id="book_id" value="<?php echo $roomrec->book_id; ?>">      
                     <?php 
                     }     
                 }else{?>
-       <input type="text" name="book_id" placeholder="Book Name" class="form-control" id="book"> <input type="hidden" name="book_id" id="book_id">
+                    <input type="text" name="book_id" placeholder="Book Name" class="form-control" id="book"> <input type="hidden" name="book_id" id="book_id">
                     <?php
                     }    
                 ?>                  
-            </div>
-            <div class="form-group col-md-2">
-            <?php        
+                </div>
+                <div class="form-group col-md-2">
+                <?php        
                 if(!empty($accession_from)){
                     $acces = $this->LibraryModel->get_by_id('lib_book_code',array('accession_number'=>$accession_from));
                     foreach($acces as $accesrec)
                     { ?>          
-        <input type="text" name="accession_from" value="<?php echo $accesrec->accession_number; ?>" placeholder="New Acc. Number" class="form-control" id="accession_number">
+                    <input type="text" name="accession_from" value="<?php echo $accesrec->accession_number; ?>" placeholder="New Acc. Number" class="form-control" id="accession_number">
                     <input type="hidden" name="accession_from" id="accession_from" value="<?php echo $accesrec->accession_number; ?>">      
-                    <?php 
-                    }     
+                <?php 
+                }     
                 }else{?>
-       <input type="text" name="accession_from" placeholder="New Acc. Number" class="form-control" id="accession_number">
-       <input type="hidden" name="accession_from" id="accession_from">
-                    <?php
-                    }    
+                    <input type="text" name="accession_from" placeholder="New Acc. Number" class="form-control" id="accession_number">
+                    <input type="hidden" name="accession_from" id="accession_from">
+                <?php
+                }    
                 ?>                  
             </div>
             <div class="form-group col-md-2">
@@ -48,15 +45,15 @@
                     $oldacces = $this->LibraryModel->get_by_id('lib_book_code',array('old_accession_number'=>$old_accession));
                     foreach($oldacces as $old_accesrec)
                     { ?>          
-        <input type="text" name="old_accession" value="<?php echo $old_accesrec->old_accession_number; ?>" placeholder="New Acc. Number" class="form-control" id="old_accession_no">
+                    <input type="text" name="old_accession" value="<?php echo $old_accesrec->old_accession_number; ?>" placeholder="New Acc. Number" class="form-control" id="old_accession_no">
                     <input type="hidden" name="old_accession" id="old_accession" value="<?php echo $old_accesrec->old_accession_number; ?>">      
                     <?php 
                     }     
                 }else{?>
-       <input type="text" name="old_accession" placeholder="Old Acc. Number" class="form-control" id="old_accession_no">
-        <input type="hidden" name="old_accession" id="old_accession">
-                    <?php
-                    }    
+                    <input type="text" name="old_accession" placeholder="Old Acc. Number" class="form-control" id="old_accession_no">
+                    <input type="hidden" name="old_accession" id="old_accession">
+                <?php
+                }    
                 ?>                  
             </div>
             <div class="form-group col-md-2">
@@ -77,43 +74,59 @@
                     }    
                 ?>                  
             </div>
-        <div class="form-group col-md-2">
-            <input type="text" name="author_name" value="<?php if($author_name): echo $author_name; endif;?>" placeholder="Author Name" class="form-control">
-        </div>
-<div class="form-group col-md-2">
-            <input type="text" name="subject_name" value="<?php if($subject_name): echo $subject_name; endif;?>" placeholder="Subject Name" class="form-control">
-        </div>
-        <div class="form-group col-md-4">
-            <input type="submit" name="search" value="Search" class="btn btn-theme">
-            <input type="submit" name="export" value="Export" class="btn btn-theme">
-        </div>
-        </div>    
-    </form>
-            <span style="margin-right:30px;color:#208e4c">
-                <?php 
-                if(@$pages):
-                    echo $pages;
-                else: 
-                    echo "";
-                endif;
-                ?>
-            </span>
+            <div class="form-group col-md-2">
+                <input type="text" name="author_name" value="<?php if($author_name): echo $author_name; endif;?>" placeholder="Author Name" class="form-control">
+            </div>
+                
+            <div class="form-group col-md-2">
+                <input type="text" name="subject_name" value="<?php if($subject_name): echo $subject_name; endif;?>" placeholder="Subject Name" class="form-control">
+            </div>
+                
+            <div class="form-group col-md-2">
+                <select name="verified_status" class="form-control">
+                    <option value="">All</option>
+                    <option value="0">Unverified</option>
+                    <option value="1">Verified</option>
+                </select>
+            </div>
+                
+            <div class="form-group col-md-2">
+                 <?php echo form_dropdown('book_status', $book_status, '',  'class="form-control" id="book_status"'); ?>
+            </div>
+                
+            <div class="form-group col-md-4">
+                <input type="submit" name="search" value="Search" class="btn btn-theme">
+                <input type="submit" name="export" value="Export" class="btn btn-theme">
+            </div>    
+        </form>
+            <div class="col-md-12">
+        <span style="margin-right:30px;color:#208e4c">
+            <?php 
+            if(@$pages):
+                echo $pages;
+            else: 
+                echo "";
+            endif;
+            ?>
+        </span>
             <?php
             if(@$books):
             if(@$count):
             ?>
-            <p>
+        <p>
             <button type="button" class="btn btn-success">
                 <i class="fa fa-check-circle"></i>Total Records: <?php echo $count; ?>
             </button>
-            </p>
+        </p>
             <?php else:?>
-            <p>
+        <p>
             <button type="button" class="btn btn-success">
                 <i class="fa fa-check-circle"></i>Total Records: <?php echo count($books); ?>
             </button>
-            </p>
+        </p>
             <?php endif;?>
+        </div>
+        <div class="col-md-12">
             <table class="table table-boxed table-hover">
               <thead>
                 <tr>
@@ -127,6 +140,7 @@
                     <th>Book Status</th>
                     <th>View Book</th>
                     <th>Status</th>
+                    <th>Stock Verification</th>
                     <th>Delete</th>
                 </tr>
               </thead>
@@ -146,10 +160,24 @@
                     <td><?php echo $row->book_isbn;?></td>
                     <td><?php echo $row->author_name;?></td>
                     <td><?php echo $row->title;?></td>
-    <td><a class="btn btn-success btn-sm" href="LibraryController/view_book/<?php echo $row->book_id;?>/<?php echo $row->serial_no;?>">View Book</a></td>
-            <td><a class="btn btn-warning btn-sm" href="LibraryController/update_book_copy/<?php echo $row->serial_no;?>/<?php echo $row->book_id;?>">Edit Status</a></td>
-             <td>
-              
+                    <td><a class="btn btn-success btn-sm" href="LibraryController/view_book/<?php echo $row->book_id;?>/<?php echo $row->serial_no;?>">View Book</a></td>
+                    <td><a class="btn btn-warning btn-sm" href="LibraryController/update_book_copy/<?php echo $row->serial_no;?>/<?php echo $row->book_id;?>">Edit Status</a></td>
+                    <td>
+                        <?php
+                        if($row->book_verified == 1):
+                            echo '<a class="btn btn-success btn-sm change_status" data-toggle="modal" data-target="#ChangeStatusModal" id="'.$row->book_id.'">
+                                <input type="hidden" value="'.$row->book_verified.'" id="status_value">
+                                <i class="fa fa-check"></i> Verified
+                            </a>';
+                        else:
+                            echo '<a class="btn btn-danger btn-sm change_status" data-toggle="modal" data-target="#ChangeStatusModal" id="'.$row->book_id.'">
+                                <input type="hidden" value="'.$row->book_verified.'" id="status_value">
+                                <i class="fa fa-close"></i> Verify
+                            </a>';
+                        endif;
+                        ?>
+                    </td>
+                    <td>
             
              <?php
                     $where = array('book_id'=>$row->book_id);
@@ -173,7 +201,7 @@
                 </tr>
                   <tr style="font-weight:bold;color:red">
                    
-                    <td colspan="11">
+                    <td colspan="12">
                         <blink>
                         <?php 
                         if(!empty($check->student_name)): 
@@ -216,12 +244,28 @@
                     <td><?php echo $row->title;?></td>
     <td><a class="btn btn-success btn-sm" href="LibraryController/view_book/<?php echo $row->book_id;?>/<?php echo $row->serial_no;?>">View Book</a></td>
             <td><a class="btn btn-warning btn-sm" href="LibraryController/update_book_copy/<?php echo $row->serial_no;?>/<?php echo $row->book_id;?>">Edit Status</a></td>
+                    <td>
+                        <?php
+                        if($row->book_verified == 1):
+                            echo '<a class="btn btn-success btn-sm change_status" data-toggle="modal" data-target="#ChangeStatusModal" id="'.$row->book_id.'">
+                                <input type="hidden" value="'.$row->book_verified.'" id="status_value">
+                                <i class="fa fa-check"></i> Verified
+                            </a>';
+                        else:
+                            echo '<a class="btn btn-danger btn-sm change_status" data-toggle="modal" data-target="#ChangeStatusModal" id="'.$row->book_id.'">
+                                <input type="hidden" value="'.$row->book_verified.'" id="status_value">
+                                <i class="fa fa-close"></i> Verify
+                            </a>';
+                        endif;
+                        ?>
+                    </td>
             <td>
                 <?php
             
-            $issuex = $this->db->get_where('lib_staff_book_issuance',array('iss_id'=>$row->book_id))->row();
+                    $where = array('book_id'=>$row->book_id);
+                    $check = $this->LibraryModel->get_IssuanceInfo($where);
              
-            if(empty($issuex)):
+            if(empty($check)):
                 ?>
                  <a class="btn btn-danger btn-sm" href="LibraryController/delete_book_copy/<?php echo $row->serial_no;?>/<?php echo $row->book_id;?>" onclick="return confirm('Are you Want to Delete this Copy..?')">Delete</a>
                     <?php
@@ -245,6 +289,7 @@
                   ?>
               </tbody>
             </table>
+            </div>
             <?php
             else:
                 echo "Records Not Found..";
@@ -252,6 +297,19 @@
                 ?>
             </article>
          
+          
+                <div class="modal fade" id="ChangeStatusModal" role="dialog" style="z-index:9999">
+                    <div class="modal-dialog modal-sm">
+                        <div class="modal-content">
+                            <div class="section-content" id="ChangeStatusResult" >
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+          
+          
+          
           </div>
         <!--//page-row-->
       </div>
@@ -277,6 +335,23 @@ jQuery(document).ready(function(){
         });
 
          
+    jQuery('.change_status').on('click',function(){
+        
+        var book_id = jQuery(this).prop('id');
+        
+          jQuery.ajax({
+               type : 'post',
+               url  : 'LibraryController/verify_books',
+               data : {
+                   'book_id' : book_id,
+                   'status'  : $('#status_value').val()
+               },
+              success :function(result){
+//                 $('.Student'+student_id).hide(); 
+                    jQuery('#ChangeStatusResult').html(result);
+              }
+           });
+    });
     
     
 });
