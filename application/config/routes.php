@@ -178,6 +178,10 @@ $route['ShowSubjectAllottment']         = 'DropdownController/show_subjct_allott
 
 
 
+$route['ArtsSubject1st']                = 'SubjectAllottmentController/arts_students_1st';
+$route['AssignSubjects1st']             = 'SubjectAllottmentController/assign_arts_subjects_1st';
+$route['AssignSubjects1st/:num/:num']   = 'SubjectAllottmentController/assign_arts_subjects_1st/:num/:num';
+$route['ArtSubject1st/:num']            = 'SubjectAllottmentController/arts_students_1st/:num';
 
 
 /***********************
@@ -870,7 +874,11 @@ $route['feeChallanDetail/:num/:num']            = 'FeeController/fee_Challan_Det
 $route['feeChallanPrint/:num/:num']             = 'FeeController/fee_Challan_Print/:num/:num'; 
 $route['feeChallanPrintPDC/:num/:num']          = 'FeeController/fee_Challan_Print_print_date_change/:num/:num'; 
 $route['feeStudentChallanPrint/:num/:num']      = 'StudentController/fee_student_challan_print/:num/:num'; 
+
 $route['feeChallanPrintAdmission/:num/:num']    = 'FeeController/fee_challan_print_admission/:num/:num'; 
+
+//$route['feeChallanPrintAdmission/:num/:num']    = 'FeeController/fee_challan_print_admission/:num/:num'; 
+
 $route['feeChallanPrintOthrInstal/:num/:num']   = 'FeeController/fee_challan_other_installments/:num/:num'; 
 $route['PrintClassWise/:num/:num/:num/:num']    = 'FeeController/print_challan_class_wise/:num/:num/:num/:num'; 
 $route['PrintLanguages/:num/:num/:num']         = 'FeeController/print_challan_language_print/:num/:num/:num'; 
@@ -1032,7 +1040,8 @@ $route['PerformanceSubject']        = 'GuiController/teacher_performance_subject
  $route['Promotions']          = 'PromotionController/student_promotion';
  
  //Hostel and mess 
-$route['hostelMess']                = 'HostelController/hostel_mess';
+$route['Hostel/Challan/Single/Index']         = 'HostelController/hostel_mess';
+//$route['hostelMess']                = 'HostelController/hostel_mess';
 $route['HostelNewRecord/:num']      = 'HostelController/hostel_new_record/:num';
 $route['HostelNewRecordAdmin/:num'] = 'HostelController/hostel_new_record_admin/:num';
 $route['HostelNewRecordAdminUpdate/:num'] = 'HostelController/hostel_new_record_admin_update/:num';
@@ -1049,9 +1058,11 @@ $route['HMDelete/:num']             = 'HostelController/hostel_mess_heads_delete
 $route['checkHostelHead']           = 'HostelController/hostel_heads_check';
 $route['hosteHeadInstall']          = 'HostelController/search_hotel_setups_info';
 
-$route['hostelFee']                     = 'HostelController/hostel_fee';
-$route['HosteInstallmetnJS']        = 'HostelController/hostel_installment_info';
-$route['messFee']                   = 'HostelController/mess_fee';
+$route['Hostel/Challan/Single/Hostel']  = 'HostelController/hostel_fee';
+//$route['hostelFee']                   = 'HostelController/hostel_fee';
+$route['HosteInstallmetnJS']            = 'HostelController/hostel_installment_info';
+$route['Hostel/Challan/Single/Mess']    = 'HostelController/mess_fee';
+//$route['messFee']                   = 'HostelController/mess_fee';
 $route['hostelFeeGroup']            = 'HostelController/hostel_fee_group';
 $route['hostelPrintChallan/:num/:num']  = 'HostelController/hostel_challan_print/:num/:num';
 $route['HostelChallanPrint/:num/:num']  = 'StudentController/hostel_print_challan/:num/:num';
@@ -1216,7 +1227,7 @@ $route['FeeVerfUpdateDate']                 = 'OnlineController/fee_verification
 $route['savePaidDetalsUpdate']              = 'OnlineController/save_paid_challan_info_update';
 $route['GrandReportv01']                    = 'OnlineController/grand_report_v01';
 $route['FeeVerificationReport']             = 'OnlineController/fee_verification_report';
-$route['OnlineGeneralMsg']                  = 'OnlineController/online_student_general_message';
+$route['OnlineGeneralMsg']                  = 'OnlineController/online_student_general_message'; //////////
 $route['StudentMessageLanguage']            = 'OnlineController/online_student_general_message_language';
 $route['OnlineParentMsg']                   = 'OnlineController/online_parent_general_message';
 $route['ApplicantRecordOnline']             = 'OnlineController/applicant_record_admin';
@@ -1244,7 +1255,7 @@ $route['FeeChallanNewAdmission']            = 'OnlineController/fee_challan_new_
 $route['VerifyPDF']                         = 'OnlineController/student_pdf_verify';
 $route['VerifyPDF/:num']                    = 'OnlineController/student_pdf_verify/:num';
 $route['GenerateSinglePDF/:num']            = 'OnlineController/generate_singale_pdf/:num';
-$route['GeneratePDFOnly']                   = 'OnlineController/generate_pdf_only';
+$route['GeneratePDFOnly']                   = 'OnlineController/generate_pdf_only'; //////////////////////
 $route['UpdateShift']                       = 'OnlineController/update_students_shift';
  
 
@@ -1332,4 +1343,12 @@ $route['Fee/Admisson/MertiList/Marks/ChangeShif/Grid']  = 'Fee/Admission/MeritLi
 
 $route['Fee/Admisson/Challan/SearchMerit']          = 'Fee/Admission/SearchController/search_admission_challan';
 $route['Fee/Admission/Challan/Generate/:num']       = 'Fee/Admission/AdmissionController/generate_admission_challan/:num';
+
+
+$route['Attendance/Allotted/Groups/List']               = 'Attendance/Allotted/Group/ReportsController/teacher_alloted_groups';
+$route['Attendance/List/Percentage/:any/:num/:num']          = 'Attendance/Allotted/Group/ReportsController/teacher_alloted_groups_details';
+$route['Attendance/List/Percentage/:any/:num/:num/:num']     = 'Attendance/Allotted/Group/ReportsController/teacher_alloted_groups_details';
+
+
+
 

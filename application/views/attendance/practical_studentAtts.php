@@ -27,7 +27,29 @@
               <input type="hidden" name="group_id" value="<?php echo $this->uri->segment(4);?>">
                   
                     <div class="form-group col-md-2">
-                          <input type="date" name="attendance_date" value="<?php echo date('Y-m-d');?>" class="form-control">       
+                         <select class="form-control" name="attendance_date">
+                        <?php
+                            $m= date("m");
+                            $de= date("d");
+                            $y= date("Y");
+                            $sec_id =$this->uri->segment(4);
+                        
+                         
+                                for($i=0; $i<=50; $i++){
+
+                                $date_is = date('d-m-Y',mktime(0,0,0,$m,($de-$i),$y)); 
+                                echo '<option value="'.$date_is.'">'.$date_is.'</option>';
+
+                                }
+                            
+ 
+                        
+                            
+
+                                
+                            ?>
+                           </select>
+                          <!--<input type="date" name="attendance_date" value="<?php echo date('Y-m-d');?>" class="form-control">-->       
                     </div>
                     <table id='testing123' cellpadding="0" cellspacing="0" border="0" class="datatable-1 table table-boxed table-bordered table-striped	 display" width="100%">
                     <thead>

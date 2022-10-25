@@ -294,6 +294,7 @@
                                             echo form_textarea(array(
                                                 'name'          => 'fee_comments',
                                                 'id'            => 'challan_comment',
+                                                'value'         => $challan_info->fc_comments,
                                                 'cols'          => '40',
                                                  'rows'          => '2',
                                                 'class'         => 'form-control',

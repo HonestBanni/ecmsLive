@@ -31,7 +31,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 if($_SERVER['HTTP_HOST'] == '116.58.106.3'):
        $config['base_url'] = "http://116.58.106.3/ecms/";
   else:
-    $config['base_url'] = 'http://localhost/ecmsLive/';  
+    $config['base_url'] = 'http://172.16.0.111/ecms/';  
 endif;
  
 

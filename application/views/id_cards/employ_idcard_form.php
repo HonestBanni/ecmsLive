@@ -34,7 +34,7 @@
                                 <div class="row">
                                     
                                     <div class="col-md-6 subject form-group">
-                                        <label style="text-indent: 3px">Student Name:</label>
+                                        <label style="text-indent: 3px">Employ Name:</label>
                                         <input type="text" class="form-control" name="employ_name" id="employ_name" autocomplete="off" value="<?php echo strtoupper($emp_rec->emp_name); ?>">
                                         <input type="hidden" readonly="readonly" name="emp_image"  id="emp_image" value="<?php echo $emp_rec->picture?>">
                                         <input type="hidden" readonly="readonly" name="emp_id" id="emp_id" value="<?php echo $emp_rec->emp_id?>">

@@ -39,22 +39,22 @@
                         
                         $SectionData = $this->db->get_where('sections',array('sec_id'=>$sec_id))->row();
                         
-                        if($SectionData->program_id == 3 || $SectionData->program_id == 6):
-                            for($i=0; $i<=21; $i++){
-
-                                $date_is = date('Y-m-d',mktime(0,0,0,$m,($de-$i),$y)); 
-                                echo '<option value="'.$date_is.'">'.$date_is.'</option>';
-
-                                }
-                            else:
-                                for($i=0; $i<=7; $i++){
+//                        if($SectionData->program_id == 3 || $SectionData->program_id == 6):
+//                            for($i=0; $i<=21; $i++){
+//
+//                                $date_is = date('Y-m-d',mktime(0,0,0,$m,($de-$i),$y)); 
+//                                echo '<option value="'.$date_is.'">'.$date_is.'</option>';
+//
+//                                }
+//                            else:
+                                for($i=0; $i<=50; $i++){
 
                                 $date_is = date('Y-m-d',mktime(0,0,0,$m,($de-$i),$y)); 
                                 echo '<option value="'.$date_is.'">'.$date_is.'</option>';
 
                                 }
                             
-                        endif;
+//                        endif;
                         
                             
 

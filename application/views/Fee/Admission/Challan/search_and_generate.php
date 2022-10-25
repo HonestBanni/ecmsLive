@@ -303,14 +303,20 @@
                                          
                             <div class="col-md-12">
                                     <label for="name">Comments</label>
-                                        <?php 
+                                        <?php
+                                        $shiftName = '';
+                                         if(isset($shift[1])):
+                                             $shiftName = $shift[1];
+                                             else:
+                                             $shiftName = $shift[2];
+                                        endif;
                                             echo form_textarea(array(
                                                 'name'          => 'fee_comments',
                                                 'id'            => 'challan_comment',
                                                 'cols'          => '40',
                                                 'rows'         => '2',
                                                 'class'         => 'form-control',
-                                                'value'        => 'Marks = '.$student_info->obtained_marks.' Shift = '.$shift[1]
+                                                'value'        => 'Marks = '.$student_info->obtained_marks.' Shift = '.@$shiftName
                                                 ));
                                            
                                          ?>

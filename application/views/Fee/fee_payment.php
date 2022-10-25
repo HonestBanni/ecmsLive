@@ -124,6 +124,7 @@
                             <div class="row">
                             <?php
                             if(!empty($studentInfo)):
+                                
                                 echo '<div class="col-md-3"><label for="name">Student Name</label>';
                                  echo form_input(array(
                                        'readonly'         => 'readonly',
@@ -238,7 +239,9 @@
                                             endif;
                                         endif;
                                     else:
-                                        echo '<button type="button" class="btn btn-danger"   ><i class="fa fa-save"></i> Student Status Pending..</button>';
+                                           if(!empty($challandId)):
+                                                echo '<button type="button" class="btn btn-danger"   ><i class="fa fa-exclamation-triangle"></i>Pending</button>';
+                                            endif;
                                     endif;
                                     
                                     ?>

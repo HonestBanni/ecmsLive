@@ -395,7 +395,7 @@
                                                              );
                                                       ?>
                                               </div>
-                                          <p><span id="remaining">160 characters remaining</span> <span id="messages">1 message(s)</span></p>                                           
+                                          <p><span id="remaining">148 characters remaining</span> <span id="messages">1 message(s)</span></p>                                           
                                      </div>
                                  
                             </div>
@@ -457,6 +457,7 @@
                                                             <th>Form No</th>
                                                             <th>Student Name</th>
                                                             <th>Father Name</th>
+                                                            <th>Sub Program</th>
                                                             <th>Applicant No</th>
                                                             <th>Degree</th>
                                                             <th>Marks 9th</th>
@@ -464,8 +465,7 @@
                                                             <th>%age</th>
                                                             <th>Entry Date</th>
                                                             <th>Challan Up</th>
-                                                            <th>DMC Up</th>
-                                                            <th>Verify Marks</th>
+                                                           
                                                            
                                                           
 
@@ -474,6 +474,7 @@
                                                     <tbody>';
   
                                                         $sn = "";
+                                                     
                                                           foreach($result as $row):
                                                               $pic_link = '';
                                                                 if($row->applicant_image):
@@ -492,7 +493,7 @@
                                                                 echo '<td>'.$row->form_no.'</td>';
                                                                 echo '<td>'.substr($row->student_name, 0, 30).' </td>';
                                                                 echo '<td>'.substr($row->father_name, 0, 30).' </td>';
-                                                                  
+                                                                 echo '<td>'.$row->subprogram.'</td>';     
                                                                 echo '<td>'.$row->applicant_mob_no1.'</td>';     
                                                                 echo '<td>'.$row->DegreeTitle.'</td>';     
                                                                 echo '<td>'.$row->obtained_marks_9th.'/'.$row->total_marks_9th.'</td>';     
@@ -514,12 +515,7 @@
                                                                 
                                                                 
                                                                  echo '<td>'.$challanPaidFlag.'</td>'; 
-                                                                 echo '<td>'.$DMC_Flag.'</td>'; 
-                                                                 if($row->app_verify_flag == 1):
-                                                                      echo '<td>No</td>'; 
-                                                                     else:
-                                                                     echo '<td><strong>Yes</strong></td>'; 
-                                                                 endif;
+                                                                
                                                                 
                                                                 
                                                                 
@@ -634,8 +630,8 @@ $('#message').keyup(function(){
         jQuery('#sendSMS').show();
     }
     var chars = this.value.length,
-        messages = Math.ceil(chars / 160),
-        remaining = messages * 160 - (chars % (messages * 160) || messages * 160);
+        messages = Math.ceil(chars / 148),
+        remaining = messages * 148 - (chars % (messages * 148) || messages * 148);
 
     $remaining.text(remaining + ' characters remaining');
     $messages.text(messages + ' message(s)');

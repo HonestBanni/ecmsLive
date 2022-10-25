@@ -60,25 +60,7 @@ jQuery(document).ready(function(){
          
      });
    });
- jQuery('#type').hide();
- jQuery('#bank_hostel').hide();
- jQuery('#bank_mess').hide();
-  jQuery('#hostel_type').on('change',function(){
-      
-      var type = jQuery('#hostel_type').val();
-      
-      if(type == 1){
-         jQuery('#type').hide();
-         jQuery('#bank_hostel').show();
-         jQuery('#bank_mess').hide();
-      }
-      if(type == 2){
-         jQuery('#type').show();
-         jQuery('#bank_hostel').hide();
-         jQuery('#bank_mess').show();
-      }
-  });  
-  
+
   
   jQuery('#print_challan').on('click',function(){
       
@@ -102,33 +84,5 @@ jQuery(document).ready(function(){
   
   
  
-  
-   //Get All Student For Group wise challan generation 
-    jQuery('#hostel_group_challan').on('change',function(){
-          var batch_id = jQuery(this).val();
-            jQuery.ajax({
-                type    :'post',
-                url     :'hostelController/get_batch_wise_students',
-                data    :{'batch_id':batch_id},
-                success :function(result){
-                   console.log(result);
-                   jQuery('#showAllStudents').html(result);
-                   
-                   
-                   
-                jQuery.ajax({
-                    type    :'post',
-                    url     :'hostelController/get_installment_type',
-                    data    :{'batch_id':batch_id},
-                    success :function(result){
-                    console.log(result);
-                    jQuery('#installment_types').html(result);
-                    }   
-                
-                });
-                   
-               },
-                
-            });
-      });    
+   
 });

@@ -7524,10 +7524,7 @@ class FinanceController extends AdminController {
                                                 $this->db->join('hr_emp_record','hr_emp_record.emp_id=gl_cheque_signature_list.emp_id'); 
                                                 $this->db->order_by('gl_cs_order','asc');
             $this->data['gl_sign_list']     =   $this->db->get_where('gl_cheque_signature_list',array('gl_cs_status'=>1))->result();
-            
-            
-            
-             $this->data['bank_COA']       =   $this->DropdownModel->dropDown_coa_chk_print('gl_amount_details', 'Selecct COA', 'fn_coa_mc_id', 'fn_coa_mc_title',array('gl_amount_details.gl_ad_atId'=>$gl_id)); 
+            $this->data['bank_COA']       =   $this->DropdownModel->dropDown_coa_chk_print('gl_amount_details', 'Selecct COA', 'fn_coa_mc_id', 'fn_coa_mc_title',array('gl_amount_details.gl_ad_atId'=>$gl_id)); 
              $this->data['cheque_type']    =   $this->CRUDModel->dropDown('gl_bank_cheque_type', 'Selecct Type', 'gl_ct_id', 'gl_ct_title'); 
             
         else:

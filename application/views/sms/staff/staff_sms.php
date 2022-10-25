@@ -159,7 +159,7 @@
                                                              );
                                                       ?>
                                               </div>
-                                          <p><span id="remaining">149 characters remaining</span> <span id="messages">1 message(s)</span></p>
+                                          <p><span id="remaining">148 characters remaining</span> <span id="messages">1 message(s)</span></p>
                                             
                                      </div>
                                  
@@ -282,37 +282,37 @@
  <script>
     jQuery(document).ready(function(){
 
-   var fieldPassword =jQuery('#smsPassword').val();
-   if(fieldPassword == ''){
-       var password =  window.prompt("Please Enter SMS Password..", "");
-       if(password == ''){
-           window.location.reload();
-       }
-       if(password ==  null){
-           window.location.reload();
-       }
-       if(password !=  ''){
-           
-          jQuery.ajax({
-              type      : 'post',
-              url       : 'checkSMSPassword',
-              data      : {'password':password},
-              dataType  : 'json',
-              success   : function(result){
-                 if(result ==  1){
-                     alert('Please enter vallid password...');
-                     window.location.href="admin/admin_home";
-                 }
-                 if(result ==  2){
-//                     alert(password);
-                     jQuery('#smsPassword').val(password);
-                 } 
-              }
-              
-              
-          });
-       }
-   }
+//   var fieldPassword =jQuery('#smsPassword').val();
+//   if(fieldPassword == ''){
+//       var password =  window.prompt("Please Enter SMS Password..", "");
+//       if(password == ''){
+//           window.location.reload();
+//       }
+//       if(password ==  null){
+//           window.location.reload();
+//       }
+//       if(password !=  ''){
+//           
+//          jQuery.ajax({
+//              type      : 'post',
+//              url       : 'checkSMSPassword',
+//              data      : {'password':password},
+//              dataType  : 'json',
+//              success   : function(result){
+//                 if(result ==  1){
+//                     alert('Please enter vallid password...');
+//                     window.location.href="admin/admin_home";
+//                 }
+//                 if(result ==  2){
+////                     alert(password);
+//                     jQuery('#smsPassword').val(password);
+//                 } 
+//              }
+//              
+//              
+//          });
+//       }
+//   }
    
     jQuery('#sendSMS').on('click',function(){
         jQuery('#sendSMS').hide();
@@ -339,8 +339,8 @@ $('#message').keyup(function(){
     
     
     var chars = this.value.length,
-        messages = Math.ceil(chars / 149),
-        remaining = messages * 149 - (chars % (messages * 149) || messages * 149);
+        messages = Math.ceil(chars / 148),
+        remaining = messages * 148 - (chars % (messages * 148) || messages * 148);
 
     $remaining.text(remaining + ' characters remaining');
     $messages.text(messages + ' message(s)');

@@ -77,10 +77,10 @@ $query_builder = TRUE;
 $db['default'] = array(
 	'dsn'	=> '',
 	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => '',
+	'username' => 'admin',
+	'password' => 'edwes@550',
 	
-	'database' => 'ecms11',
+	'database' => 'ecms',
 //	'database' => 'ecmslive_6_11_2017',
 //	'database' => 'ecmslive_5_11_2017',
 //	'database' => 'ecms_30_10_2017',

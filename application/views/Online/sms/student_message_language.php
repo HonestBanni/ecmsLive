@@ -288,7 +288,7 @@
                                                              );
                                                       ?>
                                               </div>
-                                          <p><span id="remaining">160 characters remaining</span> <span id="messages">1 message(s)</span></p>                                           
+                                          <p><span id="remaining">148 characters remaining</span> <span id="messages">1 message(s)</span></p>                                           
                                      </div>
                                  
                             </div>
@@ -516,8 +516,8 @@ $('#message').keyup(function(){
     
     
     var chars = this.value.length,
-        messages = Math.ceil(chars / 160),
-        remaining = messages * 160 - (chars % (messages * 160) || messages * 160);
+        messages = Math.ceil(chars / 148),
+        remaining = messages * 148 - (chars % (messages * 148) || messages * 148);
 
     $remaining.text(remaining + ' characters remaining');
     $messages.text(messages + ' message(s)');

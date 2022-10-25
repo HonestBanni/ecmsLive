@@ -936,7 +936,7 @@ public function hostel_head_wise_group_wise($where,$like,$date){
                 endif;
                
                 $this->db->group_by('student_record.student_id','asc');
-                $this->db->order_by('student_record.college_no','asc');
+                $this->db->order_by('hostel_refund.refund_date','asc');
         return  $this->db->get('student_record')->result();
     } 
 
@@ -1685,7 +1685,7 @@ $this->db->join('hostel_student_record','hostel_student_record.student_id=studen
                 endif;
                
                 $this->db->group_by('hostel_head_title.id');
-                $this->db->order_by('student_record.college_no','asc');
+                $this->db->order_by('hostel_refund.refund_date','asc');
         return  $this->db->get('student_record')->result();
    }
        public function get_lock_dates($from,$to){

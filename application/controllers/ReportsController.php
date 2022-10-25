@@ -9744,11 +9744,11 @@ public function student_practical_white_card_group()
                 $section                     =  $this->input->post('sections_name');
                 $student_status              =  $this->input->post('student_status');
                 
-                $this->data['subprogram']       = $this->CRUDModel->dropDown('sub_programes', ' Sub Program ', 'sub_pro_id', 'name',array('status'=>'yes','programe_id'=>$program));
+                $this->data['subprogram']           = $this->CRUDModel->dropDown('sub_programes', ' Sub Program ', 'sub_pro_id', 'name',array('status'=>'yes','programe_id'=>$program));
                 if(!empty($sub_program)):
                     $this->data['section']          = $this->CRUDModel->dropDown('sections', 'Select Sections ', 'sec_id', 'name',array('status'=>'On','sub_pro_id'=>$sub_program));
                 else:
-                    $this->data['section']  = array(''=>'Select Sections');
+                    $this->data['section']          = array(''=>'Select Sections');
                 endif;
                 
                 

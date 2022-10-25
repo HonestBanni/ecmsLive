@@ -3933,6 +3933,7 @@ public function practical_white_card_group($where)
                     student_record.college_no,
                     student_record.student_name,
                     student_record.father_name,
+                    student_record.mobile_no,
                     student_record.form_no,
                     programes_info.programe_name,
                     sub_programes.name as subprogram,
@@ -4003,10 +4004,14 @@ public function practical_white_card_group($where)
                         'college_no'    => $row->college_no,
                         'student_name'  => $row->student_name,
                         'father_name'   => $row->father_name,
+                        'mobile_no'   => $row->mobile_no,
                         'status'        => $row->status,
                         'marks'         => $marks->Percentage,
                         'sectionName'   => $row->sectionName,
                         'Total_Classes' => $att_details->Absent.' + '.$att_details->Present.' = '.$att_details->Total_Classes,
+                        'Absent'        =>$att_details->Absent,
+                        'Present'       =>$att_details->Present,
+                        'Total'         =>$att_details->Total_Classes,
                         'Percentage'    => $att_details->Percentage,
                     );  
                     endif;
@@ -4573,6 +4578,104 @@ public function practical_white_card_group($where)
             
             
     } 
+      public function attendance_group_percentage_subject_report($where=NULL,$like=NULL,$date=NULL,$att_between=NULL){
+  
+                $this->db->select('
+                    student_record.student_id,
+                    student_record.college_no,
+                    student_record.student_name,
+                    student_record.father_name,
+                    student_record.form_no,
+                    student_record.mobile_no,
+                    programes_info.programe_name,
+                    sub_programes.name as subprogram,
+                    prospectus_batch.batch_name,
+                    applicant_edu_detail.total_marks,
+                    applicant_edu_detail.obtained_marks,
+                    applicant_edu_detail.percentage,
+                    sections.sec_id,
+                    sections.name as sectionName,
+                    admission_date,
+                    college_no,
+                    student_status.name as status,
+                    ');    
+                
+                
+                $this->db->join('applicant_edu_detail','applicant_edu_detail.student_id=student_record.student_id','left outer');
+                $this->db->join('student_group_allotment','student_group_allotment.student_id=student_record.student_id','left outer');
+                $this->db->join('sections','sections.sec_id=student_group_allotment.section_id','left outer');
+                $this->db->join('student_subject_alloted','student_subject_alloted.student_id=student_record.student_id');
+                 
+                
+                $this->db->join('programes_info','programes_info.programe_id=student_record.programe_id','left outer');
+                $this->db->join('sub_programes','sub_programes.sub_pro_id=student_record.sub_pro_id','left outer');
 
+                $this->db->join('prospectus_batch','prospectus_batch.batch_id=student_record.batch_id','left outer');
+                $this->db->join('student_status','student_status.s_status_id=student_record.s_status_id','left outer');
+                
+                if($like):
+                     $this->db->like($like);
+                endif;
+                $this->db->group_by('student_record.student_id');
+                $this->db->order_by('form_no','asc');
+            
+            if($where):
+                $this->db->where($where);
+            endif;
+            $result =  $this->db->get('student_record')->result();
+            if(!empty($result)):
+                $return_array = array();
+                foreach($result as $row):
+                                $this->db->select("
+                                      count(*) as Total_Classes,
+                                      count(if(status = '0', 1, NULL)) AS Absent,
+                                      (count(*) - count(if(status = '0', 1, NULL))) as Present,
+                                        ROUND(((count(*) - count(if(status = '0', 1, NULL)))/ count(*))*100,2) as Percentage
+                                  ");
+                                  
+                                  if(empty($att_between['per_from'])):
+                                    $this->db->having('Percentage <=',$att_between['per_to']);
+                                else:
+                                    $this->db->having('Percentage BETWEEN "'.$att_between['per_from'].'" AND "'.$att_between['per_to'].'"');   
+                                endif;
+                                 
+                                if(empty($date['fromDate'])):
+                                    $this->db->where('student_attendance.attendance_date <=',date('Y-m-d', strtotime($date['toDate'])));
+                                else:
+                                    $this->db->where('student_attendance.attendance_date BETWEEN "'.date('Y-m-d', strtotime($date['fromDate'])).'" AND "'.date('Y-m-d', strtotime($date['toDate'])).'"');   
+                                endif;
+                                $this->db->join('student_attendance','student_attendance.attend_id=student_attendance_details.attend_id'); 
+                    
+                $att_details  = $this->db->get_where('student_attendance_details',array('student_id'=>$row->student_id))->row();
+                    if(!empty($att_details)):
+                        $marks      = $this->CRUDModel->get_student_montly_marks_details($row->student_id,$row->sec_id);
+                        
+                        $return_array[] = array(
+                        'college_no'    => $row->college_no,
+                        'student_name'  => $row->student_name,
+                        'father_name'   => $row->father_name,
+                        'status'        => $row->status,
+                        'sectionName'   => $row->sectionName,
+                        'mobile_no'     => $row->mobile_no,
+                        'marks'         => $marks->Percentage,
+                        'Total_Classes' => $att_details->Absent.' + '.$att_details->Present.' = '.$att_details->Total_Classes,
+                        'Absent'        =>$att_details->Absent,
+                        'Present'       =>$att_details->Present,
+                        'Total'         =>$att_details->Total_Classes,
+                        'Percentage'    => $att_details->Percentage,
+                    );  
+                    endif;
+                   
+                endforeach;
+                
+                        $keys   = array_column($return_array, 'Percentage');
+                        array_multisort($keys, SORT_DESC, $return_array);
+                return  json_decode(json_encode($return_array), FALSE); 
+           
+            
+            endif;
+           
+    }
    
 }
+//

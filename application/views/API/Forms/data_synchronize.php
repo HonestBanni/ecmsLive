@@ -29,6 +29,21 @@
                                
                             <div class="row">
                                 <div class="col-md-3">
+                                    <label for="name">Form#</label>
+                                    <div class="form-group ">
+                                        <?php 
+                                            echo form_input(
+                                                    array(
+                                                        'name'      => 'form_no',
+                                                        'value'     => $form_no,
+                                                        'class'     => 'form-control',
+                                                        
+                                                    )
+                                                );
+                                        ?>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
                                     <label for="name">Program</label>
                                     <div class="form-group ">
                                         <?php 
@@ -63,14 +78,14 @@
                                                             'name'          => 'AuthCode',
                                                             'type'          => 'text',
                                                             'class'         => 'form-control',
-                                                             'value'        =>$AuthCode
+                                                             'value'        => $AuthCode
                                                         ));
                                             echo  form_input(
                                                          array(
                                                             'name'          => 'UserID',
                                                             'type'          => 'hidden',
                                                             'class'         => 'form-control',
-                                                             'value'        =>$UserID
+                                                             'value'        => $UserID
                                                         ));
                                                  ?>
                                           
@@ -113,6 +128,7 @@
                                                       <tr>
 
                                                           <th>#</th>
+                                                          <th>Form#</th>
                                                           <th>Name</th>
                                                           <th>Father Name</th>
                                                           <th>Father CNIC</th>
@@ -130,6 +146,7 @@
                                                             $sn++;
                                                             echo '<tr>';
                                                             echo '<td>'.$sn.'</td>';
+                                                            echo '<td>'.$row->form_no.'</td>';
                                                             echo '<td>'.$row->student_name.'</td>';
                                                             echo '<td>'.$row->father_name.'</td>';
                                                             echo '<td>'.$row->father_cnic.'</td>';

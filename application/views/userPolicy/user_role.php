@@ -75,6 +75,7 @@
                   <th >S.no</th>
                
                   <th>Group Name</th>
+                  <th>No of Users</th>
                   <th>Date</th>
                   <th>Status</th>
                   <th>Manage</th>
@@ -87,10 +88,13 @@
                   <?php
                   $sn = 1;
                    foreach($userRole as $urRow):
+                            
+                       $count = $this->db->get_where('users',array('user_roleId'=>$urRow->ur_id))->result();
                        if($urRow->ur_status){$status="<a href='javascript:void(0)' class='groupId' id='".$urRow->ur_status.",".$urRow->ur_status."'><span class='fa fa-unlock text-navy'></span></a>";}else{$status="<a href='javascript:void(0)' class='productstatus' id='".$urRow->ur_status.",".$urRow->ur_status."'><span class='fa fa-unlock-alt danger'></span></a>";}
                       echo '<tr>
                                 <td>'.$sn.'</td>
                                 <td>'.$urRow->ur_name.'</td>
+                                <td>'.count($count).'</td>
                                 <td>'.$urRow->ur_date.'</td>
                                  <td>'.$status.'</td>
                                 <td><a href="userRole/'.$urRow->ur_id.'" class="productstatus" ><span class="fa fa-book text-navy"></span></a></td>

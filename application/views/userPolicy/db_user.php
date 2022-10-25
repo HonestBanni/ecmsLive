@@ -53,7 +53,7 @@
                                         </div>
                                 </div>
                                  
-                                <div class="col-md-2 col-sm-5">
+                                <div class="col-md-4 col-sm-5">
                                     <label for="name">Group</label>
                                         <div class="input-group" id="adv-search">
                                             <?php

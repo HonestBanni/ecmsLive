@@ -620,14 +620,7 @@ class OnlineController extends AdminController {
            $fee_paid_date   = $this->input->post('fee_paid_date');
            $ChildStaff      = $this->input->post('ChildStaff');
            
-            $wherechec = array(
-                's_status_id'    => '15',
-                'student_id'     => $student_id
-            );
-
-             $get_student_details = $this->CRUDModel->get_where_row('student_record',$wherechec);
-              //Update student status to application received if student status is pending
-           if(isset($get_student_details) && !empty($get_student_details)):
+           
                               $this->db->join('mobile_network','mobile_network.net_id=student_record.std_mobile_network');  
            $currentStatus   = $this->db->get_where('student_record',array('student_id'=>$student_id))->row();
               $data = array(
@@ -648,7 +641,14 @@ class OnlineController extends AdminController {
            );
            
             $this->CRUDModel->update('prospectus_challan',$fee_details,array('student_id'=>$student_id));
-            
+             $wherechec = array(
+                's_status_id'    => '15',
+                'student_id'     => $student_id
+            );
+
+             $get_student_details = $this->CRUDModel->get_where_row('student_record',$wherechec);
+              //Update student status to application received if student status is pending
+           if(isset($get_student_details) && !empty($get_student_details)):
             
            $set = array(
              's_status_id' =>'1'  
@@ -1657,9 +1657,9 @@ public function grand_report_v01(){
                 $paid_to            =  $this->input->post('paid_to');
                 $paid_by            =  $this->input->post('paid_by');
               
-                $like = '';
+                    $like = '';
 //                $where= '';
-                $where['prospectus_challan.pros_paid_status']   = '2';
+                    $where['prospectus_challan.pros_paid_status']   = '2';
                     $date['PaidTo']             = $paid_to;
                     $date['PaidFrom']           = $paid_from;
                     
@@ -1726,7 +1726,7 @@ public function grand_report_v01(){
                 $like = '';
 //                $where = '';
                 $where['prospectus_challan.pros_paid_status']   = '2';
-                $where['staffChild_flag']= '2';
+                $where['staffChild_flag']                       = '2';
 //                $where['student_record.batch_id']   = $default_batch->batch_id;
                     $date['PaidTo']             = $paid_to;
                     $date['PaidFrom']           = $paid_from;

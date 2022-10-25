@@ -1383,7 +1383,7 @@ class FeeModel extends CI_Model
         if($like):
             $this->db->like($like);
         endif;
-        $this->db->where('timestamp >= date_sub(now(),interval 12 month)');
+        $this->db->where('timestamp >= date_sub(now(),interval 2 month)');
          
         $this->db->order_by('form_no','asc');
         $this->db->join("sub_programes","sub_programes.sub_pro_id=student_record.sub_pro_id");
@@ -2749,6 +2749,7 @@ class FeeModel extends CI_Model
                              student_record.college_no,
                              student_record.mobile_no,
                              student_record.applicant_mob_no1,
+                             student_record.father_cnic,
                              student_record.app_postal_address,
                              student_record.form_no,
                               student_record.admission_comment,
@@ -5939,7 +5940,7 @@ public function full_defaulter_notice_report($where=Null,$amount=NULL,$like=NULL
                  $this->db->order_by('sections.name','asc');
         return  $this->db->get('fee_challan')->result();
     }
-      public function fee_challan_generate_pdf_only($where=Null,$std_no=NULL){
+      public function fee_challan_generate_pdf_only($where=Null,$std_no=NULL,$date=NULL){
  
             $this->db->select(
                          '
@@ -5979,6 +5980,13 @@ public function full_defaulter_notice_report($where=Null,$amount=NULL,$like=NULL
                 if($where):
                     $this->db->where($where);
                 endif;
+                
+                 if(empty($date['entry_date_from'])):
+                   $this->db->where('date_format(student_record.timestamp,"%Y-%m-%d") <=',date('Y-m-d',strtotime($date['entry_date_to'])));
+                else:
+                     $this->db->where('date_format(student_record.timestamp,"%Y-%m-%d") BETWEEN "'.date('Y-m-d',strtotime($date['entry_date_from'])).'" AND "'.date('Y-m-d',strtotime($date['entry_date_to'])).'"');   
+                endif;
+                
                
                 $this->db->group_by('student_record.student_id');
                 $this->db->order_by('applicant_edu_detail.obtained_marks','desc');

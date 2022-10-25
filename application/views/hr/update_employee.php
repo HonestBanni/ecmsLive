@@ -423,7 +423,7 @@ echo '<option type="text" value=""></option>';
     ?>
     <option>&larr; Select Designation &rarr;</option>
     <?php
-    $js = $this->db->query("SELECT * FROM hr_emp_designation");
+    $js = $this->db->query("SELECT * FROM hr_emp_designation ORDER BY title");
     foreach($js->result() as $jsrec)
     {
     ?>

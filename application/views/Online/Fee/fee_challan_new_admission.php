@@ -103,7 +103,7 @@
                                             echo form_input(array(
                                                 'name'          => 'fromDate',
                                                 'id'            => 'fromDate',
-                                                'value'         => date('d-m-Y'),
+                                                'value'         => $fromDate,
                                                 'rows'          => '2',
                                                 'class'         => 'form-control datepicker',
                                                 ));
@@ -115,7 +115,7 @@
                                                echo form_input(array(
                                                 'name'          => 'uptoDate',
                                                 'id'            => 'uptoDate',
-                                                'value'         => date('d-m-Y'),
+                                                'value'         => $uptoDate,
                                                  'rows'          => '2',
                                                 'class'         => 'form-control datepicker',
                                                 
@@ -129,7 +129,7 @@
                                                echo form_input(array(
                                                 'name'          => 'dueDate',
                                                 'id'            => 'dueDate',
-                                                'value'         => date('d-m-Y'),
+                                                'value'         => $dueDate,
                                                  'rows'          => '2',
                                                 'class'         => 'form-control datepicker',
                                                 
@@ -142,7 +142,7 @@
                                                echo form_input(array(
                                                 'name'          => 'issuDate',
                                                 'id'            => 'issuDate',
-                                                'value'         => date('d-m-Y'),
+                                                'value'         => $issuDate,
                                                  'rows'          => '2',
                                                 'class'         => 'form-control datepicker',
                                                 

@@ -18,7 +18,8 @@ class ApiController extends AdminController{
             $this->data['UserID']       = '';
             $this->data['program_id']   = '';
             $this->data['sub_pro_id']   = '';
-            $this->data['studentStatus_id']   = '';
+            $this->data['form_no']              = '';
+            $this->data['studentStatus_id']     = '';
             
             if($this->input->post('CreateAuth')):
                     
@@ -59,13 +60,15 @@ class ApiController extends AdminController{
             endif;
             
             if($this->input->post('SearchRecord')):
-                $data = '';
-                $program        = $this->input->post('Program');
-                $sub_pro_id     = $this->input->post('sub_pro_id');
-                $studentStatus     = $this->input->post('studentStatus');
+                $data               = array();
+                $program            = $this->input->post('Program');
+                $sub_pro_id         = $this->input->post('sub_pro_id');
+                $studentStatus      = $this->input->post('studentStatus');
+                $form_no            = $this->input->post('form_no');
+                
                 if(!empty($program)):
-                  $this->data['program_id']  =$program;
-                  $data['programes_info.programe_id'] =  $program;  
+                  $this->data['program_id']             = $program;
+                  $data['programes_info.programe_id']   = $program;  
                 endif;
                 if(!empty($sub_pro_id)):
                   $data['student_record.sub_pro_id'] =  $sub_pro_id;  
@@ -75,7 +78,11 @@ class ApiController extends AdminController{
                   $data['student_record.s_status_id']   =  $studentStatus;  
                   $this->data['studentStatus_id']       =  $studentStatus;  
                 endif;
-                                                                     
+                if(!empty($form_no)):
+                  $data['student_record.form_no']   =  $form_no;  
+                  $this->data['form_no']            =  $form_no;  
+                endif;
+                                                                      
                 $data_string    = json_encode($data);                                                                                   
 //                  echo '<pre>';print_r($data_string);die;
                   $header = array(
@@ -107,10 +114,12 @@ class ApiController extends AdminController{
                  
             endif;
             if($this->input->post('synchronize')):
-                    $data = '';
+                    $data           = array();
                     $program        = $this->input->post('Program');
                     $sub_pro_id     = $this->input->post('sub_pro_id');
-                    $studentStatus     = $this->input->post('studentStatus');
+                    $studentStatus  = $this->input->post('studentStatus');
+                    $form_no        = $this->input->post('form_no');
+                    
                     if(!empty($program)):
                       $this->data['program_id'] = $program;
                       $data['Program']          = $program;  
@@ -125,6 +134,10 @@ class ApiController extends AdminController{
                       $data['studentStatus']            =  $studentStatus;  
 //                      $data['student_record.s_status_id']   =  $studentStatus;  
                       $this->data['studentStatus_id']   =  $studentStatus;  
+                    endif;
+                    if(!empty($form_no)):
+                        $data['form_no'] =  $form_no;  
+                        $this->data['form_no']          =  $form_no;  
                     endif;
                     
                     $data_string    = json_encode($data);  

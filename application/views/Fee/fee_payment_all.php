@@ -85,6 +85,10 @@
                                                 'type'          => 'hidden'
                              
                                                 ));
+                                            
+                                            
+                                            
+                                            
                                          ?>
                                     </div>
                                     <?php
@@ -161,7 +165,7 @@
                                      'class'        => 'form-control',
                                     ));
                                 echo '</div>';
-                                
+                             
                             endif;
                             
                             ?>
@@ -194,9 +198,13 @@
                                 echo '</div>';
                                 
                                 if($challan_details->challan_id_lock ==1):
-                                    echo '<div style="padding-top:2%;">';
-                                    echo '<button type="button" class="btn btn-danger" style="font-size: 25px;"><i class="fa fa-lock"></i>FEE BILL LOCKED</button>';
-                                    echo '</div>';
+                                    
+                              
+                                
+                                  echo '<div style="padding-top:2%;">';
+                              
+                                  echo '<button type="button" class="btn btn-danger" style="font-size: 25px;"><i class="fa fa-lock"></i>FEE BILL LOCKED</button>';
+                                echo '</div>';
                                   endif;
                                 
                              echo '</div>';
@@ -207,25 +215,35 @@
                             
                             ?>
                                </div> 
-                          <div style="padding-top:1%;">
+                            <div style="padding-top:1%;">
                                 <div class="col-md-4 col-md-offset-1 pull-right">
-                                    
                                     <button type="submit" class="btn btn-theme" name="payment_challan_search" id="payment_challan_search"  value="payment_challan_search" ><i class="fa fa-search"></i> Search</button>
                                     <?php
                                     
 //                                     fc_ch_status_id
-                                    if(!empty($studentInfo)):
-                                       
-                                         if($challan_details->fc_ch_status_id ==1):
-                                             //If Bill Lock then button no show
-//                                            if($challan_details->challan_id_lock ==1):
-//                                             echo '<button type="button" class="btn btn-danger"   ><i class="fa fa-save"></i> Bill Lock</button>';
-//                                                else:
+                                        if(!empty($studentInfo)):
+                                            if($challan_details->fc_ch_status_id ==1):
+                                                 //If Bill Lock then button no show
+    //                                            if($challan_details->challan_id_lock ==1):
+    //                                                echo '<button type="button" class="btn btn-danger"   ><i class="fa fa-save"></i> Bill Lock</button>';
+    //                                            else:
+                                                    if($studentInfo->s_status_id == '8' ||  $studentInfo->s_status_id == '12' ||  $studentInfo->s_status_id == '20'):
+                                                        echo '<a href="admin/update_studentstatus/'.$studentInfo->student_id.'" target="_new"><button type="button" class="btn btn-danger"   ><i class="fa fa-save"></i> Student Lock</button></a>';
+                                                    else:
+
+                                                            echo '<button type="submit" class="btn btn-theme" name="payment_challan_paid" id="payment_challan_paid"  value="payment_challan_paid" ><i class="fa fa-save"></i> Paid</button>';
+
+
+                                                    endif;
+    //                                            endif;
+                                            endif;
+                                        else:
+                                            if(!empty($challandId)):
+                                               echo '<button type="button" class="btn btn-danger"   ><i class="fa fa-exclamation-triangle"></i>Pending</button>';
+                                            endif;
                                                 
-                                        echo '<button type="submit" class="btn btn-theme" name="payment_challan_paid" id="payment_challan_paid"  value="payment_challan_paid" ><i class="fa fa-save"></i> Paid</button>';
-//                                        endif;
-                                    endif;
-                                    endif;
+                                            
+                                        endif;
                                     
                                     ?>
                                    

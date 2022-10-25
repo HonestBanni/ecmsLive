@@ -137,6 +137,7 @@
 
                                                 echo form_input(array(
                                                     'name'          => 'date_from',
+                                                    'id'          => 'date_from',
                                                     'class'         => 'form-control datepicker',
                                                     'placeholder'   => 'From Date',
                                                     'type'          => 'text',
@@ -152,6 +153,7 @@
                                          <?php
 
                                                 echo form_input(array(
+                                                    'id'          => 'date_to',
                                                     'name'          => 'date_to',
                                                     'class'         => 'form-control datepicker',
                                                     'placeholder'   => 'From To',
@@ -168,6 +170,7 @@
                                          <?php
 
                                                 echo form_input(array(
+                                                    'id'          => 'issue_date',
                                                     'name'          => 'issue_date',
                                                     'class'         => 'form-control datepicker',
                                                     'placeholder'   => 'Issue Date',
@@ -184,6 +187,7 @@
                                          <?php
 
                                                 echo form_input(array(
+                                                    'id'          => 'valid_date',
                                                     'name'          => 'valid_date',
                                                     'class'         => 'form-control datepicker',
                                                     'placeholder'   => 'Valid Date',
@@ -313,6 +317,75 @@
   });
  
   
+  
+    jQuery('#type').hide();
+    jQuery('#bank_hostel').hide();
+    jQuery('#bank_mess').hide();
+    jQuery('#hostel_type').on('change',function(){
+      
+      var type              = jQuery('#hostel_type').val();
+      var batch_id          = jQuery('#hostel_group_challan').val();
+      var installment_types = jQuery('#installment_types').val();
+        jQuery('#date_from').val('');
+        jQuery('#date_to').val('');
+      
+      if(type == 1){
+                 
+         jQuery('#type').hide();
+         jQuery('#bank_hostel').show();
+         jQuery('#bank_mess').hide();
+      }
+      if(type == 2){
+         jQuery('#type').show();
+         jQuery('#bank_hostel').hide();
+         jQuery('#bank_mess').show();
+      }
+      
+            
+         jQuery.ajax({
+            type    : 'post',
+            url     : 'hostelController/hostel_challan_setup_dates',
+            data    : {'batch_id':batch_id,'type':type,'installment_types':installment_types},
+             dataType    : 'json',
+            success : function(result){
+            console.log(result);
+            jQuery('#date_from').val(result['fromDate']);
+            jQuery('#date_to').val(result['toDate']);
+            }   
+
+        });
+      
+  });  
+  
+    
+   //Get All Student For Group wise challan generation 
+    jQuery('#hostel_group_challan').on('change',function(){
+          var batch_id = jQuery(this).val();
+            jQuery.ajax({
+                type    :'post',
+                url     :'hostelController/get_batch_wise_students',
+                data    :{'batch_id':batch_id},
+                success :function(result){
+                   console.log(result);
+                   jQuery('#showAllStudents').html(result);
+                   
+                   
+                   
+                jQuery.ajax({
+                    type    :'post',
+                    url     :'hostelController/get_installment_type',
+                    data    :{'batch_id':batch_id},
+                    success :function(result){
+                    console.log(result);
+                    jQuery('#installment_types').html(result);
+                    }   
+                
+                });
+                   
+               },
+                
+            });
+      }); 
   
   </script>        
    

@@ -252,13 +252,16 @@
                                                     $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId');
                                     $check_verify = $this->db->get_where('student_fee_verification_log',array('student_id'=>$rec->student_id))->row();
                                 if(!empty($check_verify)):
-                                    echo '<td>'.$check_verify->emp_name.'<br/>'.date('d-m-Y',strtotime($check_verify->udpate_timestamp)).'</td>';
+                                    echo '<td></td>';
                                 else:
                                     echo '<td></td>';
                                 endif;    
                                 
                             if($rec->s_status_id == 15):
-                                echo '<td><a href="javascript:void(0);" class="label label-success btn-sm FeeVerficationUpdate" data-toggle="modal" data-target="#FeeVerficationUpdatePopUp"  id="'.$rec->student_id.'"><i class="fa fa-check"></i>  <b>Challan Verified</b></a></td>';
+                                echo '<td>
+                                        <a href="javascript:void(0);" class="label label-success btn-sm FeeVerficationUpdate" data-toggle="modal" data-target="#FeeVerficationUpdatePopUp"  id="'.$rec->student_id.'"><i class="fa fa-check"></i>  <b>Challan Verified</b></a><br/>
+                                            <button id="'.$rec->student_id.'" class="label label-danger btn-sm challan_button" data-toggle="modal" data-target="#ChallanModal" ><i class="fa fa-book"></i>Change Date</button>
+                                        </td>';
                             else:
                                 
                                 
@@ -309,7 +312,14 @@
                     </div>
                 </div>
             </div><!--//cols-wrapper-->
-           
+            <div class="modal fade" id="ChallanModal" role="dialog" style="z-index:9999">
+                    <div class="modal-dialog modal-md">
+                        <div class="modal-content">
+                            <div class="section-content" id="ChallanResult" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
         </div><!--//content-->
         
         <script>
@@ -400,6 +410,22 @@
               }
            });
     });
+    
+        jQuery('.challan_button').on('click',function(){
+        
+        var student_id = jQuery(this).attr('id');
+          jQuery.ajax({
+               type   :'post',
+               url    :'ProspectusChallanUpdateGet',
+               data   :{'student_id':student_id},
+              success :function(result){
+//                 $('.Student'+student_id).hide(); 
+                    jQuery('#ChallanResult').html(result);
+              }
+           });
+           });
+    
+    
   });
  
   </script>

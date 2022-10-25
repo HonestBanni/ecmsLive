@@ -7,12 +7,54 @@ jQuery(document).ready(function(){
         scroll: true,
         dataType: 'jsonp',
         select: function(event, ui){
+            
         jQuery("#h_student_name").val(ui.item.contactPerson);
         jQuery("#h_student_id").val(ui.item.code);
+        jQuery("#batch_id").val(ui.item.batch_id);
+        
+        var type                = '1';
+        var installment_types   = jQuery('#installmentNo').val();
+        var batch_id            = ui.item.batch_id;
+        jQuery('#fromDate').val('');
+        jQuery('#toDate').val('');
+        
+          jQuery.ajax({
+                type   :'post',
+                url    :'hostelController/hostel_challan_setup_dates',
+                data   :{'batch_id':batch_id,'installment_types':installment_types,'type':type},
+                dataType    : 'json',
+               success :function(result){
+                   console.log(result);
+                    jQuery('#fromDate').val(result['fromDate']);
+                    jQuery('#toDate').val(result['toDate']);
+               }
+            });
+        
+        
         }
     }).focus(function() {  jQuery(this).autocomplete("search", "");  });
     
-   
+   jQuery('#installmentNo').on('change',function(){
+       
+       var batch_id             =  jQuery("#batch_id").val();
+       var installment_types    =  jQuery("#installmentNo").val();
+       var type                 =  '1';
+       
+        jQuery('#fromDate').val('');
+        jQuery('#toDate').val('');
+        jQuery.ajax({
+                type   :'post',
+                url    :'hostelController/hostel_challan_setup_dates',
+                data   :{'batch_id':batch_id,'installment_types':installment_types,'type':type},
+                dataType    : 'json',
+               success :function(result){
+                    console.log(result);
+                    jQuery('#fromDate').val(result['fromDate']);
+                    jQuery('#toDate').val(result['toDate']);
+               }
+            });
+       
+   });
    
     //Change Program
    jQuery('#program-id').on('click',function(){

@@ -125,8 +125,31 @@
                                            
                                             
                                      </div>
-                                      
-                                    
+                                      <div class="col-md-2 col-sm-5">
+                                            <label for="name">Entry Date From</label>
+                                            <div class="input-group" id="adv-search">
+                                                <?php echo  form_input(array(
+                                                                        'name'          => 'entry_date_from',
+                                                                        'type'          => 'text',
+                                                                        'value'         => $entry_date_from,
+                                                                        'class'         => 'form-control datepicker',
+                                                                        'placeholder'   => 'Entry Date From',));
+                                                      ?>
+                                            </div>
+                                        </div> 
+                                        <div class="col-md-2 col-sm-5">
+                                            <label for="name">Entry Date To</label>
+                                            <div class="input-group" id="adv-search">
+                                                <?php echo  form_input(array(
+                                                                        'name'          => 'entry_date_to',
+                                                                        'type'          => 'text',
+                                                                        'required'      => 'required',  
+                                                                        'value'         => $entry_date_to,
+                                                                        'class'         => 'form-control datepicker',
+                                                                        'placeholder'   => 'Entry Date To',));
+                                                      ?>
+                                            </div>
+                                        </div>
                                       
                                      
                                       

@@ -529,7 +529,7 @@ public function daily_performance_report()
     {
         $session = $this->session->all_userdata();
         $user_id =$session['userData']['user_id'];
-        $department_id = array('department_id'=>11);
+        $department_id = array('department_id'=>11, 'emp_status_id'=>1);
         $this->data['emp'] = $this->CRUDModel->dropDown('hr_emp_record', ' Select Employee ', 'emp_id', 'emp_name',$department_id);
            $this->data['emp_id'] = ""; 
             $this->data['from_date'] = ""; 
@@ -1115,6 +1115,7 @@ if($this->input->post('export')):
             $book_name = $this->input->post('book_name');
             $sub_book_name = $this->input->post('sub_book');
             $author_name = $this->input->post('author_name');
+            $joint_author = $this->input->post('joint_author');
             $publish_by = $this->input->post('publish_by');
             $source = $this->input->post('source');
             $subject_name = $this->input->post('subject_name');
@@ -1147,6 +1148,7 @@ if($this->input->post('export')):
                 'author_name' =>$author_name,
                 'author_mark' =>$str,
                 'author_status' =>$author_status,
+                'joint_author_name' =>$joint_author,
                 'publish_by' =>$publish_by,
                 'publisher_address' =>$publisher_address,
                 'source' =>$source,
@@ -1738,6 +1740,7 @@ if($this->input->post('export')):
             $book_name          = ucwords(strtolower(ucwords($this->input->post('book_name'))));
             $sub_book_name      = ucwords(strtolower(ucwords($this->input->post('sub_book'))));
             $author_name        = ucwords(strtolower(ucwords($this->input->post('author_name'))));
+            $joint_author       = ucwords(strtolower(ucwords($this->input->post('joint_author'))));
             $publish_by         = ucwords(strtolower(ucwords($this->input->post('publish_by'))));
             $source             = ucwords(strtolower(ucwords($this->input->post('source'))));
             $subject_name       = ucwords(strtolower(ucwords($this->input->post('subject_name'))));
@@ -1770,6 +1773,7 @@ if($this->input->post('export')):
             'author_mark'       =>$str,
             'lib_book_cagegory' =>$book_category,
             'author_status'     =>$author_status,
+            'joint_author_name' =>$joint_author,
             'publish_by'        =>$publish_by,
             'publisher_address' =>$publisher_address,
             'source'            =>$source,

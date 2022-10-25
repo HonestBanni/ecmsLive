@@ -64,20 +64,20 @@
     <form name="student" method="post" enctype="multipart/form-data" action="<?php echo base_url();?>LibraryController/add_book">       
         <div class="row">
             <div class="col-md-12">
-    <div class="form-group col-md-3">
+    <div class="form-group col-md-4">
         <label for="usr">Book Title:</label>
         <input type="text" name="book_name" placeholder="Book Title" class="form-control" required>        
     </div>
-    <div class="form-group col-md-3">
+    <div class="form-group col-md-4">
         <label for="usr">Sub Book Title:</label>
         <input type="text" name="sub_book" placeholder="Sub Title" class="form-control">        
     </div>
-    <div class="form-group col-md-3">
+    <div class="form-group col-md-4">
         <label for="usr">Book ISBN #:</label>
         <input type="text" name="book_isbn" placeholder="Book ISBN #" class="form-control">        
     </div>
     <div class="form-group col-md-3">
-        <label for="usr">Author Name:</label>
+        <label for="usr">Main Author:</label>
         <input type="text" name="author_name" placeholder="Author Name" class="form-control">
     </div>
     <div class="form-group col-md-3">
@@ -89,6 +89,10 @@
                 <option value="Contributor">Contributor</option>
                 <option value="Publisher">Publisher</option>
             </select>
+    </div>
+    <div class="form-group col-md-3">
+        <label for="usr">Joint Author:</label>
+        <input type="text" name="joint_author" placeholder="Joint Author" class="form-control">
     </div>
     <div class="form-group col-md-3">
         <label for="usr">Book Category:</label>

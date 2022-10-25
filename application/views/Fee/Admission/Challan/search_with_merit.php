@@ -110,7 +110,7 @@
                                                           <th>Sub Program</th>
                                                           <th>Shift</th>
                                                           <th>Reserved Seat</th>
-                                                          <th>9th Marks</th>
+                                                          <th>Marks</th>
                                                           <th>Status</th>
                                                           <th>Challan</th>
                                                          

@@ -24,7 +24,7 @@
                                 <label for="name">College #</label>
                                 <?php echo  form_input(array(
                                     'name'          => 'college_no',
-                                    'id'            => 'college_no',
+                                    'id'            => 'college_no1',
                                     'type'          => 'number',
                                     'class'         => 'form-control',
                                     'placeholder'   => 'College #',
@@ -186,7 +186,7 @@ jQuery(document).ready(function(){
     function loadGridPagination(pagno){
         var form_data = {
             'form_no'       : $('#Form').val(),
-            'college_no'    : $('#college_no').val(),
+            'college_no'    : $('#college_no1').val(),
             'student_name'  : $('#student_name').val(),
             'father_name'   : $('#father_name').val(),
             'gender'        : $('#gender').val(),

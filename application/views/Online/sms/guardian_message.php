@@ -361,7 +361,7 @@
                                                              );
                                                       ?>
                                               </div>
-                                          <p><span id="remaining">160 characters remaining</span> <span id="messages">1 message(s)</span></p>                                           
+                                          <p><span id="remaining">148 characters remaining</span> <span id="messages">1 message(s)</span></p>                                           
                                      </div>
                                  
                             </div>
@@ -424,6 +424,7 @@
                                                             <th>Form No</th>
                                                             <th>Student Name</th>
                                                             <th>Father Name</th>
+                                                            <th>Sub Program</th>
                                                             <th>Guardian</th>
                                                             <th>Degree</th>
                                                             <th>Marks 9th</th>
@@ -454,7 +455,7 @@
                                                                 echo '<td>'.$row->form_no.'</td>';
                                                                 echo '<td>'.substr($row->student_name, 0, 30).' </td>';
                                                                 echo '<td>'.substr($row->father_name, 0, 30).' </td>';
-                                                                  
+                                                                echo '<td>'.$row->subprogram.'</td>';     
                                                                 echo '<td>'.$row->mobile_no.'</td>';     
                                                                 echo '<td>'.$row->DegreeTitle.'</td>';     
                                                                 echo '<td>'.$row->obtained_marks_9th.'/'.$row->total_marks_9th.'</td>';     
@@ -605,8 +606,8 @@ $('#message').keyup(function(){
     }
     
     var chars = this.value.length,
-        messages = Math.ceil(chars / 160),
-        remaining = messages * 160 - (chars % (messages * 160) || messages * 160);
+        messages = Math.ceil(chars / 148),
+        remaining = messages * 148 - (chars % (messages * 148) || messages * 148);
 
     $remaining.text(remaining + ' characters remaining');
     $messages.text(messages + ' message(s)');

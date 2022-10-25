@@ -55,11 +55,12 @@ class DropdownModel extends CI_Model
     // Hostel student autocomplete    
     public function hostel_students($where,$like=NULL){
              if($like):
-            $this->db->like('student_name',$like);
-            $this->db->or_like('form_no',$like);
-            $this->db->or_like('college_no',$like);
-        endif;
-               $this->db->join('hostel_student_record','student_record.student_id=hostel_student_record.student_id'); 
+                    $this->db->like('student_name',$like);
+                    $this->db->or_like('form_no',$like);
+                    $this->db->or_like('college_no',$like);
+                endif;
+               $this->db->join('hostel_student_record','student_record.student_id=hostel_student_record.student_id');
+               $this->db->join('prospectus_batch','prospectus_batch.batch_id=student_record.batch_id','left outer');
        return  $this->db->where($where)->get('student_record')->result();
     }
         public function add_extra_heads($where_in,$like=NULL){

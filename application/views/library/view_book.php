@@ -10,22 +10,22 @@
         <div class="row">
             <div class="col-md-12">
     <form method="post" action="LibraryController/view_book/<?php echo $books->book_id;?>/<?php echo $book_code->serial_no;?>">           
-    <div class="form-group col-md-3">
+    <div class="form-group col-md-4">
         <label for="usr">Book Title:</label>
         <input type="text" name="book_name" value="<?php echo $books->book_title;?>" class="form-control" >    
         <input type="hidden" name="book_id" value="<?php echo $books->book_id;?>">        
         <input type="hidden" name="book_id" value="<?php echo $book_code->serial_no;?>">        
     </div>
-    <div class="form-group col-md-3">
+    <div class="form-group col-md-4">
         <label for="usr">Sub Book Title:</label>
         <input type="text" name="sub_book" value="<?php echo $books->sub_book_title;?>" class="form-control">
     </div>
-    <div class="form-group col-md-3">
+    <div class="form-group col-md-4">
         <label for="usr">Book ISBN #:</label>
         <input type="text" name="book_isbn" value="<?php echo $books->book_isbn;?>" class="form-control">
     </div>
     <div class="form-group col-md-3">
-        <label for="usr">Author Name:</label>
+        <label for="usr">Main Author:</label>
         <input type="text" name="author_name" value="<?php echo $books->author_name;?>" class="form-control">
     </div>
     <div class="form-group col-md-3">
@@ -38,6 +38,10 @@
                 <option value="Translotor">Translotor</option>
             </select>
     </div>
+    <div class="form-group col-md-3">
+        <label for="usr">Joint Author:</label>
+        <input type="text" name="joint_author" value="<?php echo $books->joint_author_name;?>" class="form-control">
+    </div>
          <div class="form-group col-md-3">
         <label for="usr">Book Category:</label>
         <select name="book_category" class="form-control" required="required">
@@ -48,7 +52,7 @@
                     {
                         if($books->lib_book_cagegory == $LibRow->subject_id):
                             echo '<option selected="selected" value="'.$LibRow->subject_id.'">'.$LibRow->subject_name.'</option>';
-                            else:
+                        else:
                             echo '<option value="'.$LibRow->subject_id.'">'.$LibRow->subject_name.'</option>';
                         endif;
                     ?>

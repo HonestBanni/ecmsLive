@@ -95,9 +95,9 @@ class PolicyController extends AdminController {
             
             
             $wherePrg                   = array('ur_status'=>'1');
-            $this->data['userGorup']    = $this->CRUDModel->dropDown('users_role', 'Select Group', 'ur_id', 'ur_name',$wherePrg);    
+            $this->data['userGorup']    = $this->CRUDModel->dropDownName('users_role', 'Select Group', 'ur_id', 'ur_name',$wherePrg);    
             $this->data['emp']          = $this->CRUDModel->dropDown('hr_emp_record', 'Select EMployee', 'emp_id', 'emp_name'); 
-            $this->data['page_header']      = 'Database Users';
+            $this->data['page_header']  = 'Database Users';
             $this->data['page']         = "userPolicy/db_user";
             $this->data['title']        = 'User Edit Pages| ECMS';
             $this->load->view('common/common',$this->data);   
@@ -107,8 +107,8 @@ class PolicyController extends AdminController {
          
             
             $dbUserId       = $this->input->post('user_id');
-            $wherePrg      = array('ur_status'=>'1');
-            $userGorup      = $this->CRUDModel->dropDown('users_role', 'Select Group', 'ur_id', 'ur_name',$wherePrg);    
+            $wherePrg       = array('ur_status'=>'1');
+            $userGorup      = $this->CRUDModel->dropDownName('users_role', 'Select Group', 'ur_id', 'ur_name',$wherePrg);    
             $emp            = $this->CRUDModel->dropDown('hr_emp_record', 'Select Employee', 'emp_id', 'emp_name'); 
             
             $userInfo = $this->db->get_where('users',array('id'=>$dbUserId))->row();

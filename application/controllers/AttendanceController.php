@@ -7639,7 +7639,7 @@ public function update_assign_practical_groups()
         
             if( $term == ''){
                 
-            $result_set             = $this->CRUDModel->getResults('practical_group');
+            $result_set             = $this->CRUDModel->get_where_result('practical_group',array('status'=>'On'));
             $makkah_hotels          = array();
             foreach ($result_set as $row_set) {
                 $makkah_hotels[]   = array( 
@@ -7658,8 +7658,9 @@ public function update_assign_practical_groups()
             echo  json_encode($matches); 
             }else if($term != ''){
             $like   = array('group_name'=>$term);
-            
-            $result_set             = $this->CRUDModel->get_where_result_like('practical_group',$like);
+                                      $this->db->like($like);
+                                      $this->db->where('status','On');
+            $result_set             = $this->db->get('practical_group')->result();
             $labels          = array();
             foreach ($result_set as $row_set) {
             $labels[]        = array( 
@@ -7777,7 +7778,7 @@ public function update_assign_practical_groups()
                         $data  = array
                             (
                                 'prac_class_id' =>$prac_class_id,
-                                'attendance_date' =>$attendance_date,
+                                'attendance_date' =>date('Y-m-d',strtotime($attendance_date)),
                                 'user_id' =>$user_id
                              );
                         $attend_id = $this->CRUDModel->insert('practical_attendance',$data);

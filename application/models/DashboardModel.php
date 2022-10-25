@@ -1067,7 +1067,8 @@ class DashboardModel extends CI_Model
                         applicant_edu_detail.total_marks_9th,
                         applicant_edu_detail.obtained_marks_9th,
                         prospectus_batch.batch_name, 
-                        degree.title as DegreeTitle, 
+                        degree.title as DegreeTitle,
+                        sub_programes.name as subprogram,
                     ');
                 $this->db->join('applicant_edu_detail','applicant_edu_detail.student_id=student_record.student_id','left outer');     
                 $this->db->join('student_group_allotment','student_group_allotment.student_id=student_record.student_id','left outer');
@@ -1205,7 +1206,8 @@ class DashboardModel extends CI_Model
                        applicant_edu_detail.total_marks_9th,
                        applicant_edu_detail.obtained_marks_9th,
                         prospectus_batch.batch_name, 
-                        degree.title as DegreeTitle, 
+                        degree.title as DegreeTitle,
+                         sub_programes.name as subprogram,
                     ');
                 $this->db->join('applicant_edu_detail','applicant_edu_detail.student_id=student_record.student_id','left outer');     
                 $this->db->join('student_group_allotment','student_group_allotment.student_id=student_record.student_id','left outer');
@@ -1260,6 +1262,7 @@ class DashboardModel extends CI_Model
                                 'student_id'           =>$row->student_id,  
                                 'student_name'         =>$row->student_name, 
                                 'college_no'           =>$row->college_no, 
+                                'subprogram'           =>$row->subprogram, 
                                 'form_no'              =>$row->form_no, 
                                 'father_name'          =>$row->father_name, 
                                 'applicant_mob_no1'    =>$row->applicant_mob_no1, 
@@ -1283,6 +1286,7 @@ class DashboardModel extends CI_Model
                             $return_array[] = array(
                                 'student_id'           =>$row->student_id,  
                                 'student_name'         =>$row->student_name, 
+                                'subprogram'           =>$row->subprogram, 
                                 'college_no'           =>$row->college_no, 
                                 'form_no'              =>$row->form_no, 
                                 'father_name'          =>$row->father_name, 
@@ -1307,6 +1311,7 @@ class DashboardModel extends CI_Model
                             $return_array[] = array(
                                 'student_id'           =>$row->student_id,  
                                 'student_name'         =>$row->student_name, 
+                                'subprogram'           =>$row->subprogram, 
                                 'college_no'           =>$row->college_no, 
                                 'form_no'              =>$row->form_no, 
                                 'father_name'          =>$row->father_name, 
