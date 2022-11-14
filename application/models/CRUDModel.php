@@ -1893,7 +1893,7 @@ public function student_all_detailsdd($where=NULL){
                     $classSubjects = $this->ReportsModel->get_classSubjects(array('sec_id'=>$section_id));
                 endif;
                  if($flag == 2):
-                     $classSubjects = $this->ReportsModel->get_subject_list('student_subject_alloted',array('student_id'=>$result->student_id));
+                     $classSubjects = $this->ReportsModel->get_subject_list('student_subject_alloted',array('student_id'=>$student_id));
                 endif;
             
                 
@@ -1914,7 +1914,7 @@ public function student_all_detailsdd($where=NULL){
                     $year       = date("Y", strtotime($monthi,$time));
                      $where     = array(
                         'class_alloted.subject_id'=>$rowCS->subject_id,
-                        'monthly_test_details.student_id'=>$result->student_id,
+                        'monthly_test_details.student_id'=>$student_id,
                         'month(test_date)'=>$month,
                         'year(test_date)'=>$year,
 
@@ -1939,7 +1939,7 @@ public function student_all_detailsdd($where=NULL){
                     $year       = date("Y", strtotime($monthi, $time));
                     $where     = array(
 //                                                    'class_alloted.subject_id'=>$rowCS->subject_id,
-                        'monthly_test_details.student_id'=>$result->student_id,
+                        'monthly_test_details.student_id'=>$student_id,
                         'month(test_date)'=>$month,
                         'year(test_date)'=>$year,
 

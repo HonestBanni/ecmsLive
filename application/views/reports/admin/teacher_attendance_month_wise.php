@@ -63,7 +63,7 @@
                                        
                                          <div class="col-md-4">
                                         <label for="name" style="visibility: hidden">Date Fsdfsdfdsfsdfsdf dfdsrom sdfsdfsdfsdf</label>
-                                        <!--<button type="button" name="searchMonthWise" value="searchMonthWise" id="searchMonthWise" class="btn btn-theme"><i class="fa fa-search"></i> Search </button>-->
+                                        <button type="submit" name="search" value="search" id="search" class="btn btn-theme"><i class="fa fa-search"></i> Search </button>
                                         <button type="submit" name="ExportMonthWise" value="ExportMonthWise" id="ExportMonthWise" class="btn btn-theme"><i class="fa fa-download"></i> Excel </button>
                                         <!--<button type="button" name="loading" value="loading" id="loading" class="btn btn-theme"> Please wait...</button>-->
                                         <!--<button type="button" name="print" value="print" id="print" onclick="printdiv('div_print');" class="btn btn-theme"><i class="fa fa-print"></i> Print</button>-->
@@ -79,13 +79,45 @@
                 
                   <div id="div_print">
                 <div class="col-md-12">
-                    <div id="TeacherRecord">
-                        
+                  <?php if(isset($result) && !empty($result)): ?>
+                <h4 class="has-divider text-highlight" style="margin-top: -10px; margin-bottom: 2px;"><strong><i>Teacher Attendance ( Month Wise )</i></strong></h4>
+                        <div class="table-responsive">                      
+                            <table class="table table-bordered">
+                                <?php
+                                
+                                
+                                    $sn = '';
+                                    foreach($result as $row=>$key):
+                                        $sn ++;
+                                        if($sn == 1): // for heading 
+                                            echo '<thead> <tr>';
+                                            if(isset($key) && !empty($key)):
+                                                foreach($key as $row1=>$keyData):
+                                                    echo '<th>'.$keyData.'</th>';
+                                                endforeach;
+                                            endif;
+                                            echo '</tr></thead> ';
+                                        else:
+                                            echo '<tr>';
+                                            if(isset($key) && !empty($key)):
+                                                foreach($key as $row1=>$keyData):
+                                                    echo '<td>'.$keyData.'</td>';
+                                                endforeach;
+                                            endif;
+                                            echo '</tr>';
+
+                                        endif;    
+                                        
+                                        
+                                    endforeach;
+                               
+                                ?>
+                            </table>
+                        </div>
                     </div>
-                    </div>
                     
                     
-                    
+                    <?php  endif; ?>
                     
                    
                     
@@ -94,56 +126,5 @@
             </div><!--//cols-wrapper-->
            
         </div><!--//content-->
-<script>
-    jQuery(document).ready(function(){
-        jQuery('#loading').hide();
-        jQuery('#print').hide();
-        jQuery('#searchMonthWise').on('click',function(){
-            var Year       = jQuery('#Year').val();
-            var Month      = jQuery('#Month').val();
-            var data       = {'Year':Year,'Month':Month}
-            jQuery('#searchMonthWise').hide();
-            jQuery('#ExportMonthWise').hide();
-            jQuery('#print').hide();
-             jQuery('#loading').show();
-            $.ajax({
-                    url     : 'ReportsController/teacher_attendance_month_wise_report_result',
-                    type    : 'post',
-                    data    :  data,
-                    success  : function(response){
-                      jQuery('#TeacherRecord').html(response); 
-                       jQuery('#searchMonthWise').show();
-                       jQuery('#ExportMonthWise').show();
-                       jQuery('#print').show();
-                       jQuery('#loading').hide();
-                    }
-                });
-            });
-            
-         jQuery("#ExportMonthWise").on('click',function(){
-                jQuery('#loading').show();
-                jQuery('#print').hide();
-                jQuery('#searchMonthWise').hide();
-           
-         });   
-                
-    });
-    
-    
-            $(function() {
-            $('.datepicker').datepicker( {
-               changeMonth: true,
-                changeYear: true,
-                 dateFormat: 'dd-mm-yy'
-           
-            });
-        });
-    </script>
- 
-  <style>
-      .datepicker{
-          z-index: 1;
-      }
-  </style>     
-</script>
+
 

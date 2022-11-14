@@ -209,7 +209,18 @@ class OnlineController extends AdminController {
                             <td>'.wordwrap($arow->academic_comments, 15, "\n", true).'</td>
                         </tr>';
                         endforeach;
+                        
+                    $lat = $this->CRUDModel->get_where_row('applicant_edu_detail', array('student_id'=>$stud_id));
+                    if(!empty($lat->lat_date)): $l_date = $lat->lat_date; else: $l_date = ''; endif;
                     echo '</table>
+                        <table class="table" style="font-size: 15px;">
+                            <tr>
+                                <td width="22%">LAT Marks: </td>
+                                <td width="30%"><strong>'.$lat->lat_marks.'</strong></td>
+                                <td width="18%">LAT Test Date: </td>
+                                <td width="30%"><strong>'.$l_date.'</strong></td>
+                            </tr>
+                        </table>
                 </div>';
                 endif;    
             echo '</section>';
@@ -715,33 +726,33 @@ class OnlineController extends AdminController {
            
            //Send SMS
            
-          $clearNumber  =  $this->CRUDModel->clean_number($currentStatus->applicant_mob_no1);
-          $message      = 'Your application for admission in Edwardes College has been received.';
+        //   $clearNumber  =  $this->CRUDModel->clean_number($currentStatus->applicant_mob_no1);
+        //   $message      = 'Your application for admission in Edwardes College has been received.';
           
-           $sms_info = $this->send_message($clearNumber,$message,$currentStatus->send_format);
-//           $sms_info = $this->send_message_bulk($clearNumber,$message,$currentStatus->send_format);
-            $return_resp = '';
-                if(!empty($sms_info)):
-                    $return_resp = $sms_info;
-                    else:
-                    $return_resp = 'null';
-                    endif;     
-           $sms_log = array(
-                        'student_id'        => $currentStatus->student_id,
-                        'program_id'        => $currentStatus->programe_id,
-                        'sub_pro_id'        => $currentStatus->sub_pro_id,
-                        'batch_id'          => $currentStatus->batch_id,
-                        'sms_type'          => 1,
-                        'message'           => $message,
-                        'network'           => $currentStatus->send_format,
-                        'sender_number'     => $this->CRUDModel->clean_number($currentStatus->applicant_mob_no1),
-                        'comments'          =>$return_resp,
-                        'create_datetime'   => date('Y-m-d H:i:s'),
-                        'send_date'         => date('Y-m-d'),  
-                        'create_by'         => $this->userInfo->user_id, 
-                      );
+        //    $sms_info = $this->send_message($clearNumber,$message,$currentStatus->send_format);
+ 
+        //     $return_resp = '';
+        //     if(isset($sms_info) && !empty($sms_info)):
+        //             $return_resp = $sms_info;
+        //             else:
+        //             $return_resp = 'null';
+        //             endif;     
+        //    $sms_log = array(
+        //                 'student_id'        => $currentStatus->student_id,
+        //                 'program_id'        => $currentStatus->programe_id,
+        //                 'sub_pro_id'        => $currentStatus->sub_pro_id,
+        //                 'batch_id'          => $currentStatus->batch_id,
+        //                 'sms_type'          => 1,
+        //                 'message'           => $message,
+        //                 'network'           => $currentStatus->send_format,
+        //                 'sender_number'     => $this->CRUDModel->clean_number($currentStatus->applicant_mob_no1),
+        //                 'comments'          =>$return_resp,
+        //                 'create_datetime'   => date('Y-m-d H:i:s'),
+        //                 'send_date'         => date('Y-m-d'),  
+        //                 'create_by'         => $this->userInfo->user_id, 
+        //               );
                  
-              $this->CRUDModel->insert('sms_students',$sms_log);
+            //   $this->CRUDModel->insert('sms_students',$sms_log);
        }
        
        public function student_data_verification(){
@@ -1445,11 +1456,11 @@ public function grand_report_v01(){
                   $this->excel->getActiveSheet()->getStyle('Q1')->getFont()->setBold(true);
                   $this->excel->getActiveSheet()->getStyle('Q1')->getFont()->setSize(12);
                   
-                  $this->excel->getActiveSheet()->setCellValue('R1','O.Marks');
+                  $this->excel->getActiveSheet()->setCellValue('R1','Marks');
                   $this->excel->getActiveSheet()->getStyle('R1')->getFont()->setBold(true);
                   $this->excel->getActiveSheet()->getStyle('R1')->getFont()->setSize(12);
                   
-                  $this->excel->getActiveSheet()->setCellValue('S1','Percentage');
+                  $this->excel->getActiveSheet()->setCellValue('S1','% age');
                   $this->excel->getActiveSheet()->getStyle('S1')->getFont()->setBold(true);
                   $this->excel->getActiveSheet()->getStyle('S1')->getFont()->setSize(12);
                   
@@ -2310,6 +2321,8 @@ public function edit_applicant_record_admin(){
                     'exam_type'         => $this->input->post('exam'),
                     'rollno'            => $this->input->post('board_roll'),
                     'board_reg_no'      => $this->input->post('board_reg'),
+                    'lat_marks'         => $this->input->post('lat_marks'),
+                    'lat_date'          => $this->input->post('lat_date'),
                     'academic_comments' => strtoupper($this->input->post('acad_comments'))
                 );
 

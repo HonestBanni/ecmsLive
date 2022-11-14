@@ -2937,12 +2937,14 @@ class AdmissionController extends AdminController {
         $this->data['rseats_id']    = '';
         $this->data['s_status_id']  = '';
         $this->data['shft_id']      = '';
+        $this->data['boardregno']      = '';
             
         if($this->input->post('search')):
             $college_no     =  $this->input->post('college_no');
             $form_no        =  $this->input->post('form_no');
             $student_name   =  $this->input->post('student_name');
             $father_name    =  $this->input->post('father_name');
+            $board_regno    =  $this->input->post('board_regno');
             $gender_id      =  $this->input->post('gender_id');
             $sub_pro_id     =  $this->input->post('sub_pro_id');
             $rseats_id      =  $this->input->post('rseats_id');
@@ -2973,6 +2975,10 @@ class AdmissionController extends AdminController {
             if(!empty($father_name)):
                 $like['father_name'] = $father_name;
             $this->data['father_name'] =$father_name;
+            endif;
+            if(!empty($board_regno)):
+                $where['board_regno'] = $board_regno;
+                $this->data['boardregno']  = $board_regno;
             endif;
             if(!empty($gender_id)):
                 $where['gender.gender_id'] = $gender_id;

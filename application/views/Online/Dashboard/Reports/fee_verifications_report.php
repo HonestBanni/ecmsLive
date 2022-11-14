@@ -182,6 +182,7 @@
                         
                        <?php
                        if(!empty($result)):
+                            // echo '<pre>';print_r($result);die;
                            if($report == 'StudentWise'):
                                
                           
@@ -193,8 +194,9 @@
                             <th width="5" style="vertical-align: text-bottom;">SN</th>
                             <th width="50" style="vertical-align: text-bottom;">Challan No</th>
                             <th width="100" style="vertical-align: text-bottom;">Student Name</th>
+                            <th width="70" style="vertical-align: text-bottom;">Batch</th>
                             <th width="100" style="vertical-align: text-bottom;">F-Name</th>
-                            <th width="110" style="vertical-align: text-bottom;">Sub Program</th>
+                            <th width="80" style="vertical-align: text-bottom;">Sub Program</th>
                             <th width="50" style="vertical-align: text-bottom;">Amount</th>
                             <th width="50" style="vertical-align: text-bottom;">Status</th>
                             <th width="60" style="vertical-align: text-bottom;">Bank Paid Date</th>
@@ -215,6 +217,7 @@
                                 echo '<td><i>'.$sn.'</i></td>';
                                 echo '<td>'.$rec->form_no.'</td>';
                                 echo '<td>'.wordwrap($rec->student_name, 20, "\n", true).'</td>';
+                                echo '<td>'.$rec->batch.'</td>';
                                 echo '<td>'.wordwrap($rec->father_name, 20, "\n", true).'</td>';
                                 echo '<td>'.$rec->sub_program.'</td>';
                                 

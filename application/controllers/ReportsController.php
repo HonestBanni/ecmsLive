@@ -13,6 +13,7 @@ class ReportsController extends AdminController {
              $this->load->model('SmsModel');
              $this->load->model('dropdownModel');
              $this->load->library("pagination");
+             $this->load->Model('WhiteCardModel');
              $this->userInfo           = json_decode(json_encode($this->getUser()), FALSE);
             
              
@@ -3605,6 +3606,7 @@ class ReportsController extends AdminController {
                     student_record.comment,
                     student_record.father_name,
                     student_record.form_no,
+                    student_record.programe_id,
                     programes_info.programe_name,
                     sub_programes.name as subprogram,
                     sections.sec_id,
@@ -4223,7 +4225,7 @@ class ReportsController extends AdminController {
            endif; 
         }
         
-        public function student_attendance_white_card_print(){
+        public function student_attendance_white_card_print_old(){
             
             $studentId = $this->uri->segment(2);
             $sectionId = $this->uri->segment(3);
@@ -4237,16 +4239,13 @@ class ReportsController extends AdminController {
             //flag == 2 subject allot
             if($CheckStd->flag==1):
                $this->data['result']           = $this->ReportsModel->get_whiteCard_subject(array('student_group_allotment.student_id'=>$studentId,'student_group_allotment.section_id'=>$sectionId)); 
-                
-                else:
-                    
+            else:
                 $this->data['result']           = $this->ReportsModel->get_whiteCard_section(
                         array(
                             'student_subject_alloted.student_id'=>$studentId,
                             'student_subject_alloted.section_id'=>$sectionId
                         )); 
-           
-            endif;
+           endif;
           
             endif; 
             
@@ -4256,7 +4255,206 @@ class ReportsController extends AdminController {
             $this->data['page']             =  'reports/whiteCardPrint';
             $this->load->view('common/common',$this->data); 
         }
+        public function student_attendance_white_card_print(){
+            $studentId                      = $this->uri->segment(2);
+            $this->data                     = $this->WhiteCardModel->StudentWhiteCard($studentId);
+            $this->data['program']          = 'White card Print';
+            $this->data['page_title']       = 'Student white card | ECMS';
+            $this->data['page']             =  'reports/whitecards/gernal_white_print';
+            $this->load->view('common/common',$this->data); 
+        }
+        public function student_attendance_white_card_print_2(){
+            
+
+            $studentId                      = $this->uri->segment(2);
+            $this->data                     = $this->WhiteCardModel->StudentWhiteCard($studentId);
+            // echo '<pre>';print_r($this->data);die;
+            $this->data['program']          = 'White card Print';
+            $this->data['page_title']       = 'Student white card | ECMS';
+            $this->data['page']             =  'reports/whitecards/gernal_white_print2';
+            $this->load->view('common/common',$this->data); 
+        }
+        public function student_attendance_white_card_print_A(){
+            $studentId = $this->uri->segment(2);
+             $sectionId = $this->uri->segment(3);
+            
+            $CheckStd = $this->CRUDModel->get_where_row('class_alloted',array('sec_id'=>$sectionId));
+            if($CheckStd):
+                // $this->data['class_id'] =  $CheckStd->class_id;
+                // $this->data['flag']     =  $CheckStd->flag;
+//            echo '<pre>';print_r($CheckStd);die;
+                //flag == 1 group_allot
+                //flag == 2 subject allot
+                if($CheckStd->flag==1):
+                        $result           = $this->ReportsModel->get_whiteCard_subject(array('student_group_allotment.student_id'=>$studentId,'student_group_allotment.section_id'=>$sectionId)); 
+                else:
+                        $result           = $this->ReportsModel->get_whiteCard_section(array('student_subject_alloted.student_id'=>$studentId,'student_subject_alloted.section_id'=>$sectionId)); 
+                endif;
+                $return_array = array(); // final return array
+                if(isset($result) && !empty($result)):
+                    $fy_id          = $this->db->get_where('whitecard_financial_year',array('status'=>1))->row();
+            // Create Array for Months $month_array
+                    $montts_array   = array();
+                    $time           = strtotime($fy_id->year_start);
+                        $montts_array[] = 'Subject';
+                            for($i=1;$i<=12;$i++):
+                                $monthi = '+'.$i.'month';
+                                $month  = date("M-y", strtotime($monthi, $time));
+                                $montts_array[] = $month;
+                            endfor;
+                        $montts_array[] = 'Total';    
+                        $return_array[] = $montts_array;    
+
+            // Get student subjects 
+                    if($CheckStd->flag ==1):
+                        $this->data['classSubjects'] =  $classSubjects = $this->ReportsModel->get_classSubjects(array('sec_id'=>$result->sec_id)); //Class wise ( Medical , Engi CS , all BS)
+                     endif;
+                     if($CheckStd->flag == 2):
+                        $this->data['classSubjects'] = $classSubjects = $this->ReportsModel->get_subject_list('student_subject_alloted',array('student_id'=>$result->student_id)); // Subject Wise (Arts ,A-level)
+                     endif;
+                     if(isset($classSubjects) && !empty($classSubjects)):
+                        $netPresent = '';
+                        $netTotal   = '';
+            // Create Subject Array $subject_array  with attendance
+                        foreach($classSubjects as $rowCS):
+                            $GrandTotal = 0;
+                            $granPresent = 0;
+                            $subject_array = array();
+                            $subject_array[] = substr($rowCS->title,0,20); // Subject Name.
+                            for($i=1;$i<=12;$i++):
+                                $monthi     = '+'.$i.'month';
+                                $month      = date("m", strtotime($monthi, $time));
+                                $year       = date("Y", strtotime($monthi, $time));
+                                $where      = array(
+                                    'subject_id'                => $rowCS->subject_id,
+                                    'student_id'                =>$result->student_id,
+                                    'month(attendance_date)'    =>$month,
+                                    'year(attendance_date)'     =>$year,
+                                );
+                                $stdAtts = $this->ReportsModel->get_student_att($where);
+                                $p=0;
+                                $a=0;
+                            // Each Subject Attendance count, Absent and Present
+                                foreach($stdAtts as $stdAtt):
+                                    if($stdAtt->status == 1):
+                                        if($stdAtt->ca_classcount ==2):
+                                            $p++; $p++;
+                                        else:
+                                            $p++;
+                                        endif;
+                                    else:
+                                        if($stdAtt->ca_classcount ==2):
+                                            $a++; $a++;
+                                        else:
+                                            $a++;
+                                        endif;
+                                    endif;
+                                endforeach;
+                                $total = $a+$p;
+                                if($total):
+                                    $subject_array[]    = $p.'/'.$total;
+                                    $granPresent        += $p; 
+                                    $GrandTotal         += $total;
+                                else:
+                                    $subject_array[]   = '';
+                                endif;
+                                
+                                $per             = 0; 
+                                 if(isset($GrandTotal) && !empty($GrandTotal)):
+                                  $per = ($granPresent/$GrandTotal)*100;
+                                 endif;
+ 
+                            endfor;
+                            $netPresent += $granPresent;
+                            $netTotal   += $GrandTotal;
+ 
+                            $subject_array[]    = $granPresent.'/'.$GrandTotal.'='.round($per,1)  ;
+                            $return_array[]     = $subject_array;
+                        endforeach;
+                        
+                     endif;
+            // Create Final Array for Each Month and Grand Total 
+
+                    $total_array[]     = '% age';
+                    $final_total       = 0;
+                    $final_total_a     = 0;
+                    $final_total_p     = 0;
+
+                    for($ti=1;$ti<=12;$ti++):
+                        $monthti     = '+'.$ti.'month';
+                        $month      = date("m", strtotime($monthti, $time));
+                        $year       = date("Y", strtotime($monthti, $time));
+                        $gfoter_total  = 0 ; 
+                        if(isset($classSubjects) && !empty($classSubjects)):
+                            $foter_p = 0;
+                            $foter_a = 0;
+                            $foter_total = 0;
+                            foreach($classSubjects as $ta_row):
+                                $where_ta= array(
+                                    'subject_id'                => $ta_row->subject_id,
+                                    'student_id'                =>$result->student_id,
+                                    'month(attendance_date)'    =>$month,
+                                    'year(attendance_date)'     =>$year,
+                                );
+                                
+                                $QueryTotal = $this->ReportsModel->get_student_att($where_ta);
+                                
+                                if(isset($QueryTotal) && !empty($QueryTotal)):
+                                    $tp=0;
+                                    $ta=0;
+                                    
+                                    foreach($QueryTotal as $TTRow):
+                                        if($TTRow->status == 1):
+                                            if($TTRow->ca_classcount ==2):
+                                                $tp++;
+                                                $tp++;
+                                            else:
+                                                $tp++;
+                                            endif;
+                                        else:
+                                            if($TTRow->ca_classcount ==2):
+                                                $ta++;
+                                                $ta++;
+                                            else:
+                                                $ta++;
+                                            endif;
+                                        endif;
+                                    endforeach;
+                                    $foter_p += $tp;
+                                    $foter_a += $ta;
+                                endif;
+                            endforeach;
+                            $foter_total = $foter_a+$foter_p;                           //Each Month Total
+                            if(isset($foter_total) && !empty($foter_total)):            
+                                $gfoter_total = round(($foter_p/$foter_total)*100,1).' %';   //Each Month Per%
+                            else:
+                                $gfoter_total = '';
+                            endif;
+                            $final_total_a     += $foter_a;
+                            $final_total_p     += $foter_p;
+                         endif;  
+                        $total_array[]     = $gfoter_total;
+                    endfor;
+                    $final_total = $final_total_a+$final_total_p;                       //Final Total 
+                    if(isset($final_total) && !empty($final_total)):
+                        $total_array[]     = $final_total_p.'/'.$final_total.' = '.round(($final_total_p/$final_total)*100,1).' %'; // Final Total Result
+                    else:
+                        $total_array[]     = ''; 
+                    endif;
+                    $return_array[] = $total_array;
+                endif;
+            endif; 
+            $this->data['result']       = $result;
+            $this->data['Attendance']   = $return_array;
+          
+            $this->data['program']          = 'White card Print';
+            $this->data['page_title']       = 'Student white card | ECMS';
+            $this->data['page']             =  'reports/whitecards/gernal_white_print';
+            $this->load->view('common/common',$this->data); 
+        }
         
+      
+
         public function student_attendance_white_card_teacher(){
             
             $studentId = $this->uri->segment(2);
@@ -10262,13 +10460,241 @@ public function student_practical_white_card_group()
             
             echo json_encode($result);
     }
-   
+    public function teacher_attendance_month_wise_report(){
+
+        if($this->input->post('ExportMonthWise')):
+           
+          $year       = $this->input->post('Year');
+          $month      = $this->input->post('Month');
+          $heading    = array();
+          $days       = cal_days_in_month(CAL_GREGORIAN,$month,$year);
+          $i          = '';
+          
+          $heading['S#']      = 'S.No';
+          $heading['Teacher_Name']      = date('F, Y',strtotime('1-'.$month.'-'.$year));
+                for($i=1 ;$i<=$days ; $i++):
+                  $heading[$i]  = $i;
+                endfor;
+                $heading['Total']   = 'Total';
+                $return_data        = array();
+                $return_dataCount   = '0';
+                $return_data[$return_dataCount] =  $heading;
+                $where  = array(
+                      'emp_status_id' => 1,
+                      'cat_id'        => 1,
+                       // 'user_status'   => 1
+                           'emp_id !='        =>'255'
+                      );
+                          $this->db->join('users','users.user_empId=hr_emp_record.emp_id');
+                          $this->db->order_by('emp_name','asc');
+                          $this->db->group_by('emp_id');
+          $result     =   $this->db->get_where('hr_emp_record',$where)->result(); 
+              if($result):
+                  $data   = array();
+                  foreach($result as $rowEmp):
+                      $return_dataCount++;
+                      $total_count = '';
+                          $data['$#']             = $return_dataCount;
+                          $data['Teacher_Name']   = $rowEmp->emp_name;
+                          for($i=1 ;$i<=$days ; $i++):
+                              $pricital_count = '';
+                            //   $id= $this->db->get_where('users',array('user_empId'=>$rowEmp->emp_id))->row();
+                              //Normal Class Count ------------------------------------------
+                                $where = array(
+                                //    'emp_id'            => $rowEmp->emp_id,
+                                    'student_attendance.user_id'    => $rowEmp->id,
+                                    'attendance_date'               => $year.'-'.$month.'-'.$i,
+                                    'ca_merge_id'                   => '0'
+                                    // 'timetable.day_id'              => date('N',strtotime($year.'-'.$month.'-'.$i))
+                                );
+                                      $this->db->select('count(*) as total');  
+                                      $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id');
+                                      // $this->db->join('timetable','timetable.class_id=class_alloted.class_id');
+                                      // $this->db->join('class_starting_time','class_starting_time.stime_id=timetable.stime_id','left outer'); 
+                                      // $this->db->order_by('class_starting_time.class_stime','asc');
+                                      // $this->db->group_by('class_starting_time.class_stime');
+                              $return_notmerge = $this->db->get_where('student_attendance',$where)->row();
+                              $total_att_count ='';
+                              if(isset($return_notmerge->total) && !empty($return_notmerge->total)):
+                                  $total_att_count  += $return_notmerge->total;
+                                  $total_count      += $return_notmerge->total;  
+                              endif; 
+
+                              //Merg Class Count ------------------------------------------
+                                  $where_mer = array(
+                                      'student_attendance.user_id'    => $rowEmp->id,
+                                       // 'emp_id'            => $rowEmp->emp_id,
+                                      'attendance_date'               => $year.'-'.$month.'-'.$i,
+                                      'ca_merge_id !='                => '0'
+                                      );    
+                                                  $this->db->select('count(*) as total');   
+                                                  $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id');
+                                                  $this->db->group_by('class_alloted.ca_merge_id');
+                                  $return_merge = $this->db->get_where('student_attendance',$where_mer)->row();
+                          
+                                  if(isset($return_merge) && !empty($return_merge)):
+                                      // $data[$i]       = count($return_merge);
+                                      $total_att_count  += $return_merge->total; 
+                                      $total_count      += $return_merge->total;  
+                                  endif; 
+
+                                //Get practical attendance 
+                                  $where_pract= array(
+                                      'user_id'               =>$rowEmp->id,
+                                      //  'emp_id'               =>$rowEmp->emp_id,
+                                      'attendance_date'      => $year.'-'.$month.'-'.$i,
+                                  );
+                                            $this->db->select('count(*) as total');  
+                                            $this->db->join('practical_attendance','practical_attendance.prac_class_id=practical_alloted.practical_class_id');
+                                  $pract =  $this->db->get_where('practical_alloted', $where_pract)->result();
+                                  
+                                  if(isset($pract->total) && !empty( $pract->total)):
+                                      $total_att_count  += $pract->total;
+                                      $total_count      += $pract->total; 
+                                  endif;
+                                  if($total_att_count):
+                                      $data[$i] =$total_att_count;
+                                  else:
+                                      $data[$i] = '';
+                                  endif;
+                              endfor;
+                          $data['Total']                  = $total_count; 
+                          $return_data[$return_dataCount] = $data;
+                  endforeach; 
+              endif;
+              $exceldata = $return_data;
+                  
+
+              $this->load->library('excel');
+              $date = date('d-m-Y H:i:s');
+              $this->excel->getActiveSheet()->fromArray($exceldata, null, 'A1');
+              $filename='Teacher Attendace Month wise '.$date.'.xls';
+              header('Content-Type: application/vnd.ms-excel');
+              header('Content-Disposition: attachment;filename="'.$filename.'"'); 
+              header('Cache-Control: max-age=0'); 
+              $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');  
+              $objWriter->save('php://output');
+          redirect('TeacherAtndMonthWise','refresh'); 
+       endif;
+        if($this->input->post('search')):
+           
+          $year       = $this->input->post('Year');
+          $month      = $this->input->post('Month');
+          $heading    = array();
+          $days       = cal_days_in_month(CAL_GREGORIAN,$month,$year);
+          $i          = '';
+          
+          $heading['S#']      = 'S.No';
+          $heading['Teacher_Name']      = date('F, Y',strtotime('1-'.$month.'-'.$year));
+                for($i=1 ;$i<=$days ; $i++):
+                  $heading[$i]  = $i;
+                endfor;
+                $heading['Total']   = 'Total';
+                $return_data        = array();
+                $return_dataCount   = '0';
+                $return_data[$return_dataCount] =  $heading;
+                $where  = array(
+                      'emp_status_id' => 1,
+                      'cat_id'        => 1,
+                       // 'user_status'   => 1
+                           'emp_id !='        =>'255'
+                      );
+                          $this->db->join('users','users.user_empId=hr_emp_record.emp_id');
+                          $this->db->order_by('emp_name','asc');
+                          $this->db->group_by('emp_id');
+          $result     =   $this->db->get_where('hr_emp_record',$where)->result(); 
+              if($result):
+                  $data   = array();
+                  foreach($result as $rowEmp):
+                      $return_dataCount++;
+                      $total_count = '';
+                          $data['$#']             = $return_dataCount;
+                          $data['Teacher_Name']   = $rowEmp->emp_name;
+                          for($i=1 ;$i<=$days ; $i++):
+                              $pricital_count = '';
+                            //   $id= $this->db->get_where('users',array('user_empId'=>$rowEmp->emp_id))->row();
+                              //Normal Class Count ------------------------------------------
+                                $where = array(
+                                //    'emp_id'            => $rowEmp->emp_id,
+                                    'student_attendance.user_id'    => $rowEmp->id,
+                                    'attendance_date'               => $year.'-'.$month.'-'.$i,
+                                    'ca_merge_id'                   => '0'
+                                    // 'timetable.day_id'              => date('N',strtotime($year.'-'.$month.'-'.$i))
+                                );
+                                      $this->db->select('count(*) as total');  
+                                      $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id');
+                                      // $this->db->join('timetable','timetable.class_id=class_alloted.class_id');
+                                      // $this->db->join('class_starting_time','class_starting_time.stime_id=timetable.stime_id','left outer'); 
+                                      // $this->db->order_by('class_starting_time.class_stime','asc');
+                                      // $this->db->group_by('class_starting_time.class_stime');
+                              $return_notmerge = $this->db->get_where('student_attendance',$where)->row();
+                              $total_att_count ='';
+                              if(isset($return_notmerge->total) && !empty($return_notmerge->total)):
+                                  $total_att_count  += $return_notmerge->total;
+                                  $total_count      += $return_notmerge->total;  
+                              endif; 
+
+                              //Merg Class Count ------------------------------------------
+                                  $where_mer = array(
+                                      'student_attendance.user_id'    => $rowEmp->id,
+                                       // 'emp_id'            => $rowEmp->emp_id,
+                                      'attendance_date'               => $year.'-'.$month.'-'.$i,
+                                      'ca_merge_id !='                => '0'
+                                      );    
+                                                  $this->db->select('count(*) as total');   
+                                                  $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id');
+                                                  $this->db->group_by('class_alloted.ca_merge_id');
+                                  $return_merge = $this->db->get_where('student_attendance',$where_mer)->row();
+                          
+                                  if(isset($return_merge) && !empty($return_merge)):
+                                      // $data[$i]       = count($return_merge);
+                                      $total_att_count  += $return_merge->total; 
+                                      $total_count      += $return_merge->total;  
+                                  endif; 
+
+                                //Get practical attendance 
+                                  $where_pract= array(
+                                      'user_id'               =>$rowEmp->id,
+                                      //  'emp_id'               =>$rowEmp->emp_id,
+                                      'attendance_date'      => $year.'-'.$month.'-'.$i,
+                                  );
+                                            $this->db->select('count(*) as total');  
+                                            $this->db->join('practical_attendance','practical_attendance.prac_class_id=practical_alloted.practical_class_id');
+                                  $pract =  $this->db->get_where('practical_alloted', $where_pract)->result();
+                                  
+                                  if(isset($pract->total) && !empty( $pract->total)):
+                                      $total_att_count  += $pract->total;
+                                      $total_count      += $pract->total; 
+                                  endif;
+                                  if($total_att_count):
+                                      $data[$i] =$total_att_count;
+                                  else:
+                                      $data[$i] = '';
+                                  endif;
+                              endfor;
+                          $data['Total']                  = $total_count; 
+                          $return_data[$return_dataCount] = $data;
+                  endforeach; 
+              endif;
+              $this->data['result'] = $return_data;
+                  
+
+               
+       endif;
+       
+      $this->data['months']          = $this->CRUDModel->dropDown('month', '', 'mth_num', 'mth_title',array('mth_status'=>'1')); 
+      $this->data['year']             = $this->CRUDModel->dropDown('year', '', 'yr_num', 'yr_num',array('yr_status'=>'1')); 
+      $this->data['ReportName']       = 'Teacher Attendance ( Month Wise )';
+      $this->data['page_title']       = 'Student Attendance ( Month Wise ) | ECMS';
+      $this->data['page']             =  'reports/admin/teacher_attendance_month_wise';
+      $this->load->view('common/common',$this->data); 
+  }
     
   
-     public function teacher_attendance_month_wise_report(){
+     public function teacher_attendance_month_wise_report_with_current_date(){
          
          
-         if($this->input->post('ExportMonthWise')):
+         if($this->input->post('search')):
              
             $year       = $this->input->post('Year');
             $month      = $this->input->post('Month');
@@ -10276,15 +10702,17 @@ public function student_practical_white_card_group()
             $days       = cal_days_in_month(CAL_GREGORIAN,$month,$year);
             $i          = '';
             
-            $heading['S#']      = 'S.No';
-            $heading['Teacher_Name']      = date('F, Y',strtotime('1-'.$month.'-'.$year));
+            $heading['S#']                  = 'S.No';
+            $heading['Teacher_Name']        = date('F, Y',strtotime('1-'.$month.'-'.$year));
             for($i=1 ;$i<=$days ; $i++):
-                $heading[$i]  = $i;
+                $heading[$i]                = $i;
             endfor;
-            $heading['Total']   = 'Total';
-            $return_data        = array();
-            $return_dataCount   = '0';
+            
+            $heading['Total']               = 'Total';
+            $return_data                    = array();
+            $return_dataCount               = '0';
             $return_data[$return_dataCount] =  $heading;
+
             $where      = array('emp_status_id'=>1,'cat_id'=>1,'user_status'=>1);
                             $this->db->join('users','users.user_empId=hr_emp_record.emp_id');
                             $this->db->order_by('emp_name','asc');
@@ -10303,17 +10731,19 @@ public function student_practical_white_card_group()
                             
                             for($i=1 ;$i<=$days ; $i++):
                                 $id= $this->db->get_where('users',array('user_empId'=>$rowEmp->emp_id))->row();
-                              $where = array(
-//                                    'emp_id'            => '16',
+                                $where = array(
+                                //    'emp_id'            => '110',
                                     'student_attendance.user_id'    => @$id->id,
                                     'attendance_date'               => $year.'-'.$month.'-'.$i,
-                                    'timetable.day_id'              => date('N',strtotime($year.'-'.$month.'-'.$i))
+                                    // 'timetable.day_id'              => date('N',strtotime($year.'-'.$month.'-'.$i))
                                 );
                                         $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id');
-                                        $this->db->join('timetable','timetable.class_id=class_alloted.class_id');
-                                        $this->db->join('class_starting_time','class_starting_time.stime_id=timetable.stime_id','left outer'); 
-                                        $this->db->order_by('class_starting_time.class_stime','asc');
-                                        $this->db->group_by('class_starting_time.class_stime');
+                                        // $this->db->join('timetable','timetable.class_id=class_alloted.class_id');
+                                        // $this->db->join('class_starting_time','class_starting_time.stime_id=timetable.stime_id','left outer'); 
+                                        // $this->db->order_by('class_starting_time.class_stime','asc');
+                                        // $this->db->group_by('class_starting_time.class_stime');
+
+                                        // $this->db->group_by('class_alloted.ca_merge_id');
                             $return = $this->db->get_where('student_attendance',$where)->result();
                              
                             if($return):
@@ -10329,7 +10759,74 @@ public function student_practical_white_card_group()
                         endforeach; 
                        endif;
                        $exceldata = $return_data;
- 
+                  
+         endif;
+         if($this->input->post('ExportMonthWise')):
+             
+            $year       = $this->input->post('Year');
+            $month      = $this->input->post('Month');
+            $heading    = array();
+            $days       = cal_days_in_month(CAL_GREGORIAN,$month,$year);
+            $i          = '';
+            
+            $heading['S#']                  = 'S.No';
+            $heading['Teacher_Name']        = date('F, Y',strtotime('1-'.$month.'-'.$year));
+            for($i=1 ;$i<=$days ; $i++):
+                $heading[$i]                = $i;
+            endfor;
+            
+            $heading['Total']               = 'Total';
+            $return_data                    = array();
+            $return_dataCount               = '0';
+            $return_data[$return_dataCount] =  $heading;
+
+            $where      = array('emp_status_id'=>1,'cat_id'=>1,'user_status'=>1);
+                            $this->db->join('users','users.user_empId=hr_emp_record.emp_id');
+                            $this->db->order_by('emp_name','asc');
+                            $this->db->group_by('emp_id');
+            $result     = $this->db->get_where('hr_emp_record',$where)->result();
+//             echo '<pre>';print_r($result);die;
+//             $return_dataCount = '0';
+              if($result):
+                        $data           = array();
+                       foreach($result as $rowEmp):
+                           $return_dataCount++;
+                            $total_count = ''; 
+                            
+                            $data['$#']             = $return_dataCount;
+                            $data['Teacher_Name']   = $rowEmp->emp_name;
+                            
+                            for($i=1 ;$i<=$days ; $i++):
+                                $id= $this->db->get_where('users',array('user_empId'=>$rowEmp->emp_id))->row();
+                                $where = array(
+                                //    'emp_id'            => '110',
+                                    'student_attendance.user_id'    => @$id->id,
+                                    'attendance_date'               => $year.'-'.$month.'-'.$i,
+                                    // 'timetable.day_id'              => date('N',strtotime($year.'-'.$month.'-'.$i))
+                                );
+                                        $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id');
+                                        // $this->db->join('timetable','timetable.class_id=class_alloted.class_id');
+                                        // $this->db->join('class_starting_time','class_starting_time.stime_id=timetable.stime_id','left outer'); 
+                                        // $this->db->order_by('class_starting_time.class_stime','asc');
+                                        // $this->db->group_by('class_starting_time.class_stime');
+
+                                        // $this->db->group_by('class_alloted.ca_merge_id');
+                            $return = $this->db->get_where('student_attendance',$where)->result();
+                             
+                            if($return):
+                                $data[$i]       = count($return);
+                                $total_count    +=count($return);  
+                                else:
+                                    $data[$i] = '';
+                                 endif;  
+                                 
+                            endfor;
+                            $data['Total']                  = $total_count; 
+                            $return_data[$return_dataCount] = $data;
+                        endforeach; 
+                       endif;
+                       $exceldata = $return_data;
+                    //    echo '<pre>';print_r($return_data);die;
                   $this->load->library('excel');
                 $date = date('d-m-Y H:i:s');
                 $this->excel->getActiveSheet()->fromArray($exceldata, null, 'A1');

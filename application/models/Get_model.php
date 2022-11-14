@@ -837,6 +837,7 @@ public function search_group_student($table,$where=NULL,$like=NULL,$custom=NULL)
                 gender.title as genderName,
                 reserved_seat.name as seat,
                 sub_programes.name as sub_program,
+                applicant_edu_detail.rollno,
                 applicant_edu_detail.total_marks,
                 applicant_edu_detail.obtained_marks,
                 applicant_edu_detail.percentage,
@@ -897,6 +898,7 @@ public function search_group_student($table,$where=NULL,$like=NULL,$custom=NULL)
                        'postal_address' => $drow->postal_address,
                        'domicile'       => $drow->domicile,
                        'religion'       => $drow->religion,
+                       'rollno'       => $drow->rollno,
                    ); 
                 endforeach;
                 return $return_array;

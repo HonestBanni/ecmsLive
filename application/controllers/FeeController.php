@@ -3875,34 +3875,34 @@ class FeeController extends AdminController {
 //                      
 //                          //Send SMS
 //           
-                            $clearNumber  =  $this->CRUDModel->clean_number($student_status->applicant_mob_no1);
-                            $message      = 'Congratulations! Your first installment challan for admission in Edwardes College has been confirmed.';
+                            // $clearNumber  =  $this->CRUDModel->clean_number($student_status->applicant_mob_no1);
+                            // $message      = 'Congratulations! Your first installment challan for admission in Edwardes College has been confirmed.';
 // 
-                            $network = $this->db->get_where('mobile_network',array('net_id'=>$student_status->std_mobile_network))->row();
+                            // $network = $this->db->get_where('mobile_network',array('net_id'=>$student_status->std_mobile_network))->row();
 //                            
-                             $sms_info = $this->send_message_bulk($clearNumber,$message,$network->send_format);
-                              $return_resp = '';
-                                if(!empty($sms_info)):
-                                      $return_resp = $sms_info;
-                                else:
-                                      $return_resp = 'null';
-                                endif;     
-                             $sms_log = array(
-                                          'student_id'        => $student_status->student_id,
-                                          'program_id'        => $student_status->programe_id,
-                                          'sub_pro_id'        => $student_status->sub_pro_id,
-                                          'batch_id'          => $student_status->batch_id,
-                                          'sms_type'          => 1,
-                                          'message'           => $message,
-                                          'network'           => $network->send_format,
-                                          'sender_number'     => $this->CRUDModel->clean_number($student_status->applicant_mob_no1),
-                                          'comments'          => $return_resp,
-                                          'create_datetime'   => date('Y-m-d H:i:s'),
-                                          'send_date'         => date('Y-m-d'),  
-                                          'create_by'         => $this->userInfo->user_id, 
-                                        );
+                            //  $sms_info = $this->send_message_bulk($clearNumber,$message,$network->send_format);
+                            //   $return_resp = '';
+                            //     if(isset($sms_info) && !empty($sms_info)):
+                            //           $return_resp = $sms_info;
+                            //     else:
+                            //           $return_resp = 'null';
+                            //     endif;     
+                            //  $sms_log = array(
+                            //               'student_id'        => $student_status->student_id,
+                            //               'program_id'        => $student_status->programe_id,
+                            //               'sub_pro_id'        => $student_status->sub_pro_id,
+                            //               'batch_id'          => $student_status->batch_id,
+                            //               'sms_type'          => 1,
+                            //               'message'           => $message,
+                            //               'network'           => $network->send_format,
+                            //               'sender_number'     => $this->CRUDModel->clean_number($student_status->applicant_mob_no1),
+                            //               'comments'          => $return_resp,
+                            //               'create_datetime'   => date('Y-m-d H:i:s'),
+                            //               'send_date'         => date('Y-m-d'),  
+                            //               'create_by'         => $this->userInfo->user_id, 
+                            //             );
 
-                                $this->CRUDModel->insert('sms_students',$sms_log);
+                               // $this->CRUDModel->insert('sms_students',$sms_log);
 //                         
 //                      
 //                  endif;

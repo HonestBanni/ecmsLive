@@ -26,6 +26,107 @@ class TestController extends AdminController {
              $this->load->model('CRUDModel');
           }
           
+          public function shift_change(){
+            $where_in_seX = array(
+                // 1st Year 
+                    '645', //1m1
+                    '646', //1m2
+                    '647', //1m3
+                    '648', //1m4
+                    '649', //1m5
+                    '650', //1m6
+                    '651', //1m7
+
+                    '662', //1C1
+                    '663', //1C2
+                    '664', //1C3
+                    '665', //1C4
+                    
+                    '658', //1E1
+                    '659', //1E2
+                    '660', //1E3
+                    '661', //1E4
+                    
+                    '667', //1A1
+                    '668', //1A2
+                    '542', //1A3
+                    
+                    '657', //1G1
+                    '653', //1G1 Eng
+                    '666', //1G1 CS
+                    '669', //1G1 Art
+                    '670', //1G1 ICS
+                    '677', //1 ICS
+                // 2nd Year 
+                    '521', //2M1
+                    '522', //2M2
+                    '523', //2M3
+                    '524', //2M4
+                    '525', //2M5
+                    '526', //2M6
+
+                    '535', //2E1
+                    '536', //2E2
+                    '537', //2E3
+                    
+                    '514', //2C1
+                    '515', //2C2
+                    
+                    '518', //2A1
+                    '519', //2A2
+                    
+                    '520', //2G1
+                    '534', //2G1 ENG
+                    '543', //2G1 ARTS                    
+                    '581', //2G1 ICS                    
+                    '517', //2G1 CS                    
+
+                    
+
+
+            );
+            $where_in_se_afternoon_sections = array(
+                    '652', //1m8
+                    '653',//1m9
+                    '654',//1m10
+                    '655',//1m11
+                    '582',//1c5
+                    '675',//1c6
+
+                    '527',//2m7
+                    '528',//2m8
+                    '529',//2m9
+                    '538',//2E4
+                    '516',//2C3
+                    '567',//2C4
+              );
+                            $this->db->where_in('sec_id',$where_in_se_afternoon_sections);
+                            // $this->db->where('status','On');
+          $sectionQuery =   $this->db->get_where('sections')->result();
+        //   echo '<pre>';print_r($sectionQuery);die;
+            if($sectionQuery):
+                foreach($sectionQuery as $row):
+
+
+                                $this->db->join('student_group_allotment','student_group_allotment.student_id=student_record.student_id','left outer');
+                    $result =   $this->db->get_where('student_record',array('section_id'=>$row->sec_id))->result();
+                   
+                    if(isset($result) && !empty($result)):
+                        foreach($result as $rowstd):
+                            
+                                $set    = array('shift_id'=>2);
+                                $where  = array('student_id'=>$rowstd->student_id);
+                                $this->CRUDModel->update('student_record',$set,$where);
+                            // echo '<pre>';print_r($rowstd);
+                            // die;
+                        endforeach;
+                    endif;
+                endforeach;
+            endif;
+           
+
+          }
+
           public function change_admission_date(){
                         // $this->db->join('student_record','student_record.student_id=fee_challan.fc_student_id');
              $query =   $this->db->get_where('student_record',array('batch_id'=>'74','s_status_id'=>'9','admission_date'=>'1970-01-01','programe_id'=>'1'))->result();

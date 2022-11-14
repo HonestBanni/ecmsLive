@@ -59,10 +59,10 @@
            
                     
                     <div class="form-group col-md-2">
-                            <input type="date" name="attendance_date" value="<?php if($attendance_date): echo $attendance_date;endif; ?>" class="form-control">
+                            <input type="text" name="attendance_date" value="<?php if($attendance_date): echo $attendance_date;endif; ?>" class="form-control datepicker">
                       </div>
                     <div class="form-group col-md-2">
-                            <input type="date" name="attendance_to_date" value="<?php if($attendance_to_date): echo $attendance_to_date;endif; ?>" class="form-control">
+                            <input type="text" name="attendance_to_date" value="<?php if($attendance_to_date): echo $attendance_to_date;endif; ?>" class="form-control datepicker">
                       </div>
                          <input type="submit" name="search" class="btn btn-theme" value="Search">
                          <input type="submit" name="print" class="btn btn-theme" value="Print">
@@ -84,9 +84,11 @@
                     <table id='testing123' cellpadding="0" cellspacing="0" border="0" class="datatable-1 table table-boxed table-bordered table-striped	 display" width="100%">
                     <thead>
                         <tr>
+                            <th>S.No</th>
                             <th>Current Teacher</th>
                             <th>Subject</th>
                             <th>Section</th>
+                            <th>Group</th>
                             <th>Entered By</th>
                             <th>Duration</th>
                             <th>Present/Leave/Absent</th>
@@ -97,9 +99,9 @@
                     </thead>
                     <tbody>
                         <?php
-                        
+                         $sn= '';
                     foreach($result as $rec){
-                      
+                        $sn++;
                         $attend_id = $rec->attend_id;        
                         $present = $this->db->query("SELECT * FROM student_attendance_details WHERE attend_id = '$attend_id' AND status=1");
                         $leave = $this->db->query("SELECT * FROM student_attendance_details WHERE attend_id = '$attend_id' AND status=2");
@@ -112,12 +114,21 @@
                         
                                         $this->db->join('users','users.id=student_attendance.user_id');
                                          $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId');
-                           $entery_by =  $this->db->get_where('student_attendance',array('attend_id'=>$rec->attend_id))->row()->emp_name;
+                        $entery_by =  $this->db->get_where('student_attendance',array('attend_id'=>$rec->attend_id))->row()->emp_name;
+
+                        
                         ?>
                         <tr class="gradeA">
+                            <td><?php echo $sn;?></td>
                             <td><?php echo $rec->employee;?></td>
                             <td><?php echo $rec->subject;?></td>
                             <td><?php echo $rec->section;?></td>
+                            <td><?php 
+                                $group = $this->db->get_where('class_alloted_merge_groups',array('camg_id'=>$rec->ca_merge_id))->row();
+                                if(isset($group) && !empty($group)):
+                                    echo $group->camg_name;
+                                endif;
+                            ?></td>
                             <td><?php echo $entery_by;?></td>
                             <td><?php echo $time_table->class_stime.','.$time_table->class_etime;?></td>
                             <td>
@@ -160,5 +171,20 @@
             }
             }).focus(function() {  jQuery(this).autocomplete("search", "");  
         });
+
+        $(function() {
+            $('.datepicker').datepicker( {
+               changeMonth: true,
+                changeYear: true,
+                 dateFormat: 'dd-mm-yy'
+           
+            });
+        });
     });
 </script>
+<style>
+      .datepicker{
+          z-index: 1;
+      }
+  </style>     
+  

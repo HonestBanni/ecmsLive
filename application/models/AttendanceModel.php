@@ -1822,6 +1822,7 @@ class AttendanceModel extends CI_Model
             student_attendance.attendance_date as attendance_date,
             student_attendance.attend_id as attend_id,
             class_alloted.class_id as class_id,
+            class_alloted.ca_merge_id as ca_merge_id,
             class_alloted.flag as flag,
             class_alloted.timestamp as timestamp,
             hr_emp_record.emp_name as employee,
@@ -1836,8 +1837,8 @@ class AttendanceModel extends CI_Model
         $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id');
         $this->db->join('hr_emp_record','hr_emp_record.emp_id=class_alloted.emp_id');
         $this->db->join('subject','subject.subject_id=class_alloted.subject_id');
-       $this->db->join('sections','sections.sec_id=class_alloted.sec_id');
-       $this->db->order_by('sections.name','asc');
+        $this->db->join('sections','sections.sec_id=class_alloted.sec_id');
+        $this->db->order_by('sections.name','asc');
         if($from_date !="" && $to_date !=""):
                 $this->db->where('student_attendance.attendance_date BETWEEN "'.date('Y-m-d',strtotime($from_date)).'" and "'.date('Y-m-d',strtotime($to_date)).'"');
         endif;
@@ -2962,6 +2963,7 @@ $this->db->join('practical_subject','practical_subject.prac_subject_id=practical
         if($from_date !="" && $to_date !=""):
                 $this->db->where('practical_attendance.attendance_date BETWEEN "'.date('Y-m-d',strtotime($from_date)).'" and "'.date('Y-m-d',strtotime($to_date)).'"');
         endif;
+       $this->db->order_by('practical_attendance.attendance_date','asc');
        $this->db->order_by('practical_group.group_name','asc');
         $query =  $this->db->get();
         if($query):

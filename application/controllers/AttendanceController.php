@@ -3593,10 +3593,10 @@ $data  = array
             $this->data['sec_id'] = '';
             $this->data['subject_id'] = '';
             $this->data['dbuserId'] = '';
-            $this->data['attendance_date']      = date('Y-m-d');
-            $this->data['attendance_to_date']   = date('Y-m-d');
-            $to_date                            = date('Y-m-d');
-            $from_date                          = date('Y-m-d');
+            $this->data['attendance_date']      = date('d-m-Y');
+            $this->data['attendance_to_date']   = date('d-m-Y');
+            $to_date                            = date('d-m-Y');
+            $from_date                          = date('d-m-Y');
              //like Array
             $like                               = '';
             $where                              = '';
@@ -3800,17 +3800,17 @@ $data  = array
     
     public function search_attendance_history_vp(){  
           
-            $this->data['emp_id'] = '';
-            $this->data['sec_id'] = '';
-            $this->data['subject_id'] = '';
-            $this->data['dbuserId'] = '';
-            $this->data['present'] = '';
-            $this->data['absent'] = '';
-            $this->data['total'] = '';
-            $this->data['attendance_date']      = date('Y-m-d');
-            $this->data['attendance_to_date']   = date('Y-m-d');
-            $to_date                            = date('Y-m-d');
-            $from_date                          = date('Y-m-d');
+            $this->data['emp_id']               = '';
+            $this->data['sec_id']               = '';
+            $this->data['subject_id']           = '';
+            $this->data['dbuserId']             = '';
+            $this->data['present']              = '';
+            $this->data['absent']               = '';
+            $this->data['total']                = '';
+            $this->data['attendance_date']      = date('d-m-Y');
+            $this->data['attendance_to_date']   = date('d-m-Y');
+            $to_date                            = date('d-m-Y');
+            $from_date                          = date('d-m-Y');
              //like Array
             $like                               = '';
             $where                              = '';
@@ -3822,6 +3822,7 @@ $data  = array
             $subject_id         =  $this->input->post('subject_id');
             $attendance_date    =  $this->input->post('attendance_date');
             $attendance_to_date =  $this->input->post('attendance_to_date');
+            // $attendance_to_date =  $this->input->post('attendance_to_date');
             $dbuserId           =  $this->input->post('dbuser_id');
            
             if(!empty($emp_id)):
@@ -4032,10 +4033,10 @@ $data  = array
             $this->data['sec_id'] = '';
             $this->data['subject_id'] = '';
             $this->data['dbuserId'] = '';
-            $this->data['attendance_date']      = date('Y-m-d');
-            $this->data['attendance_to_date']   = date('Y-m-d');
-            $to_date                            = date('Y-m-d');
-            $from_date                          = date('Y-m-d');
+            $this->data['attendance_date']      = date('d-m-Y');
+            $this->data['attendance_to_date']   = date('d-m-Y');
+            $to_date                            = date('d-m-Y');
+            $from_date                          = date('d-m-Y');
              //like Array
             $like                               = '';
             $where                              = '';
@@ -4144,10 +4145,10 @@ $data  = array
             $this->data['group_id'] = '';
             $this->data['subject_id'] = '';
             $this->data['dbuserId'] = '';
-            $this->data['attendance_date']      = date('Y-m-d');
-            $this->data['attendance_to_date']   = date('Y-m-d');
-            $to_date                            = date('Y-m-d');
-            $from_date                          = date('Y-m-d');
+            $this->data['attendance_date']      = date('d-m-Y');
+            $this->data['attendance_to_date']   = date('d-m-Y');
+            $to_date                            = date('d-m-Y');
+            $from_date                          = date('d-m-Y');
             
             $like = '';
             $where = '';
@@ -11363,7 +11364,8 @@ $this->data['result']       = $this->AttendanceModel->view_attendance('student_a
        public function student_mobile_info(){
         
        $stdInfo = $this->db->get_where('student_record',array('student_id'=>$this->input->post('StudentId')))->row();
-       
+    //    echo '<pre>';print_r($stdInfo);die;
+        echo '<div style="text-align: center;"><img src="assets/images/students/'.$stdInfo->applicant_image.'" width="200" height="150"></div>';        
        echo '<table  cellpadding="0" cellspacing="0" border="0" class="datatable-1 table table-boxed table-bordered table-striped	 display" width="100%">
                     <thead>
                         <tr>

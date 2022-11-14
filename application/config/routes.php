@@ -523,8 +523,13 @@ $route['whiteCardGrandGui']         = 'ReportsController/student_attendance_whit
 $route['whiteCardDegree']           = 'ReportsController/student_attendance_white_card_degree';
 $route['whiteCardLaw']              = 'ReportsController/student_attendance_white_card_law';
 $route['BSProgramWCard']            = 'ReportsController/bs_white_cards';
+
 $route['whiteCardPrint/:num/:num']  = 'ReportsController/student_attendance_white_card_print/:num/:num';
-$route['whiteCardTeacher/:num/:num'] = 'ReportsController/student_attendance_white_card_teacher/:num/:num';
+$route['whiteCardPrint/:num']       = 'ReportsController/student_attendance_white_card_print/:num';
+
+$route['whiteCardPrint2/:num']          = 'ReportsController/student_attendance_white_card_print_2/:num'; //temporary
+$route['whiteCardPrint2/:num/:num']     = 'ReportsController/student_attendance_white_card_print_2/:num/:num'; //temporary
+$route['whiteCardTeacher/:num/:num']    = 'ReportsController/student_attendance_white_card_teacher/:num/:num';
 $route['BSProgramAttRpt']            = 'ReportsController/bs_programes_attendance_marks_history';
 
 $route['TMSI']                      = 'ReportsController/teacher_missing_test_inter';

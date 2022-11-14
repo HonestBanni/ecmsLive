@@ -14,6 +14,9 @@
     return false;
   }
 </script>
+<?php 
+// echo error_reporting(0)
+?>
 <!-- ******CONTENT****** --> 
 <div class="content container">
   <div class="page-wrapper">
@@ -189,6 +192,7 @@
             
             <?php
             if(@$result):
+              // if(isset($result) && !empty($result)):
             ?>
             <div id="div_print">
                 

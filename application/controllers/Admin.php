@@ -2094,9 +2094,13 @@ $this->excel->getActiveSheet()->getStyle(chr($col))->getAlignment()->setHorizont
             $this->excel->getActiveSheet()->setCellValue('T1','Religion');
             $this->excel->getActiveSheet()->getStyle('T1')->getFont()->setBold(true);
             $this->excel->getActiveSheet()->getStyle('T1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('U1','Roll No');
+            $this->excel->getActiveSheet()->getStyle('U1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('U1')->getFont()->setSize(16);
     
                 
-       for($col = ord('A'); $col <= ord('T'); $col++){
+       for($col = ord('A'); $col <= ord('U'); $col++){
                 //set column dimension
                 $this->excel->getActiveSheet()->getColumnDimension(chr($col))->setAutoSize(true);
                  //change the font size

@@ -605,6 +605,7 @@ class DashboardModel extends CI_Model
             if($where):
                 $this->db->where($where);
             endif;
+            $this->db->where('student_record.timestamp >= date_sub(now(),interval 4 month)');
             $this->db->order_by('student_record.student_id','desc');
             $this->db->group_by('student_record.student_id');
     return $this->db->get('student_record')->result();
@@ -651,6 +652,7 @@ class DashboardModel extends CI_Model
         if($where):
             $this->db->where($where);
         endif;
+        $this->db->where('student_record.timestamp >= date_sub(now(),interval 4 month)');
         $this->db->group_by('student_record.student_id');
         return $this->db->get()->result();
    }

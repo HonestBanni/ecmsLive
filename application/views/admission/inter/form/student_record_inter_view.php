@@ -20,6 +20,9 @@
                         <div class="form-group col-md-2">
                             <input type="text" name="father_name" value="<?php if($father_name): echo $father_name;endif; ?>" placeholder="Father Name" class="form-control">
                       </div>
+                        <div class="form-group col-md-2">
+                            <input type="text" name="board_regno" value="<?php if($boardregno): echo $boardregno;endif; ?>" placeholder="Board Reg No" class="form-control">
+                      </div>
                       <div class="form-group col-md-2">
                             <?php 
                             echo form_dropdown('gender_id', $gender, $gender_id,  'class="form-control" id="my_id"');
@@ -71,6 +74,7 @@
                             <th>Picture</th>
                             <th>Student</th>
                             <th>F-Name</th>
+                            <th>Reg No</th>
                             <th>DoB</th>
                             <th>Form #</th>
                             <th>College #</th>
@@ -123,6 +127,7 @@ $i = 1;
  <td><a href="admin/student_profile/<?php echo $student_id;?>"><span style="font-size:15px;"><?php echo $student_name;?></span></a>    
                     </td>
                 <td><?php echo $father_name;?></td>
+                <td><?php echo $rec->board_regno;?></td>
                 <td><?php if(!empty($rec->dob)): echo date('d-m-Y',strtotime($rec->dob)); endif;?></td>
                 <td><?php echo $rec->form_no;?></td>
                 <td><?php echo $rec->college_no;?></td>

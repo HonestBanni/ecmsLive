@@ -442,6 +442,18 @@
                                         <input type="text" id="acad_comments"  name="acad_comments" class="form-control" autocomplete="off"  maxlength="150" value="<?php echo $acad_row->academic_comments; ?>">
                                         <br>
                                     </div>
+                                    
+                                    <div class="col-md-4 subject form-group">
+                                        <label style="text-indent: 3px">LAT Marks</label>
+                                        <input type="text" id="lat_marks"  name="lat_marks" class="form-control" autocomplete="off" value="<?php echo $acad_row->lat_marks; ?>">
+                                        <br>
+                                    </div>
+                                    
+                                    <div class="col-md-4 subject form-group">
+                                        <label style="text-indent: 3px">LAT Test Date</label>
+                                        <input type="date" id="lat_date"  name="lat_date" class="form-control" value="<?php if(!empty ($acad_row->lat_date)): echo $acad_row->lat_date; endif; ?>">
+                                        <br>
+                                    </div>
                                   
                                 </div>
                                 

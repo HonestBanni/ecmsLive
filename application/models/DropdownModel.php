@@ -68,6 +68,7 @@ class DropdownModel extends CI_Model
             $this->db->like('student_name',$like);
             $this->db->or_like('form_no',$like);
             $this->db->or_like('college_no',$like);
+            $this->db->or_like('board_regno',$like);
         endif;
                    $this->db->join('student_status','student_status.s_status_id=student_record.s_status_id'); 
                    $this->db->order_by('student_record.student_id','desc');

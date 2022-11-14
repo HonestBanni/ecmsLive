@@ -85,10 +85,10 @@
             </div>
                    
                     <div class="form-group col-md-2">
-                            <input type="date" name="attendance_date" value="<?php if($attendance_date): echo $attendance_date;endif; ?>" class="form-control">
+                            <input type="text" name="attendance_date" value="<?php if($attendance_date): echo $attendance_date;endif; ?>" class="form-control datepicker">
                       </div>
                     <div class="form-group col-md-2">
-                            <input type="date" name="attendance_to_date" value="<?php if($attendance_to_date): echo $attendance_to_date;endif; ?>" class="form-control">
+                            <input type="text" name="attendance_to_date" value="<?php if($attendance_to_date): echo $attendance_to_date;endif; ?>" class="form-control datepicker">
                       </div>
                         
                         
@@ -171,5 +171,19 @@
             }
             }).focus(function() {  jQuery(this).autocomplete("search", "");  
         });
+        $(function() {
+            $('.datepicker').datepicker( {
+               changeMonth: true,
+                changeYear: true,
+                 dateFormat: 'dd-mm-yy'
+           
+            });
+        });
     });
 </script>
+
+<style>
+      .datepicker{
+          z-index: 1;
+      }
+  </style> 

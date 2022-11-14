@@ -29,13 +29,14 @@
                     $merged_groups = $this->CRUDModel->get_where_result('class_alloted', array('ca_merge_id'=>$merged_id));
                   ?>
                     <div class="form-group col-md-2">
+                        <label for="name">Attendance Date</label>
                          <select class="form-control" name="attendance_date">
                          <?php
                             $m= date("m");
                             $de= date("d");
                             $y= date("Y");
 
-                                for($i=0; $i<=7; $i++){
+                                for($i=0; $i<=10; $i++){
 
                                 $date_is = date('Y-m-d',mktime(0,0,0,$m,($de-$i),$y)); 
                                 echo '<option value="'.$date_is.'">'.$date_is.'</option>';

@@ -47,12 +47,10 @@
 //
 //                                }
 //                            else:
-                                for($i=0; $i<=50; $i++){
-
-                                $date_is = date('Y-m-d',mktime(0,0,0,$m,($de-$i),$y)); 
-                                echo '<option value="'.$date_is.'">'.$date_is.'</option>';
-
-                                }
+                                for($i=0; $i<=10; $i++){
+                                    $date_is = date('Y-m-d',mktime(0,0,0,$m,($de-$i),$y)); 
+                                    echo '<option value="'.$date_is.'">'.$date_is.'</option>';
+                                    }
                             
 //                        endif;
                         

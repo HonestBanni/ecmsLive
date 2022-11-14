@@ -364,12 +364,12 @@ class SmsModel extends CI_Model
                 $this->db->order_by('sections.name','asc');
                  $this->db->order_by('college_no','asc');
                  
-       $result =  $this->db->get('student_record')->result();
+       $results =  $this->db->get('student_record')->result();
        
-       if(!empty($result)):
+       if(!empty($results)):
                 $return_array    = '';
        $sn = '';
-           foreach($result as $stdRow):
+           foreach($results as $stdRow):
                
                 $gPresent       = '';
                 $gAbsent        = '';
@@ -396,11 +396,12 @@ class SmsModel extends CI_Model
                             'student_subject_alloted.section_id'=>$stdRow->section_id
                         )); 
             endif;
+            
             if($flag ==1):
                     $classSubjects = $this->ReportsModel->get_classSubjects(array('sec_id'=>$stdRow->section_id));
             endif;
              if($flag == 2):
-                 $classSubjects = $this->ReportsModel->get_subject_list('student_subject_alloted',array('student_id'=>$result->student_id));
+                 $classSubjects = $this->ReportsModel->get_subject_list('student_subject_alloted',array('student_id'=>$stdRow->student_id));
             endif;
             
                 
@@ -423,7 +424,7 @@ class SmsModel extends CI_Model
                                     $where = array(
                                         'subject_id'                => $rowCS->subject_id,
                                         // 'sec_id'                    => $stdRow->section_id,
-                                        'student_id'                =>$result->student_id,
+                                        'student_id'                =>$stdRow->student_id,
                                         'month(attendance_date)'    =>$month,
                                         'year(attendance_date)'     =>$year,
                                     );

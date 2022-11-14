@@ -141,9 +141,9 @@
                                 <td>'.$resRow->batch_name.'</td>
                                 <td>'.$resRow->sectionName.'</td>
                                 <td>'.$resRow->studentStatus.'</td>
-                                <td>
-                                    <a class="btn btn-success" target="_blank" href="whiteCardPrint/'.$resRow->student_id.'/'.$resRow->sec_id.'">White Card</a>
-                                </td>
+                                <td>';
+                                echo '<a class="btn btn-success" target="_blank" href="whiteCardPrint/'.$resRow->student_id.'/'.$resRow->sec_id.'">White Card</a>';
+                                echo '</td>
                                 <td>
                                     <a class="btn btn-success" target="_blank" href="whiteCardTeacher/'.$resRow->student_id.'/'.$resRow->sec_id.'">T. White Card</a>
                                 </td>

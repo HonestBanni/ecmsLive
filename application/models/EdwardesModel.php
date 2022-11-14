@@ -148,6 +148,8 @@ public function get_applicant_education_info($table,$where=NULL){
             applicant_edu_detail.academic_comments,
             applicant_edu_detail.rollno,
             applicant_edu_detail.board_reg_no,
+            applicant_edu_detail.lat_marks,
+            applicant_edu_detail.lat_date,
             degree.title as degree_title,
             board_university.title as bu_title,
         ');

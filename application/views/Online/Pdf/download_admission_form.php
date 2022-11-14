@@ -299,7 +299,7 @@ if($st_data):
                             <li>If you are applying for more than one discipline, you will have to submit separate application for each discipline.</li>
                             <li>Students from other than Peshawar Board, must submit their Original Migration Certificate to Administration Department Edwardes College.</li>
                             <li>D grade passes are not eligible for admission in Edwardes College. (FA/FSc only)</li>
-                            <li>Applicants must have passed their SSC Exam: in 2020. Previous year passes are not eligible for admission.</li>
+                            <!--<li>Applicants must have passed their SSC Exam: in 2020. Previous year passes are not eligible for admission.</li>-->
                             <li>Students applying for admission against Reserved Seats must specify the respective quota (if any), Otherwise the application will not be considered in "Reserved Seats" category</li>
                             <li>Applicants having domicile other than Peshawar can apply for admission in hostel. Hostel admissions are subject to availability of seats.</li>
                             <li>If the information provided by the applicant in the admission form is found false or misleading, the admission will be cancelled.</li>
