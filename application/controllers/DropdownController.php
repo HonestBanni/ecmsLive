@@ -24,8 +24,8 @@ class DropdownController extends AdminController {
           
     public function __construct() {
              parent::__construct();
-             $this->userInfo = json_decode(json_encode($this->getUser()), FALSE);
-             $this->load->model('AttendanceModel');
+             $this->userInfo = json_decode(json_encode($this->check_login_status()), FALSE);
+ 
           }
           
           //Hostel Student Auto compelete 
@@ -84,10 +84,9 @@ class DropdownController extends AdminController {
                 $labels         = array();
                     foreach ($result_set as $row_set) {
                         $labels[]       = array( 
-                            'label'     =>$row_set->student_name.' S/D '.$row_set->father_name.' ,Form# '.$row_set->form_no.' , '.$row_set->batch_name, 
-                            'code'      =>$row_set->hostel_id, 
+                            'label'     =>$row_set->student_name.' S/D '.$row_set->father_name.' ,Form# '.$row_set->form_no.' ', 
+                            'code'     =>$row_set->hostel_id, 
                             'value'     =>$row_set->student_name, 
-                            'batch_id'  =>$row_set->batch_id, 
                               
                     );
                 }
@@ -96,8 +95,6 @@ class DropdownController extends AdminController {
                     $label['value']     = $label['value'];
                     $label['code']      = $label['code'];
                     $label['label']     = $label['label']; 
-                    $label['batch_id']     = $label['batch_id'];
-                    
                     
                     $matches[]          = $label;
             }
@@ -109,10 +106,9 @@ class DropdownController extends AdminController {
                 $labels                 = array();
                     foreach ($result_set as $row_set) {
                     $labels[]           = array( 
-                          'label'     =>$row_set->student_name.' S/D '.$row_set->father_name.' ,Form# '.$row_set->form_no.' , '.$row_set->batch_name, 
+                          'label'     =>$row_set->student_name.' S/D '.$row_set->father_name.' ,Form# '.$row_set->form_no.' ', 
                             'code'     =>$row_set->hostel_id, 
                             'value'     =>$row_set->student_name,
-                         'batch_id'  =>$row_set->batch_id, 
                     );
              }
             $matches                = array();
@@ -120,7 +116,6 @@ class DropdownController extends AdminController {
                      $label['value']    = $label['value'];
                     $label['code']      = $label['code'];
                     $label['label']     = $label['label']; 
-                    $label['batch_id']     = $label['batch_id']; 
                    
                     $matches[]          = $label;
             }
@@ -294,402 +289,20 @@ public function getSection(){
 //            }
 //        }
     
- public function get_voucher_info(){
-            $term = trim(strip_tags($this->input->get('term')));
-            $where = array(
-               'gl_amount_transition.fn_account_type_id'=> 1 
-            );
-            if( $term == ''){
-                $like           = $term;
-                $result_set     = $this->DropdownModel->get_voucher_info($like,$where);
-                $labels         = array();
-                    foreach ($result_set as $row_set) {
-                        $labels[]       = array( 
-                            'label'     => 'V# '.$row_set->gl_at_vocher.' Payee : ('.$row_set->gl_at_payeeId.')'.' Fy : ('.$row_set->year.')', 
-                            'value'     =>'V# '.$row_set->gl_at_vocher, 
-                            'date'      =>date('d-m-Y',strtotime($row_set->payment_date)),
-                            'cheque'    =>$row_set->gl_at_cheque, 
-                            'payee'     =>$row_set->gl_at_payeeId, 
-                            'desc'      =>$row_set->gl_at_description, 
-                            'amount'      =>$row_set->print_cheque_value, 
-                            
-                              
-                    );
-                }
-            $matches    = array();
-                foreach($labels as $label){
-                    $label['value']    = $label['value'];
-                    $label['label']     = $label['label']; 
-                    $label['date']      = $label['date'];
-                    $label['cheque']    = $label['cheque'];
-                    $label['payee']     = $label['payee'];
-                    $label['desc']      = $label['desc']; 
-                    $label['amount']    = $label['amount']; 
-                    
-                    $matches[]          = $label;
-            }
-            $matches                    = array_slice($matches, 0, 20);
-                echo  json_encode($matches); 
-            }else if($term != ''){
-                $like                   = $term;
-                $result_set             = $this->DropdownModel->get_voucher_info($like,$where);
-                $labels                 = array();
-                    foreach ($result_set as $row_set) {
-                    $labels[]           = array( 
-                            'label'     => 'V# '.$row_set->gl_at_vocher.' Payee : ('.$row_set->gl_at_payeeId.')'.' Fy : ('.$row_set->year.')', 
-                            'value'     =>'V# '.$row_set->gl_at_vocher, 
-                            'date'      =>date('d-m-Y',strtotime($row_set->payment_date)),
-                            'cheque'    =>$row_set->gl_at_cheque, 
-                            'payee'     =>$row_set->gl_at_payeeId, 
-                            'desc'      =>$row_set->gl_at_description, 
-                            'amount'      =>$row_set->print_cheque_value, 
-                    );
-             }
-            $matches                = array();
-            foreach($labels as $label){
-                    $label['value']    = $label['value'];
-                    $label['label']     = $label['label']; 
-                    $label['date']      = $label['date'];
-                    $label['cheque']    = $label['cheque'];
-                    $label['payee']     = $label['payee'];
-                    $label['desc']      = $label['desc']; 
-                    $label['amount']    = $label['amount']; 
-                   
-                    $matches[]          = $label;
-            }
-                $matches                = array_slice($matches, 0, 20);
-            echo  json_encode($matches); 
-            }
-        }       
- public function get_voucher_info_grand_and_aid(){
-            $term = trim(strip_tags($this->input->get('term')));
-            $where = array(
-               'gl_amount_transition.fn_account_type_id'=> 3 
-            );
-            if( $term == ''){
-                $like           = $term;
-                $result_set     = $this->DropdownModel->get_voucher_info($like,$where);
-                $labels         = array();
-                    foreach ($result_set as $row_set) {
-                        $labels[]       = array( 
-                            'label'     => 'V# '.$row_set->gl_at_vocher.' Payee : ('.$row_set->gl_at_payeeId.')'.' Fy : ('.$row_set->year.')', 
-                            'value'     =>'V# '.$row_set->gl_at_vocher, 
-                            'date'      =>date('d-m-Y',strtotime($row_set->payment_date)),
-                            'cheque'    =>$row_set->gl_at_cheque, 
-                            'payee'     =>$row_set->gl_at_payeeId, 
-                            'desc'      =>$row_set->gl_at_description, 
-                            'amount'      =>$row_set->print_cheque_value, 
-                            
-                              
-                    );
-                }
-            $matches    = array();
-                foreach($labels as $label){
-                    $label['value']    = $label['value'];
-                    $label['label']     = $label['label']; 
-                    $label['date']      = $label['date'];
-                    $label['cheque']    = $label['cheque'];
-                    $label['payee']     = $label['payee'];
-                    $label['desc']      = $label['desc']; 
-                    $label['amount']    = $label['amount']; 
-                    
-                    $matches[]          = $label;
-            }
-            $matches                    = array_slice($matches, 0, 20);
-                echo  json_encode($matches); 
-            }else if($term != ''){
-                $like                   = $term;
-                $result_set             = $this->DropdownModel->get_voucher_info($like,$where);
-                $labels                 = array();
-                    foreach ($result_set as $row_set) {
-                    $labels[]           = array( 
-                            'label'     => 'V# '.$row_set->gl_at_vocher.' Payee : ('.$row_set->gl_at_payeeId.')'.' Fy : ('.$row_set->year.')', 
-                            'value'     =>'V# '.$row_set->gl_at_vocher, 
-                            'date'      =>date('d-m-Y',strtotime($row_set->payment_date)),
-                            'cheque'    =>$row_set->gl_at_cheque, 
-                            'payee'     =>$row_set->gl_at_payeeId, 
-                            'desc'      =>$row_set->gl_at_description, 
-                            'amount'      =>$row_set->print_cheque_value, 
-                    );
-             }
-            $matches                = array();
-            foreach($labels as $label){
-                    $label['value']    = $label['value'];
-                    $label['label']     = $label['label']; 
-                    $label['date']      = $label['date'];
-                    $label['cheque']    = $label['cheque'];
-                    $label['payee']     = $label['payee'];
-                    $label['desc']      = $label['desc']; 
-                    $label['amount']    = $label['amount']; 
-                   
-                    $matches[]          = $label;
-            }
-                $matches                = array_slice($matches, 0, 20);
-            echo  json_encode($matches); 
-            }
-        }       
- public function get_voucher_info_hm(){
-            $term = trim(strip_tags($this->input->get('term')));
-            $where = array(
-               'gl_amount_transition.fn_account_type_id'=>'2' 
-            );
-            if( $term == ''){
-                $like           = $term;
-                $result_set     = $this->DropdownModel->get_voucher_info($like,$where);
-                $labels         = array();
-                    foreach ($result_set as $row_set) {
-                        $labels[]       = array( 
-                           
-                            'label'     => 'V# '.$row_set->gl_at_vocher.' Payee : ('.$row_set->gl_at_payeeId.')'.' Fy : ('.$row_set->year.')', 
-                            'value'     =>'V# '.$row_set->gl_at_vocher, 
-                            'date'      =>date('d-m-Y',strtotime($row_set->payment_date)),
-                            'cheque'    =>$row_set->gl_at_cheque, 
-                            'payee'     =>$row_set->gl_at_payeeId, 
-                            'desc'      =>$row_set->gl_at_description, 
-                            'amount'      =>$row_set->print_cheque_value, 
-                            
-                              
-                    );
-                }
-            $matches    = array();
-                foreach($labels as $label){
-                    $label['value']    = $label['value'];
-                    $label['label']     = $label['label']; 
-                    $label['date']      = $label['date'];
-                    $label['cheque']    = $label['cheque'];
-                    $label['payee']     = $label['payee'];
-                    $label['desc']      = $label['desc']; 
-                    $label['amount']    = $label['amount']; 
-                    
-                    $matches[]          = $label;
-            }
-            $matches                    = array_slice($matches, 0, 20);
-                echo  json_encode($matches); 
-            }else if($term != ''){
-                $like                   = $term;
-                $result_set             = $this->DropdownModel->get_voucher_info($like,$where);
-                $labels                 = array();
-                    foreach ($result_set as $row_set) {
-                    $labels[]           = array( 
-                            'label'     => 'V# '.$row_set->gl_at_vocher.' Payee : ('.$row_set->gl_at_payeeId.')'.' Fy : ('.$row_set->year.')', 
-                            'value'     =>'V# '.$row_set->gl_at_vocher, 
-                            'date'      =>date('d-m-Y',strtotime($row_set->payment_date)),
-                            'cheque'    =>$row_set->gl_at_cheque, 
-                            'payee'     =>$row_set->gl_at_payeeId, 
-                            'desc'      =>$row_set->gl_at_description, 
-                            'amount'      =>$row_set->print_cheque_value, 
-                    );
-             }
-            $matches                = array();
-            foreach($labels as $label){
-                    $label['value']    = $label['value'];
-                    $label['label']     = $label['label']; 
-                    $label['date']      = $label['date'];
-                    $label['cheque']    = $label['cheque'];
-                    $label['payee']     = $label['payee'];
-                    $label['desc']      = $label['desc']; 
-                    $label['amount']    = $label['amount']; 
-                   
-                    $matches[]          = $label;
-            }
-                $matches                = array_slice($matches, 0, 20);
-            echo  json_encode($matches); 
-            }
-        }       
-        public function hostel_fee_title(){
-                $term                       = trim(strip_tags($this->input->get('term')));
-                if( $term == ''){
-                    $like                   = $term;
-                    $result_set             = $this->db->where(array('status'=>1,'hostel_type_id'=>1))->get('hostel_head_title')->result();
-                    $labels                 = array();
-                        foreach ($result_set as $row_set) {
-                            $labels[]       = array( 
-                                'label'     => $row_set->title, 
-                                'id'        => $row_set->id, 
-                                'value'     => $row_set->title, 
-                                'type'      => $row_set->hostel_type_id 
-                        );
-                    }
-                $matches    = array();
-                    foreach($labels as $label){
-                        $label['value']     = $label['value'];
-                        $label['id']     = $label['id'];
-                        $label['label']     = $label['label']; 
-                        $label['type']     = $label['type']; 
-                        $matches[]          = $label;
-                }
-                $matches                    = array_slice($matches, 0, 20);
-                    echo  json_encode($matches); 
-                }else if($term != ''){
-                    $like                   = $term;
-                    $result_set             = $this->db->where(array('status'=>1,'hostel_type_id'=>1))->like('title',$like)->get('hostel_head_title')->result();
-                    $labels                 = array();
-                        foreach ($result_set as $row_set) {
-                        $labels[]           = array( 
-                                'label'     =>$row_set->title, 
-                                'id'     =>$row_set->id, 
-                                'value'     =>$row_set->title, 
-                                'type'     =>$row_set->hostel_type_id 
-                        );
-                 }
-                $matches                    = array();
-                foreach($labels as $label){
-                    $label['value']     = $label['value'];
-                        $label['id']    = $label['id'];
-                        $label['label'] = $label['label']; 
-                        $label['type'] = $label['type']; 
-                        $matches[]      = $label;
-                }
-                    $matches                = array_slice($matches, 0, 20);
-                echo  json_encode($matches); 
-        }
-        }
-    public function mess_fee_title(){
-                $term                       = trim(strip_tags($this->input->get('term')));
-                if( $term == ''){
-                    $like                   = $term;
-                    $result_set             = $this->db->where(array('status'=>1,'hostel_type_id'=>2))->get('hostel_head_title')->result();
-                    $labels                 = array();
-                        foreach ($result_set as $row_set) {
-                            $labels[]       = array( 
-                                'label'     => $row_set->title, 
-                                'id'        => $row_set->id, 
-                                'value'     => $row_set->title, 
-                                'type'      => $row_set->hostel_type_id 
-                        );
-                    }
-                $matches    = array();
-                    foreach($labels as $label){
-                        $label['value']     = $label['value'];
-                        $label['id']     = $label['id'];
-                        $label['label']     = $label['label']; 
-                        $label['type']     = $label['type']; 
-                        $matches[]          = $label;
-                }
-                $matches                    = array_slice($matches, 0, 20);
-                    echo  json_encode($matches); 
-                }else if($term != ''){
-                    $like                   = $term;
-                    $result_set             = $this->db->where(array('status'=>1,'hostel_type_id'=>2))->like('title',$like)->get('hostel_head_title')->result();
-                    $labels                 = array();
-                        foreach ($result_set as $row_set) {
-                        $labels[]           = array( 
-                                'label'     =>$row_set->title, 
-                                'id'     =>$row_set->id, 
-                                'value'     =>$row_set->title, 
-                                'type'     =>$row_set->hostel_type_id 
-                        );
-                 }
-                $matches                    = array();
-                foreach($labels as $label){
-                    $label['value']     = $label['value'];
-                        $label['id']    = $label['id'];
-                        $label['label'] = $label['label']; 
-                        $label['type'] = $label['type']; 
-                        $matches[]      = $label;
-                }
-                    $matches                = array_slice($matches, 0, 20);
-                echo  json_encode($matches); 
-        }
-        }
         
-    public function get_batch_hostel_fee_heads_auto(){
-                $term                       = trim(strip_tags($this->input->get('term')));
-                if( $term == ''){
-                    $like                   = $term;
-                                              $this->db->order_by('programe_id','asc'); 
-                                              $this->db->order_by('batch_order','desc'); 
-                    $result_set             = $this->db->where(array('status'=>'on'))->get('prospectus_batch')->result();
-                    $labels                 = array();
-                        foreach ($result_set as $row_set) {
-                            $labels[]       = array( 
-                                'label'     => $row_set->batch_name, 
-                                'id'        => $row_set->batch_id, 
-//                                'value'     => $row_set->title, 
-//                                'type'      => $row_set->hostel_type_id 
-                        );
-                    }
-                $matches    = array();
-                    foreach($labels as $label){
-//                        $label['value']     = $label['value'];
-                        $label['id']     = $label['id'];
-                        $label['label']     = $label['label']; 
-//                        $label['type']     = $label['type']; 
-                        $matches[]          = $label;
-                }
-                $matches                    = array_slice($matches, 0, 20);
-                    echo  json_encode($matches); 
-                }else if($term != ''){
-                    $like                   = $term;
-                                              $this->db->order_by('programe_id','asc');  
-                                              $this->db->order_by('batch_order','desc');  
-                    $result_set             = $this->db->where(array('status'=>'on'))->like('batch_name',$like)->get('prospectus_batch')->result();
-                    $labels                 = array();
-                        foreach ($result_set as $row_set) {
-                        $labels[]           = array( 
-                                'label'     =>$row_set->batch_name, 
-                                'id'        =>$row_set->batch_id, 
-//                                'value'     =>$row_set->title, 
-//                                'type'     =>$row_set->hostel_type_id 
-                        );
-                 }
-                $matches                    = array();
-                foreach($labels as $label){
-//                    $label['value']     = $label['value'];
-                        $label['id']    = $label['id'];
-                        $label['label'] = $label['label']; 
-//                        $label['type'] = $label['type']; 
-                        $matches[]      = $label;
-                }
-                    $matches                = array_slice($matches, 0, 20);
-                echo  json_encode($matches); 
-        }
-        }
-    public function show_subjct_allottment_auto(){
+        
+ 
+        
+        public function employee_name_auto(){
             $term = trim(strip_tags($this->input->get('term')));
             if( $term == ''):
                 $like           = $term;
-                $result_set     = $this->DropdownModel->show_subjct_allottment_auto();
-                $labels         = array();
-                    foreach ($result_set as $row_set):
-                        $labels[]       = array( 
-                            'label'     =>$row_set->title.' ( '.$row_set->name.' )', 
-                            'code'      =>$row_set->subject_id, 
-                            'value'     =>$row_set->title.' ( '.$row_set->name.' )', 
-                    );
-                    endforeach;
-                    $matches= array_slice($labels, 0, 20);
-                    echo  json_encode($matches); 
-            else:
-               
-                $like                   = $term;
-                $result_set             = $this->DropdownModel->show_subjct_allottment_auto($like);
-                $labels                 = array();
-                    foreach ($result_set as $row_set):
-                        
-                    
-                    $labels[]           = array( 
-                           'label'     =>$row_set->title.' ( '.$row_set->name.' )', 
-                            'code'     =>$row_set->subject_id, 
-                            'value'     =>$row_set->title.' ( '.$row_set->name.' )',
-                    );
-             endforeach;
-                $matches    = array_slice($labels, 0, 20);
-                echo  json_encode($matches); 
-            endif;
-        }
-        
-        public function employee_name_with_designation_auto(){
-            $term = trim(strip_tags($this->input->get('term')));
-            if( $term == ''):
-                $like           = $term;
-                $result_set     = $this->DropdownModel->employee_name_with_designation_auto();
+                $result_set     = $this->DropdownModel->employee_name_auto();
                 $labels         = array();
                     foreach ($result_set as $row_set):
                         $labels[]       = array( 
                             'value'         => $row_set->emp_name,
-                            'designation'   => $row_set->designation,
-                            'label'         => $row_set->emp_name.'( '.$row_set->designation.' )',
+                            'label'         => $row_set->emp_name,
                             'id'            => $row_set->emp_id
                     );
                     endforeach;
@@ -698,13 +311,12 @@ public function getSection(){
             else:
                
                 $like                   = $term;
-                $result_set             = $this->DropdownModel->employee_name_with_designation_auto($like);
+                $result_set             = $this->DropdownModel->employee_name_auto($like);
                 $labels                 = array();
                     foreach ($result_set as $row_set):
                     $labels[]           = array( 
                             'value'         => $row_set->emp_name,
-                            'designation'   => $row_set->designation,
-                            'label'         => $row_set->emp_name.'( '.$row_set->designation.' )',
+                            'label'         => $row_set->emp_name,
                             'id'            => $row_set->emp_id
                     );
                     endforeach;
@@ -915,7 +527,6 @@ public function getSection(){
         $programId = $this->input->post('programId');
         $where = array('programe_id'=>$programId,'status'=>'on');
                      $this->db->order_by('batch_order','asc');   
-//                     $this->db->order_by('batch_id','desc');   
         $getbatchs = $this->db->get_where('prospectus_batch',$where)->result();
          echo '<option value="">Select Batch</option>';
         foreach($getbatchs as $secRow):
@@ -972,205 +583,103 @@ public function getSection(){
                 $matches    = array_slice($labels, 0, 20);
                 echo  json_encode($matches); 
             endif;
-        }   
-        
-    public function auto_emp_bs_law(){ 
+        }    
+       public function auto_emp_bs_programs(){ 
             
-        $term = trim(strip_tags($this->input->get('term')));
-        if(!empty($term)):
-            $where = array(
-//                'degree_type_id'    => 2,//1 = Fa/Fsc,2 = BS, 3 =Languages
-                'sections.program_id' => 9,
-                'cat_id'            => 1,
-                'emp_status_id'     => 1
-            );
-              $result_set = $this->DropdownModel->bs_subject_alloted_teachers($where,$term);
+            $term = trim(strip_tags($this->input->get('term')));
+            if(!empty($term)):
+                $where = array(
+                    'degree_type_id'    => 2,//1 = Fa/Fsc,2 = BS, 3 =Languages
+                    'cat_id'            => 1,
+                    'emp_status_id'     => 1
+                );
+                  $result_set             = $this->DropdownModel->bs_subject_alloted_teachers($where,$term);
+            
+                $labels                 = array();
+                        foreach ($result_set as $row_set) {
+                        $labels[]           = array( 
+                            'label'     => $row_set->emp_name, 
+                            'code'      => $row_set->emp_name, 
+                            'value'     => $row_set->emp_name,
+                            'emp_id'     => $row_set->emp_id,
+                        );
+                 }
+                $matches                = array();
+                foreach($labels as $label){
+                         $label['value']    = $label['value'];
+                        $label['code']      = $label['code'];
+                        $label['label']     = $label['label']; 
 
-            $labels                 = array();
-                    foreach ($result_set as $row_set) {
-                    $labels[]           = array( 
-                        'label'     => $row_set->emp_name, 
-                        'code'      => $row_set->emp_name, 
-                        'value'     => $row_set->emp_name,
-                        'emp_id'     => $row_set->emp_id,
-                    );
-             }
-            $matches                = array();
-            foreach($labels as $label){
-                     $label['value']    = $label['value'];
-                    $label['code']      = $label['code'];
-                    $label['label']     = $label['label']; 
-
-                    $matches[]          = $label;
-            }
-                $matches = array_slice($matches, 0, 20);
-            echo  json_encode($matches);  
-        endif;
-                
+                        $matches[]          = $label;
+                }
+                    $matches                = array_slice($matches, 0, 20);
+                echo  json_encode($matches);  
+            endif;
+         
+            
+             
     }
-    
-    public function auto_sec_bs_law(){ 
-            
-        $term = trim(strip_tags($this->input->get('term')));
-        if(!empty($term)):
-            $where = array(
-//                'degree_type_id'    => 2,//1 = Fa/Fsc,2 = BS, 3 =Languages
-                'sections.program_id' => 9,
-                'sections.status'   => 'On',
-
-            );
-              $result_set             = $this->DropdownModel->bs_alloted_sections($where,$term);
-
-            $labels                 = array();
-                    foreach ($result_set as $row_set) {
-                    $labels[]           = array( 
-                        'label'     => $row_set->name, 
-                        'code'      => $row_set->name, 
-                        'value'     => $row_set->name,
-                        'sec_id'     => $row_set->sec_id,
-                    );
-             }
-            $matches                = array();
-            foreach($labels as $label){
-                     $label['value']    = $label['value'];
-                    $label['code']      = $label['code'];
-                    $label['label']     = $label['label']; 
-
-                    $matches[]          = $label;
-            }
-                $matches                = array_slice($matches, 0, 20);
-            echo  json_encode($matches);  
-        endif;
-    }
-    
-    public function auto_subj_bs_law(){ 
-            
-        $term = trim(strip_tags($this->input->get('term')));
-        if(!empty($term)):
-            $where = array(
-//                'degree_type_id'    => 2,//1 = Fa/Fsc,2 = BS, 3 =Languages
-                'programes_info.programe_id' => 9,
-            );
-              $result_set             = $this->DropdownModel->bs_alloted_subjects($where,$term);
-
-            $labels                 = array();
-                    foreach ($result_set as $row_set) {
-                    $labels[]           = array( 
-                        'label'     => $row_set->title.' ( '.$row_set->name.' ) ', 
-                        'code'      => $row_set->title, 
-                        'value'     => $row_set->title,
-                        'sub_id'     => $row_set->subject_id,
-                    );
-             }
-            $matches                = array();
-            foreach($labels as $label){
-                     $label['value']    = $label['value'];
-                    $label['code']      = $label['code'];
-                    $label['label']     = $label['label']; 
-
-                    $matches[]          = $label;
-            }
-                $matches                = array_slice($matches, 0, 20);
-            echo  json_encode($matches);  
-        endif;
-    } 
-   
-    public function auto_emp_bs_programs(){ 
-            
-        $term = trim(strip_tags($this->input->get('term')));
-        if(!empty($term)):
-            $where = array(
-//                'degree_type_id'    => 2,//1 = Fa/Fsc,2 = BS, 3 =Languages
-                'cat_id'            => 1,
-//                'emp_status_id'     => 1
-            );
-              $result_set             = $this->DropdownModel->bs_subject_alloted_teachers($where,$term);
-
-            $labels                 = array();
-                    foreach ($result_set as $row_set) {
-                    $labels[]           = array( 
-                        'label'     => $row_set->emp_name, 
-                        'code'      => $row_set->emp_name, 
-                        'value'     => $row_set->emp_name,
-                        'emp_id'     => $row_set->emp_id,
-                    );
-             }
-            $matches                = array();
-            foreach($labels as $label){
-                     $label['value']    = $label['value'];
-                    $label['code']      = $label['code'];
-                    $label['label']     = $label['label']; 
-
-                    $matches[]          = $label;
-            }
-                $matches                = array_slice($matches, 0, 20);
-            echo  json_encode($matches);  
-        endif;
-                
-    }
-    
     public function auto_sec_bs_programs(){ 
             
-        $term = trim(strip_tags($this->input->get('term')));
-        if(!empty($term)):
-            $where = array(
-                'degree_type_id'    => 2,//1 = Fa/Fsc,2 = BS, 3 =Languages
-                'sections.status'   => 'On',
+            $term = trim(strip_tags($this->input->get('term')));
+            if(!empty($term)):
+                $where = array(
+                    'degree_type_id'    => 2,//1 = Fa/Fsc,2 = BS, 3 =Languages
+                    'sections.status'   => 'On',
+                    
+                );
+                  $result_set             = $this->DropdownModel->bs_alloted_sections($where,$term);
+            
+                $labels                 = array();
+                        foreach ($result_set as $row_set) {
+                        $labels[]           = array( 
+                            'label'     => $row_set->name, 
+                            'code'      => $row_set->name, 
+                            'value'     => $row_set->name,
+                            'sec_id'     => $row_set->sec_id,
+                        );
+                 }
+                $matches                = array();
+                foreach($labels as $label){
+                         $label['value']    = $label['value'];
+                        $label['code']      = $label['code'];
+                        $label['label']     = $label['label']; 
 
-            );
-              $result_set             = $this->DropdownModel->bs_alloted_sections($where,$term);
-
-            $labels                 = array();
-                    foreach ($result_set as $row_set) {
-                    $labels[]           = array( 
-                        'label'     => $row_set->name, 
-                        'code'      => $row_set->name, 
-                        'value'     => $row_set->name,
-                        'sec_id'     => $row_set->sec_id,
-                    );
-             }
-            $matches                = array();
-            foreach($labels as $label){
-                     $label['value']    = $label['value'];
-                    $label['code']      = $label['code'];
-                    $label['label']     = $label['label']; 
-
-                    $matches[]          = $label;
-            }
-                $matches                = array_slice($matches, 0, 20);
-            echo  json_encode($matches);  
-        endif;
+                        $matches[]          = $label;
+                }
+                    $matches                = array_slice($matches, 0, 20);
+                echo  json_encode($matches);  
+            endif;
     }
-    
     public function auto_subj_bs_programs(){ 
             
-        $term = trim(strip_tags($this->input->get('term')));
-        if(!empty($term)):
-            $where = array(
-                'degree_type_id'    => 2,//1 = Fa/Fsc,2 = BS, 3 =Languages
-            );
-              $result_set             = $this->DropdownModel->bs_alloted_subjects($where,$term);
+            $term = trim(strip_tags($this->input->get('term')));
+            if(!empty($term)):
+                $where = array(
+                    'degree_type_id'    => 2,//1 = Fa/Fsc,2 = BS, 3 =Languages
+                );
+                  $result_set             = $this->DropdownModel->bs_alloted_subjects($where,$term);
+            
+                $labels                 = array();
+                        foreach ($result_set as $row_set) {
+                        $labels[]           = array( 
+                            'label'     => $row_set->title.' ( '.$row_set->name.' ) ', 
+                            'code'      => $row_set->title, 
+                            'value'     => $row_set->title,
+                            'sub_id'     => $row_set->subject_id,
+                        );
+                 }
+                $matches                = array();
+                foreach($labels as $label){
+                         $label['value']    = $label['value'];
+                        $label['code']      = $label['code'];
+                        $label['label']     = $label['label']; 
 
-            $labels                 = array();
-                    foreach ($result_set as $row_set) {
-                    $labels[]           = array( 
-                        'label'     => $row_set->title.' ( '.$row_set->name.' ) ', 
-                        'code'      => $row_set->title, 
-                        'value'     => $row_set->title,
-                        'sub_id'     => $row_set->subject_id,
-                    );
-             }
-            $matches                = array();
-            foreach($labels as $label){
-                     $label['value']    = $label['value'];
-                    $label['code']      = $label['code'];
-                    $label['label']     = $label['label']; 
-
-                    $matches[]          = $label;
-            }
-                $matches                = array_slice($matches, 0, 20);
-            echo  json_encode($matches);  
-        endif;
+                        $matches[]          = $label;
+                }
+                    $matches                = array_slice($matches, 0, 20);
+                echo  json_encode($matches);  
+            endif;
     } 
    
     
@@ -1411,122 +920,6 @@ public function getSection(){
             }
     }
     
-     public function group_allotment_inter_1st(){ 
-        $term = $this->input->get('term');
-        $where = array(
-            's_status_id'       => 5,
-            'flag'              => 0,
-            'programe_id'       => 1
-        );
-        
-        if( $term == ''):  
-            $result_set = $this->DropdownModel->group_allotment_inter_1st($where, array(), 'sub_pro_id', array(1,2,4,5));
-            $data_array = array();
-
-            foreach ($result_set as $row_set):
-                $data_array[]   = array( 
-                    'value'     =>$row_set->student_name.'('.$row_set->college_no.')',
-                    'label'     =>$row_set->student_name.'('.$row_set->college_no.')',
-                    'id'        =>$row_set->student_id,
-                    'college_no' =>$row_set->college_no
-                );  
-            endforeach;
-
-            $matches = array();
-
-            foreach($data_array as $data_row):
-                $data_row['value']  = $data_row['value'];
-                $data_row['id']     = $data_row['id'];
-                $data_row['label']  = "{$data_row['label']}"; 
-                $matches[]          = $data_row;
-            endforeach;
-            $matches = array_slice($matches, 0, 10);
-            echo  json_encode($matches); 
-            
-        elseif($term != ''):
-            
-            $like   = $term;
-            $result_set = $this->DropdownModel->group_allotment_inter_1st($where, $like, 'sub_pro_id', array(1,2,4,5));
-            $labels          = array();
-            foreach ($result_set as $row_set):
-                $labels[]        = array( 
-                    'value' => $row_set->student_name.'('.$row_set->college_no.')',
-                    'label' => $row_set->student_name.'('.$row_set->college_no.')',
-                    'id'    => $row_set->student_id,
-                    'college_no' => $row_set->college_no
-                );
-            endforeach;
-            $matches = array();
-            foreach($labels as $lbl_row){
-                $lbl_row['value']   = $lbl_row['value'];
-                $lbl_row['id']      = $lbl_row['id'];
-                $lbl_row['label']   = "{$lbl_row['label']}"; 
-                $matches[]          = $lbl_row;
-            }
-        $matches = array_slice($matches, 0, 10);
-        echo  json_encode($matches); 
-        
-        endif;
-    }
-    
-     public function group_allotment_inter_2nd(){ 
-        $term = $this->input->get('term');
-        $where = array(
-            's_status_id'   => 5,
-            'flag'          => 0,
-            'programe_id'   => 1
-        );
-        
-        if( $term == ''):  
-            $result_set = $this->DropdownModel->group_allotment_inter_1st($where, array(), 'sub_pro_id', array(24,25,26,27));
-            $data_array = array();
-
-            foreach ($result_set as $row_set):
-                $data_array[]   = array( 
-                    'value'     =>$row_set->student_name.'('.$row_set->college_no.')',
-                    'label'     =>$row_set->student_name.'('.$row_set->college_no.')',
-                    'id'        =>$row_set->student_id,
-                    'college_no' =>$row_set->college_no
-                );  
-            endforeach;
-
-            $matches = array();
-
-            foreach($data_array as $data_row):
-                $data_row['value']  = $data_row['value'];
-                $data_row['id']     = $data_row['id'];
-                $data_row['label']  = "{$data_row['label']}"; 
-                $matches[]          = $data_row;
-            endforeach;
-            $matches = array_slice($matches, 0, 10);
-            echo  json_encode($matches); 
-            
-        elseif($term != ''):
-            
-            $like   = $term;
-            $result_set = $this->DropdownModel->group_allotment_inter_1st($where, $like, 'sub_pro_id', array(24,25,26,27));
-            $labels          = array();
-            foreach ($result_set as $row_set):
-                $labels[]        = array( 
-                    'value' => $row_set->student_name.'('.$row_set->college_no.')',
-                    'label' => $row_set->student_name.'('.$row_set->college_no.')',
-                    'id'    => $row_set->student_id,
-                    'college_no' => $row_set->college_no
-                );
-            endforeach;
-            $matches = array();
-            foreach($labels as $lbl_row){
-                $lbl_row['value']   = $lbl_row['value'];
-                $lbl_row['id']      = $lbl_row['id'];
-                $lbl_row['label']   = "{$lbl_row['label']}"; 
-                $matches[]          = $lbl_row;
-            }
-        $matches = array_slice($matches, 0, 10);
-        echo  json_encode($matches); 
-        
-        endif;
-    }
-    
     
      public function hr_contract_type(){
         
@@ -1537,70 +930,310 @@ public function getSection(){
                echo '<option value="'.$secRow->contract_type_id.'">'.$secRow->title.'</option>';
         endforeach;
     }
-    public function auto_section_active(){ 
+    
+    
+    public function employee_degree(){ 
+        $term = trim(strip_tags($_GET['term']));
         
-        $sections = $this->input->post('sections'); 
-        
-            $return = array();
-            if(isset($sections) && !empty($sections)):
+            if( $term == ''){
                 
-            $result_set    = $this->DropdownModel->auto_section_active('sections');
-            
+            $result_set             = $this->CRUDModel->getResults('degree');
+            $makkah_hotels          = array();
             foreach ($result_set as $row_set) {
-                $return[]   = array( 
-                    'value' => $row_set->name,
-                    'label' => $row_set->name,
-                    'id'    => $row_set->sec_id
+                $makkah_hotels[]   = array( 
+                    'value'=>$row_set->degree_name,
+                    'label'=>$row_set->degree_name,
+                    'id'=>$row_set->degree_id
                 );  
+                
             }
-     
-            else:
-                $like               = array('name'=>$sections);
-                $result_set         = $this->DropdownModel->auto_section_active('sections',$like);
-                foreach ($result_set as $row_set) {
-                $return[]        = array( 
-                      'value'=>$row_set->name,
-                      'label'=>$row_set->name,
-                      'id'=>$row_set->sec_id
-                        );
-                }
-           endif;
-            $return                = array_slice($return, 0, 20);
-            echo  json_encode($return); 
-        }
-    public function auto_employee_teachers_serving(){ 
-          $employee_name = $this->input->post('employee_name');
-          
-          $return_array          = array();
-           if( $employee_name == ''):   
-                $result_set             = $this->AttendanceModel->getdesig('hr_emp_record');
-                    foreach ($result_set as $row_set) {
-                    $return_array[]     = array( 
-                        'value'         => $row_set->emp_name.'('.$row_set->designation.')',
-                        'label'         => $row_set->emp_name.'('.$row_set->designation.')',
-                        'id'            => $row_set->emp_id
-                    );  
-            }
-           
-           else:
-                $like       = array('emp_name'=>$employee_name);
-                $result_set = $this->AttendanceModel->getdesig('hr_emp_record',$like);
+            $matches = array();
+            foreach($makkah_hotels as $makkah_hotel) { 
+            $makkah_hotel['value']  = $makkah_hotel['value'];
+            $makkah_hotel['degree_id']  = $makkah_hotel['id'];
+            $makkah_hotel['label']  = "{$makkah_hotel['label']}"; 
+            $matches[]              = $makkah_hotel; }
+            $matches                = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            }else if($term != ''){
+            $like   = array('degree_name'=>$term);
             
+            $result_set             = $this->CRUDModel->get_where_result_like('degree',$like);
+            $labels          = array();
             foreach ($result_set as $row_set) {
-            $return_array[]        = array( 
-                  'value'=>$row_set->emp_name.'('.$row_set->designation.')',
-                    'label'=>$row_set->emp_name.'('.$row_set->designation.')',
-                    'id'=>$row_set->emp_id
+            $labels[]        = array( 
+                  'value'=>$row_set->degree_name,
+                    'label'=>$row_set->degree_name,
+                    'id'=>$row_set->degree_id
                     );
-            } 
-//            echo  json_encode($matches); 
-            endif;
-              
-             echo  json_encode(array_slice($return_array, 0, 10)); 
+            
+            }
+            $matches                = array();
+            foreach($labels as $makkah_hotel){
+            $makkah_hotel['value']  = $makkah_hotel['value'];
+            $makkah_hotel['degree_id']  = $makkah_hotel['id'];
+            $makkah_hotel['label']  = "{$makkah_hotel['label']}"; 
+            $matches[]              = $makkah_hotel;
+            }
+            $matches                = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            }
     }
-    
-    
-    
+      public function auto_board_university(){ 
+        $term = trim(strip_tags($_GET['term']));
+        
+            if( $term == ''){
+                
+            $result_set             = $this->CRUDModel->getResults('board_university');
+            $makkah_hotels          = array();
+            foreach ($result_set as $row_set) {
+                $makkah_hotels[]   = array( 
+                    'value'=>$row_set->bu_title,
+                    'label'=>$row_set->bu_title,
+                    'id'=>$row_set->bu_id
+                );  
+                
+            }
+            $matches = array();
+            foreach($makkah_hotels as $makkah_hotel) { 
+            $makkah_hotel['value']  = $makkah_hotel['value'];
+            $makkah_hotel['bu_id']  = $makkah_hotel['id'];
+            $makkah_hotel['label']  = "{$makkah_hotel['label']}"; 
+            $matches[]              = $makkah_hotel; }
+            $matches                = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            }else if($term != ''){
+            $like   = array('bu_title'=>$term);
+            
+            $result_set             = $this->CRUDModel->get_where_result_like('board_university',$like);
+            $labels          = array();
+            foreach ($result_set as $row_set) {
+            $labels[]        = array( 
+                  'value'=>$row_set->bu_title,
+                    'label'=>$row_set->bu_title,
+                    'id'=>$row_set->bu_id
+                    );
+            }
+            $matches                = array();
+            foreach($labels as $makkah_hotel){
+            $makkah_hotel['value']  = $makkah_hotel['value'];
+            $makkah_hotel['bu_id']  = $makkah_hotel['id'];
+            $makkah_hotel['label']  = "{$makkah_hotel['label']}"; 
+            $matches[]              = $makkah_hotel;
+            }
+            $matches                = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            }
+    }
+ public function auto_district(){ 
+        $term = trim(strip_tags($_GET['term']));
+        
+            if( $term == ''){
+                
+            $result_set             = $this->CRUDModel->getResults('district');
+            $makkah_hotels          = array();
+            foreach ($result_set as $row_set) {
+                $makkah_hotels[]   = array( 
+                    'value'=>$row_set->name,
+                    'label'=>$row_set->name,
+                    'id'=>$row_set->district_id
+                );  
+                
+            }
+            $matches = array();
+            foreach($makkah_hotels as $makkah_hotel) { 
+            $makkah_hotel['value']  = $makkah_hotel['value'];
+            $makkah_hotel['district_id']  = $makkah_hotel['id'];
+            $makkah_hotel['label']  = "{$makkah_hotel['label']}"; 
+            $matches[]              = $makkah_hotel; }
+            $matches                = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            }else if($term != ''){
+            $like   = array('name'=>$term);
+            
+            $result_set             = $this->CRUDModel->get_where_result_like('district',$like);
+            $labels          = array();
+            foreach ($result_set as $row_set) {
+            $labels[]        = array( 
+                  'value'=>$row_set->name,
+                    'label'=>$row_set->name,
+                    'id'=>$row_set->district_id
+                    );
+            
+            }
+            $matches                = array();
+            foreach($labels as $makkah_hotel){
+            $makkah_hotel['value']  = $makkah_hotel['value'];
+            $makkah_hotel['district_id']  = $makkah_hotel['id'];
+            $makkah_hotel['label']  = "{$makkah_hotel['label']}"; 
+            $matches[]              = $makkah_hotel;
+            }
+            $matches                = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            }
+    }
+    public function auto_country(){ 
+        $term = trim(strip_tags($_GET['term']));
+        
+            if( $term == ''){
+                
+            $result_set             = $this->CRUDModel->getResults('country');
+            $makkah_hotels          = array();
+            foreach ($result_set as $row_set) {
+                $makkah_hotels[]   = array( 
+                    'value'=>$row_set->name,
+                    'label'=>$row_set->name,
+                    'id'=>$row_set->country_id
+                );  
+                
+            }
+            $matches = array();
+            foreach($makkah_hotels as $makkah_hotel) { 
+            $makkah_hotel['value']  = $makkah_hotel['value'];
+            $makkah_hotel['country_id']  = $makkah_hotel['id'];
+            $makkah_hotel['label']  = "{$makkah_hotel['label']}"; 
+            $matches[]              = $makkah_hotel; }
+            $matches                = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            }else if($term != ''){
+            $like   = array('name'=>$term);
+            
+            $result_set             = $this->CRUDModel->get_where_result_like('country',$like);
+            $labels          = array();
+            foreach ($result_set as $row_set) {
+            $labels[]        = array( 
+                  'value'=>$row_set->name,
+                    'label'=>$row_set->name,
+                    'id'=>$row_set->country_id
+                    );
+            
+            }
+            $matches                = array();
+            foreach($labels as $makkah_hotel){
+            $makkah_hotel['value']  = $makkah_hotel['value'];
+            $makkah_hotel['country_id']  = $makkah_hotel['id'];
+            $makkah_hotel['label']  = "{$makkah_hotel['label']}"; 
+            $matches[]              = $makkah_hotel;
+            }
+            $matches                = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            }
+    }
+     public function get_parent_menu(){
+        $menu2ID = $this->input->post('menu1_id');
+        $result  = $this->CRUDModel->get_where_result('menul2',array('m2_m1Id'=>$menu2ID));
+        foreach($result as $row):
+            echo '<option value='.$row->m2_id.'>'.$row->m2_name.'</option>';
+        endforeach;
+        
+    }
+     public function get_category_type(){
+        $category_id = $this->input->post('category_id');
+       // echo '<option value="">SELECT TYPE</option>';
+        if(!empty($category_id)):
+            $result  = $this->CRUDModel->get_where_result('hr_emp_category_type',array('ctgy_type_cat_id'=>$category_id),array('order'=>'asc','column'=>'ctgy_type_code'));
+            foreach($result as $row):
+                echo '<option value='.$row->category_type_id.'>['.$row->ctgy_type_code.'] '.$row->ctgy_type_name.'</option>';
+            endforeach;
+        else:
+            echo '<option value="">CATEGORY TYPE</option>';
+        endif;
+    }
+     public function get_department(){
+        $category_id = $this->input->post('category_id');
+         echo '<option value="">DEPARTMENT</option>';
+            $result  = $this->CRUDModel->get_where_result('hr_emp_departments',array('emp_deprt_cat_id'=>$category_id),array('order'=>'asc','column'=>'emp_deprt_name'));
+            foreach($result as $row):
+                echo '<option value='.$row->emp_deprt_id.'>'.$row->emp_deprt_name.'</option>';
+            endforeach;
+        
+    }
+     public function get_designation_type(){
+        $category_type_id = $this->input->post('category_type_id');
+//        echo '<option value="">SELECT TYPE</option>';
+        if(!empty($category_type_id)):
+            $result  = $this->CRUDModel->get_where_result('hr_emp_designation',array('emp_desg_cat_type_id'=>$category_type_id),array('order'=>'asc','column'=>'emp_desg_code'));
+            if($result):
+                foreach($result as $row):
+                    echo '<option value='.$row->emp_desg_id.'>['.$row->emp_desg_code.'] '.$row->emp_desg_name.'</option>';
+                endforeach;
+            else:
+                echo '<option value="">SELECT DESIGNATION</option>';
+            endif;
+           
+        else:
+            echo '<option value="">SELECT DESIGNATION</option>';
+        endif;
+    }
+    public function auto_year(){
+           $term = trim(strip_tags($this->input->get('term')));
+            if( $term == ''){
+                $like           = $term;
+                                  $this->db->order_by('yr_title','desc');  
+                $result_set     = $this->db->get_where('year')->result();
+                $labels         = array();
+                    foreach ($result_set as $row_set) {
+                        $labels[]       = array( 
+                            'label'     =>$row_set->yr_title, 
+                            'code'     =>$row_set->yr_title, 
+                            'value'     =>$row_set->yr_title, 
+                              
+                    );
+                }
+            $matches    = array();
+                foreach($labels as $label){
+                    $label['value']     = $label['value'];
+                    $label['code']      = $label['code'];
+                    $label['label']     = $label['label']; 
+                    
+                    $matches[]          = $label;
+            }
+            $matches                    = array_slice($matches, 0, 10);
+                echo  json_encode($matches); 
+            }else if($term != ''){
+                $like                   = $term;
+                                          $this->db->like('yr_title',$like); 
+                                          $this->db->order_by('yr_title','desc');
+                $result_set             = $this->db->get_where('year')->result();
+                $labels                 = array();
+                    foreach ($result_set as $row_set) {
+                    $labels[]           = array( 
+                         'label'     =>$row_set->yr_title, 
+                        'code'     =>$row_set->yr_title, 
+                        'value'     =>$row_set->yr_title, 
+                    );
+             }
+            $matches                = array();
+            foreach($labels as $label){
+                     $label['value']    = $label['value'];
+                    $label['code']      = $label['code'];
+                    $label['label']     = $label['label']; 
+                   
+                    $matches[]          = $label;
+            }
+                $matches                = array_slice($matches, 0, 10);
+            echo  json_encode($matches); 
+            }
+        
+        }
+        
+        public function get_branch(){
+        $id = $this->input->post('bank');
+//        echo '<option value="">SELECT TYPE</option>';
+        if(!empty($id)):
+            $result  = $this->CRUDModel->get_where_result('hr_bank_branch',array('branch_bank_id'=>$id),array('order'=>'asc','column'=>'branch_name'));
+            if($result):
+                foreach($result as $row):
+                    echo '<option value='.$row->branch_id.'> '.$row->branch_name.'</option>';
+                endforeach;
+            else:
+                echo '<option value="">SELECT BRANCH</option>';
+            endif;
+           
+        else:
+            echo '<option value="">SELECT BRANCH</option>';
+        endif;
+    }
     }
 
 

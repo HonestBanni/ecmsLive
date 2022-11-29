@@ -3,23 +3,13 @@
 
 </div><!--//wrapper-->  
  
-    
-    <!-- *****CONFIGURE STYLE****** -->  
-    <div class="config-wrapper hidden-xs">
-        <div class="config-wrapper-inner">
-            <a id="config-trigger" class="config-trigger" href="#"><i class="fa fa-cog"></i></a>
-            <div id="config-panel" class="config-panel">
-                <p>Choose Colour</p>
-                <ul id="color-options" class="list-unstyled list-inline">
-                    <li class="default active" ><a data-style="assets/css/styles.css" data-logo="assets/images/logo.png" href="#"></a></li>
-                    <li class="green"><a data-style="assets/css/styles-green.css" data-logo="assets/images/logo-green.png" href="#"></a></li>
-                    <li class="purple"><a data-style="assets/css/styles-purple.css" data-logo="assets/images/logo-purple.png" href="#"></a></li>
-                    <li class="red"><a data-style="assets/css/styles-red.css" data-logo="assets/images/logo-red.png" href="#"></a></li>
-                </ul><!--//color-options-->
-                <a id="config-close" class="close" href="#"><i class="fa fa-times-circle"></i></a>
-            </div><!--//configure-panel-->
-        </div><!--//config-wrapper-inner-->
-    </div><!--//config-wrapper-->
+     <div class="modal fade" id="entry_pr_loader" role="dialog" style="z-index:9999; margin-top: 400px;">
+        <div class="modal-dialog">
+
+                <div class="alert alert-info"><i class="fa fa-spin fa-spinner"></i> Please wait...!</div>
+
+        </div>
+    </div>
  
     <!-- Javascript -->   
 
@@ -48,23 +38,26 @@
 
     <script src="assets/plugins/jquery.mask.min.js"></script>
     
-           <!--Dropdown search-->
-    <link rel="stylesheet" href="assets/css/choices.min.css">
-    <script src="assets/js/choices.min.js"></script>
+    
   
     <script type="text/javascript">
-        jQuery(document).ready(function(){
-                  
         
-         var multipleCancelButton = new Choices('.dropdown-search', {
-                    removeItemButton: true,
-                    maxItemCount:20,
-                    searchResultLimit:20,
-                    renderChoiceLimit:20
-                  });
-            
-            
-            
+//         jQuery("#entry_pr_loader").hide();
+//        jQuery(document).ajaxStart(function() {
+//            
+//            jQuery("#entry_pr_loader").show();
+//            $('#entry_pr_loader').modal('toggle');
+//            
+//          });
+//
+//          jQuery(document).ajaxStop(function() {
+//              $('#entry_pr_loader').modal('toggle');
+//                jQuery("#entry_pr_loader").hide();
+//             
+//          });
+      
+        
+        jQuery(document).ready(function(){
             jQuery(function() {
                 jQuery('.date').mask('99-99-9999');
                 jQuery('.date_time').mask('9999-99-99 99:99:99');
@@ -73,6 +66,7 @@
                 jQuery('.phone').mask('9999-9999999');
                 jQuery('.nic').mask('99999-9999999-9');
                 jQuery('.reg').mask('SSS-999999999');
+                
             });
         });
 
@@ -80,9 +74,10 @@
   $( function() {
        var d = new Date();
 d.setMonth(1); 
-    $( "#datepicker" ).datepicker({
-      defaultDate: 1,
-      dateFormat: 'yy-mm-dd'
+    $( ".datepicker" ).datepicker({
+        changeMonth: true,
+        changeYear: true,
+         dateFormat: 'dd-mm-yy'
     });
   } );
   

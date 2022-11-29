@@ -1,0 +1,223 @@
+
+<!-- ******CONTENT****** --> 
+<div class="content container">
+  <div class="page-wrapper">
+    <header class="page-heading clearfix">
+      <h1 class="heading-title pull-left"><?php echo $HeaderPage?> 
+      </h1>
+      <div class="breadcrumbs pull-right">
+        <ul class="breadcrumbs-list">
+          <li class="breadcrumbs-label">You are here:
+          </li>
+          <li> 
+            <?php echo anchor('admin/admin_home', 'Home');?> 
+            <i class="fa fa-angle-right">
+            </i>
+          </li>
+          <li class="current"><?php echo $HeaderPage?>
+        </ul>
+      </div>
+      <!--//breadcrumbs-->
+    </header> 
+    <div class="page-content">
+      <div class="row">
+        <section class="course-finder" style="padding-bottom: 2%;">
+            <h1 class="section-heading text-highlight">
+                <span class="line"><?php echo $HeaderPage?> Search</span>
+            </h1>
+                <div class="section-content" >
+                    <div class="row">
+                        <?php echo form_open('',array('class'=>'form-inline course-finder-form','name'=>'reportForm'));   ?>
+                        
+                        <div class="col-md-12">
+                            <div class="col-md-2 col-sm-5">
+                               <label for="name">College #</label>
+                               <div class="input-group">
+                                <?php
+                                echo form_input(array(
+                                        'name'          => 'college_number',
+                                        'id'            => 'college_number',
+                                        'value'         => $college_number,
+                                        'class'         => 'form-control',
+                                        'placeholder'   => 'College #',
+                                        'type'          => 'text'
+                                    )); 
+                                ?>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-5">
+                               <label for="name">Student Name</label>
+                               <div class="input-group">
+                                    <?php
+                                      echo form_input(array(
+                                        'name'          => 'std_name',
+                                        'id'            => 'std_name',
+                                        'value'         => $std_name,
+                                        'class'         => 'form-control',
+                                        'placeholder'   => 'Student name',
+                                        'type'          => 'text',
+                                      ));
+
+                                  ?>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-5">
+                               <label for="name">Father Name</label>
+                               <div class="input-group">
+                                    <?php
+                                      echo form_input(array(
+                                      'name'          => 'std_fname',
+                                      'id'            => 'std_fname',
+                                      'value'         => @$std_fname,
+                                      'class'         => 'form-control',
+                                      'placeholder'   => 'Father name',
+                                      'type'          => 'text',
+                                      ));
+                                    ?>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-5">
+                                <label for="name">Program</label>
+                                <div class="input-group">
+                                    <?php 
+                                        echo form_dropdown('sectionpr', $subPrograme,@$sectionId,  'class="form-control" id="sub_program_inter"');
+                                    ?>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-5">
+                                <label for="name">Section</label>
+                                <div class="input-group">
+                                    <?php 
+                                        echo form_dropdown('section', $sections,@$sectionId,  'class="form-control" id="section_dropdown"');
+                                    ?>
+                                </div>
+                            </div>
+                        </div>  
+                        <p>&nbsp;</p>
+                        <div class="col-md-12">
+                            <div class="col-md-12 col-sm-5">
+                                <div class="form-group">
+                                    <button type="submit" name="search_log" value="search_log"   class="btn btn-theme"><i class="fa fa-search"></i> Search </button>
+                                    <button type="submit" name="export_log" value="export_log"  class="btn btn-theme"><i class="fa fa-plus"></i> Export Excel </button>
+                                    <button type="button" name="print" value="print" onclick="printdiv('div_print');" class="btn btn-theme"><i class="fa fa-print"></i> Print</button>      
+                                </div>  
+                            </div>  
+                        </div>
+                    </div>
+                            
+                    <?php
+                    echo form_close();
+                    ?>
+                </div><!--//section-content-->
+         </section>
+         
+              
+        
+            <div class="table-responsive">    
+                 <div id="div_print">
+                <table class="table table-hover">
+
+                    <thead>
+                        <tr>
+                            <th>S No.</th>
+                            <th >College No.</th>
+                            <th >Student Name</th>
+                            <th>Father Name</th>
+                            <th>Section</th>
+                            
+                        
+                        </tr>
+                    </thead>
+                 <tbody>
+                    
+                     <?php
+                     
+                     if(@$subject_record):
+//                         echo '<pre>';print_r($subject_record);die;
+                         $sn= '';
+                         
+                         foreach($subject_record as $srRow):
+                         
+                        $subjects = $this->AttendanceModel->get_subject_group_list('student_subject_alloted_logs',array('student_id'=>$srRow->student_id));
+                        // $section = $this->AttendanceModel->get_section_list('sections',array('student_id'=>$srRow->student_id));
+                       if(!empty($subjects)):
+                           
+                            $sn++;
+                        
+                             echo '<tr style="font-size: 14px; background: #eee;">
+                                    <th>'.$sn.'</th>
+                                     <th>'.$srRow->college_no.'</th>
+                                     <th>'.$srRow->student_name.'</th>
+                                     <th>'.$srRow->father_name.'</th>
+                                     <th>'.$srRow->section_name.'</th>
+                            </tr>';
+                             echo '<tr>
+                                 <th></th>
+                                    <th>Date Time</th>
+                                    <th colspan="2">Log Subjects</th>
+                                       <th>Username</th>
+                            </tr>';
+                            
+                             foreach($subjects as $subjects):
+                                 
+                            echo'<tr>
+                                
+                                <td></td>
+                            <td>'.date('d-m-Y H:i:s',strtotime($subjects->timestamp)).'</td>
+                            <td colspan="2">';
+                                             
+                                                $this->db->join('subject','subject.subject_id=student_subject_alloted_logs.subject_id');
+                             $subjectsList =    $this->db->get_where('student_subject_alloted_logs',array('timestamp'=>$subjects->timestamp,'student_id'=>$srRow->student_id))->result();
+                             if($subjectsList):
+                               foreach($subjectsList as $rowList):
+                                 echo $rowList->title.', ';
+                             endforeach;  
+                              
+                             endif;
+                             
+                            echo '
+                                 </td><td>'.$subjects->email.'</td> 
+                             ';
+                            
+                                     
+                            endforeach;
+                            
+                            echo '</td>
+                           
+                            </tr>
+                            <tr><td colspan="6">&nbsp;</td></tr>'; 
+                            endif;
+                            
+                         endforeach;
+                        
+                     endif;
+                     ?>
+                     
+                 </tbody>
+                </table><!--//table-->
+                <?php echo $print_log;?>
+           </div>
+             </div>
+          <!--//contact-form-->
+        </div>
+        <!--//page-row-->
+      </div>
+      <!--//page-content-->
+    </div>
+    <!--//page-wrapper--> 
+  </div>
+  <!--//content-->
+ 
+  <script language="javascript">
+    function printdiv(printpage)
+    {
+    var headstr = "<html><head><title></title></head><body>";
+    var footstr = "</body>";
+    var newstr = document.all.item(printpage).innerHTML;
+    var oldstr = document.body.innerHTML;
+    document.body.innerHTML = headstr+newstr+footstr;
+    window.print();
+    document.body.innerHTML = oldstr;
+    return false;
+    }
+</script>

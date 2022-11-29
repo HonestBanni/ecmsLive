@@ -6,2359 +6,1515 @@ class HrController extends AdminController {
 
      public function __construct() {
              parent::__construct();
-             $this->load->model('CRUDModel');
-             $this->load->model('HrModel');
-             $this->load->library("pagination");     
+            $this->load->model('HrModel');
+    }
+   
+    public function employee_form(){
+        //Employee Registration
+        $this->data['gender']       = $this->CRUDModel->dropDown('gender', 'Gender', 'gender_id', 'title');
+        $this->data['network']      = $this->CRUDModel->dropDown('mobile_network', 'Select', 'net_id', 'network',array('net_id !='=>'0'));
+        $this->data['religion']     = $this->CRUDModel->dropDown('religion', 'Select', 'religion_id', 'title');
+        $this->data['m_status']     = $this->CRUDModel->dropDown('marital_status', 'Select', 'marital_status_id', 'title');
+        $this->data['status']       = $this->CRUDModel->dropDown('hr_emp_status', '', 'emp_status_id', 'emp_status_name',array('emp_status_id'=>1));
+         //Adacdemics
+        $this->data['division']         = $this->CRUDModel->dropDown('hr_emp_division', 'Select Division', 'devision_id', 'division_name');
+        
+        $this->data['department']       = $this->CRUDModel->dropDown('hr_emp_departments', 'Department', 'emp_deprt_id', 'emp_deprt_name','',array('column'=>'emp_deprt_name','order'=>'asc'));
+            $this->data['designation']  = $this->CRUDModel->dropDown('hr_emp_designation', 'Designation', 'emp_desg_id', 'emp_desg_name','',array('column'=>'emp_desg_name','order'=>'asc'));
+            $this->data['scale']        = $this->CRUDModel->dropDown('hr_emp_scale', 'Scale', 'emp_scale_id', 'scale_name','',array('column'=>'scale_order','order'=>'asc'));
+            $this->data['category']     = $this->CRUDModel->dropDown('hr_emp_category', 'Category', 'category_id', 'category_name');
+            $this->data['contract_tp']  = $this->CRUDModel->dropDown('hr_emp_category_type', 'Contract Type', 'category_type_id', 'ctgy_type_name');
+            
+            $this->data['breadcrumbs']  = 'Register Employee';
+            $this->data['page_title']   = 'Register Employee | ECP';
+            $this->data['page']         = 'HR/Forms/register_employee_form_v';
+            $this->load->view('common/common',$this->data);
         }
     
-    public function get_by_id($table,$id){
-    $query = $this->db->select('*')
-            ->from($table)
-            ->where($id)
-            ->get();
-      return $query->result();
-    }
-    
-     public function bank()
-    {       
-        $this->data['result']       = $this->HrModel->getbank();
-        $this->data['page_title']   = 'Banks | ECP';
-        $this->data['page']         = 'hr/bank';
-        $this->load->view('common/common',$this->data);
-    }
-	
-		public function grant_in_aid()
-	{		
-        $id = $this->uri->segment(3);
-        $this->data['emp_id'] = $id;
-        
-       if($this->input->post()):
-                $data = array
-                (
-                    'file_no'=>$this->input->post('file_no'),
-                    'emp_id'=>$this->input->post('emp_id'),
-                    'degree_id'=>$this->input->post('degree_id'),
-                    'start_date'=>$this->input->post('start_date'),
-                    'end_date'=>$this->input->post('end_date'),
-                    'amount_received'=>$this->input->post('amount_received'),
-                    'amount_coll_date'=>$this->input->post('amount_coll_date'),
-                    'status_bond_id'=>$this->input->post('status_bond_id'),
-                    'remarks'=>$this->input->post('remarks'),
-                );
-            $this->CRUDModel->insert('hr_emp_grant_in_aid',$data);
-            redirect('HrController/grant_in_aid/'.$this->input->post('emp_id'));
-        endif;
-            $this->data['degree']  = $this->CRUDModel->dropDown('degree', 'Select degree ', 'degree_id', 'title');
-        
-            $where = array('hr_emp_grant_in_aid.emp_id'=>$this->uri->segment(3));
-            $this->data['employee_grant'] = $this->HrModel->hr_grant_in_add($where);
-            $this->data['page_title']   = 'Employee Grant in Aid | ECMS';
-            $this->data['page']         = 'hr/grant_in_add';
-            $this->load->view('common/common',$this->data); 
-	}
-    
-    public function update_research_paper()
-    {
-       $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $author = $this->input->post('author');
-            $title = $this->input->post('title');
-            $journal = $this->input->post('journal');
-            $volume = $this->input->post('volume');
-            $pages = $this->input->post('pages');
-            $date = $this->input->post('date');
-            $date1 = date('Y-m-d', strtotime($date));
-            $issn = $this->input->post('issn');
-            $remarks = $this->input->post('remarks');
-            $year = $this->input->post('year');
+    public function register_employee(){
+                        
+        if($this->input->post('RegEmployee') =='RegEmployee'):
+                        
+                        
+                $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']     = 'WARNING';
+                
+                $this->form_validation->set_rules('emp_name', 'Employee Name', 'required', array('required'=>'1'));
+//                $this->form_validation->set_rules('father_name', 'Father Name', 'required', array('required'=>'2'));
+//                $this->form_validation->set_rules('emp_cnic', 'CNIC', 'required|min_length[15]', array('required'=>'3','min_length'=>'4'));
+                $this->form_validation->set_rules('gender_id', 'Gender', 'required', array('required'=>'5'));       
+                $this->form_validation->set_rules('dob_day', 'DoB Day', 'required', array('required'=>'6'));
+                $this->form_validation->set_rules('dob_month', 'DoB Month', 'required', array('required'=>'6'));
+                $this->form_validation->set_rules('dob_year', 'DoB Year', 'required', array('required'=>'6'));
+//                $this->form_validation->set_rules('permanent_address', 'Permanent Address', 'required', array('required'=>'7'));
+//                $this->form_validation->set_rules('district_id', 'District', 'required', array('required'=>'8'));
+//                $this->form_validation->set_rules('country_id', 'Country', 'required', array('required'=>'9'));
+//                $this->form_validation->set_rules('contact1', 'Contact No', 'required|min_length[11]', array('required'=>'10','min_length'=>'11'));
+//                $this->form_validation->set_rules('net_id', 'Network', 'required', array('required'=>'12'));
+//                $this->form_validation->set_rules('religion_id', 'Religion', 'required', array('required'=>'13'));
+//                $this->form_validation->set_rules('email', 'Email', 'required', array('required'=>'14'));
+//                $this->form_validation->set_rules('email', 'Email', 'required|valid_email', array('required'=>'14','valid_email'=>'15'));
+//                $this->form_validation->set_rules('department_id', 'Department', 'required', array('required'=>'16'));
+//                $this->form_validation->set_rules('shift_id', 'Shift', 'required', array('required'=>'17'));
+//                $this->form_validation->set_rules('bank_id', 'Bank', 'required', array('required'=>'18'));
+//                $this->form_validation->set_rules('account_no', 'Account No', 'required', array('required'=>'19'));
+//                $this->form_validation->set_rules('cat_id', 'Employee Category', 'required', array('required'=>'20'));
+//                $this->form_validation->set_rules('contract_type_id', 'Employee Type', 'required', array('required'=>'21'));
+//                $this->form_validation->set_rules('emp_status_id', 'Employee Type', 'required', array('required'=>'22'));
+                
+                
+                if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Employee name is required.'; break;
+//                        case 2: $return_json['e_text'] = 'Father name is required.'; break;
+//                        case 3: $return_json['e_text'] = 'CNIC is required.'; break;
+//                        case 4: $return_json['e_text'] = 'Enter valid CINC.'; break;
+                        case 5: $return_json['e_text'] = 'Gender is required.'; break;
+                        case 6: $return_json['e_text'] = 'Date of birth is required.'; break;
+//                        case 7: $return_json['e_text'] = 'Permanent address isrequired.'; break;
+//                        case 8: $return_json['e_text'] = 'District is required.'; break;
+//                        case 9: $return_json['e_text'] = 'Country is required.'; break;
+//                        case 10: $return_json['e_text'] = 'Contact no is required.'; break;
+//                        case 11: $return_json['e_text'] = 'Enter valid number 0000-0000000'; break;
+//                        case 12: $return_json['e_text'] = 'Network is required.'; break;
+//                        case 13: $return_json['e_text'] = 'Religion is required.'; break;
+//                        case 14: $return_json['e_text'] = 'Email is required.'; break;
+//                        case 15: $return_json['e_text'] = 'Enter valid email'; break;
+//                        case 16: $return_json['e_text'] = 'Department is required.'; break;
+//                        case 17: $return_json['e_text'] = 'Shift is required.'; break;
+//                        case 18: $return_json['e_text'] = 'Bank is required'; break;
+//                        case 19: $return_json['e_text'] = 'Account no is required'; break;
+//                        case 20: $return_json['e_text'] = 'Employee category is required'; break;
+//                        case 21: $return_json['e_text'] = 'Employee type is required'; break;
+//                        case 22: $return_json['e_text'] = 'Employee status is required'; break;
+                    endswitch;
+            else:
+
+                 $dob_Y         = $this->input->post('dob_year');
+                 $dob_M         = $this->input->post('dob_month');
+                 $dob_D         = $this->input->post('dob_day');
+                $retur_year     = $dob_Y+'60';
+                        
+            $file_name = '';
+            if($_FILES['file']['name']):
+                 $image      = $this->CRUDModel->do_resize('file','assets/images/employee');
+                 $file_name  = $image['file_name'];
+            endif;
+            
             $data = array(
-                'author'=>$author,
-                'title'=>$title,
-                'journal'=>$journal,
-                'volume'=>$volume,
-                'pages'=>$pages,
-                'date'=>$date1,
-                'year'=>$year,
-                'issn'=>$issn,
-                'remarks'=>$remarks
-            );
-            $where = array('rp_id'=>$id); 
-            $this->CRUDModel->update('hr_research_paper',$data,$where);
-              redirect('HrController/employee_reocrd'); 
-           endif;
-        if($id):
-            $where = array('rp_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_research_paper',$where);
-
-            $this->data['page_title']        = 'Update Research Paper | ECMS';
-            $this->data['page']        =  'hr/update_research_paper';
-            $this->load->view('common/common',$this->data);
-        endif; 
-    }
-    
-    public function view_research_paper()
-    {
-       $id = $this->uri->segment(3);
-       if($id):
-            $where = array('rp_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_research_paper',$where);
-            $this->data['page_title']        = 'View Research Paper | ECMS';
-            $this->data['page']        =  'hr/view_research_paper';
-            $this->load->view('common/common',$this->data);
-        endif; 
-    }
-    
-    public function update_professional_edu()
-    {
-       $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $title = $this->input->post('title');
-            $aff_institute = $this->input->post('aff_institute');
-            $country_id = $this->input->post('country_id');
-            $date = $this->input->post('date');
-            $date1 = date('Y-m-d', strtotime($date));
-            $remarks = $this->input->post('remarks');
-            $duration = $this->input->post('duration');
-            $data = array(
-                'emp_id'=>$id,
-                'title'=>$title,
-                'aff_institute'=>$aff_institute,
-                'country_id'=>$country_id,
-                'date'=>$date1,
-                'duration'=>$duration,
-                'remarks'=>$remarks
-            );
-            $where = array('fe_id'=>$id); 
-            $this->CRUDModel->update('hr_professional_edu',$data,$where);
-              redirect('HrController/employee_reocrd'); 
-           endif;
-        if($id):
-            $where = array('fe_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_professional_edu',$where);
-
-            $this->data['page_title']        = 'Update Professional Education | ECMS';
-            $this->data['page']        =  'hr/update_professional_edu';
-            $this->load->view('common/common',$this->data);
-        endif; 
-    }
-    
-    public function view_professional_edu()
-    {
-       $id = $this->uri->segment(3);
-       if($id):
-            $where = array('fe_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_professional_edu',$where);
-            $this->data['page_title']        = 'View Professional Education | ECMS';
-            $this->data['page']        =  'hr/view_professional_edu';
-            $this->load->view('common/common',$this->data);
-        endif; 
-    }
-    
-    public function delete_professional_edu()
-    {	    
-        $id    = $this->uri->segment(3);
-        $where = array('fe_id'=>$id);
-        $this->CRUDModel->deleteid('hr_professional_edu',$where);
-        redirect('HrController/employee_reocrd');
-	}
-    
-    public function delete_research_paper()
-    {	    
-        $id    = $this->uri->segment(3);
-        $where = array('rp_id'=>$id);
-        $this->CRUDModel->deleteid('hr_research_paper',$where);
-        redirect('HrController/employee_reocrd');
-	}
-    
-    public function add_research_paper()
-    {
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $author = $this->input->post('author');
-            $title = $this->input->post('title');
-            $journal = $this->input->post('journal');
-            $volume = $this->input->post('volume');
-            $pages = $this->input->post('pages');
-            $date = $this->input->post('date');
-			if(!empty($date)):
-            $date1 = date('Y-m-d', strtotime($date));
-			else:
-				$date1= date('Y-m-d');
-			endif;
-            $issn = $this->input->post('issn');
-            $remarks = $this->input->post('remarks');
-            $year = $this->input->post('year');
-            $data = array(
-                'emp_id'=>$id,
-                'author'=>$author,
-                'title'=>$title,
-                'journal'=>$journal,
-                'volume'=>$volume,
-                'pages'=>$pages,
-                'date'=>$date1,
-                'year'=>$year,
-                'issn'=>$issn,
-                'remarks'=>$remarks
-            );
-            $this->CRUDModel->insert('hr_research_paper',$data);
-            redirect('HrController/add_research_paper/'.$id); 
-        endif;
-        if($id):
-            $where = array('emp_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_emp_record',$where);
-            $this->data['research'] = $this->CRUDModel->get_where_result('hr_research_paper',$where);
-            $this->data['page_title']        = 'Add Research Paper | ECMS';
-            $this->data['page']        =  'hr/add_research_paper';
-            $this->load->view('common/common',$this->data);
-        endif;
-    }
-    
-    public function add_professional_education()
-    {
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $title = $this->input->post('title');
-            $aff_institute = $this->input->post('aff_institute');
-            $country_id = $this->input->post('country_id');
-            $date = $this->input->post('date');
-            $date1 = date('Y-m-d', strtotime($date));
-            $remarks = $this->input->post('remarks');
-            $duration = $this->input->post('duration');
-            $data = array(
-                'emp_id'=>$id,
-                'title'=>$title,
-                'aff_institute'=>$aff_institute,
-                'country_id'=>$country_id,
-                'date'=>$date1,
-                'duration'=>$duration,
-                'remarks'=>$remarks
-            );
-            $this->CRUDModel->insert('hr_professional_edu',$data);
-            redirect('HrController/add_professional_education/'.$id); 
-        endif;
-        if($id):
-            $where = array('emp_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_emp_record',$where);
-            $this->data['professionl_edu'] = $this->CRUDModel->get_where_result('hr_professional_edu',$where);
-            $this->data['page_title']        = 'Add Professional Education | ECMS';
-            $this->data['page']        =  'hr/add_professional_education';
-            $this->load->view('common/common',$this->data);
-        endif;
-    }
-    
-    public function t_employee_report()
-    {
-       $this->data['category']    = $this->CRUDModel->dropDown('hr_emp_category', 'Staff Category', 'cat_id', 'title');
-        $this->data['contract'] = $this->CRUDModel->dropDown('hr_emp_contract_type', 'Select Type', 'contract_type_id', 'title');       
-        
-        $this->data['emp_status_id']  = '';
-        $this->data['cat_id']  = '';
-        $this->data['contract_type_id']  = '';
-        
-        if($this->input->post('search')):
-        $emp_status_id    =  $this->input->post('emp_status_id');
-        $cat_id      =  $this->input->post('cat_id');
-        $contract_type_id =  $this->input->post('contract_type_id');
-        //like Array
-        $like = '';
-        $where = '';
-            
-        if(!empty($emp_status_id)):
-            $where['hr_emp_record.emp_status_id'] = $emp_status_id;
-            $this->data['emp_status_id']  = $emp_status_id;
-        endif;
-        if(!empty($contract_type_id)):
-            $where['hr_emp_record.contract_type_id'] = $contract_type_id;
-            $this->data['contract_type_id']  = $contract_type_id;
-        endif;
-        if(!empty($cat_id)):
-            $where['hr_emp_record.cat_id'] = $cat_id;
-            $this->data['cat_id']  = $cat_id;
-        endif;                                     	
-        $this->data['cat'] = $this->CRUDModel->get_where_row('hr_emp_category', array('cat_id'=>$cat_id));  
-        $this->data['cont'] = $this->CRUDModel->get_where_row('hr_emp_contract_type', array('contract_type_id'=>$contract_type_id));                                                     
-        $this->data['result'] = $this->HrModel->getTEmployee('hr_emp_record',$where);  
-        endif;
-       $this->data['page_title']   = 'Teaching Staff | ECMS';
-       $this->data['page']         = 'hr/t_employee_record';
-       $this->load->view('common/common',$this->data);  
-    }
-    
-    public function nt_employee_report()
-    {
-       $where = array('emp_status_id'=>1,'cat_id'=>2);
-       $this->data['result']=$this->HrModel->getTEmployee('hr_emp_record',$where);
-       $this->data['page_title']   = 'Non Teaching Staff | ECMS';
-       $this->data['page']         = 'hr/nt_employee_record';
-       $this->load->view('common/common',$this->data);  
-    }
-    
-    public function add_bank()
-    {	  	
-        if($this->input->post()):
-            $name           = $this->input->post('name');
-            $account_no     = $this->input->post('account_no');
-            $branch_code      = $this->input->post('branch_code');
-            $address      = $this->input->post('address');
-            $comment      = $this->input->post('comment');
-            $data       = array(
-                'name'      =>$name,
-                'branch_code' =>$branch_code,
-                'account_no' =>$account_no,
-                'address' =>$address,
-                'comment' =>$comment
-            );
-            $this->CRUDModel->insert('bank',$data);
-            $this->data['page_title']   = 'Banks | ECP';
-            $this->data['page']         = 'hr/bank';
-            $this->load->view('common/common',$this->data);
-            redirect('HrController/bank');
-          else:
-              redirect('/');
-        endif;	 
-	} 
-    
-    
-    public function add_head_of_dept()
-    {	  	
-        if($this->input->post()):
-            $department_id      = $this->input->post('department_id');
-            $emp_id      = $this->input->post('emp_id');
-            $date      = $this->input->post('date');
-            $comment      = $this->input->post('comment');
-            $data       = array(
-                'department_id' =>$department_id,
-                'emp_id' =>$emp_id,
-                'date' =>$date,
-                'comment' =>$comment
-            );
-            $this->CRUDModel->insert('hr_head_department',$data);
-            $this->data['page_title']   = 'Head of Department | ECP';
-            $this->data['page']         = 'hr/head_of_department';
-            $this->load->view('common/common',$this->data);
-            redirect('HrController/head_of_dept');
-          else:
-              redirect('/');
-        endif;	 
-	} 
-    
-    public function update_bank()
-    {		
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $name               = $this->input->post('name');
-            $branch_code        = $this->input->post('branch_code');
-            $address            = $this->input->post('address');
-            $comment            = $this->input->post('comment');
-            $account_no         = $this->input->post('account_no');
-            $bank_id =$this->input->post('bank_id');
-              $data = array(
-                'name' =>$name,
-                'branch_code' =>$branch_code,
-                'account_no' =>$account_no,
-                'address' =>$address,
-                'comment' =>$comment
-                  );
-              $where = array('bank_id'=>$bank_id); 
-              $this->CRUDModel->update('bank',$data,$where);
-              redirect('HrController/bank'); 
-           endif;
-        if($id):
-            $where = array('bank_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('bank',$where);
-
-            $this->data['page_title']        = 'Updae bank | ECP';
-            $this->data['page']        =  'hr/update_bank';
-            $this->load->view('common/common',$this->data);
-        else:
-        redirect('/');
-        endif;
-    }
-    
-    public function update_head_of_dept()
-    {		
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $department_id      = $this->input->post('department_id');
-            $emp_id      = $this->input->post('emp_id');
-            $date      = $this->input->post('date');
-            $comment      = $this->input->post('comment');
-            $data       = array(
-                'department_id' =>$department_id,
-                'emp_id' =>$emp_id,
-                'date' =>$date,
-                'comment' =>$comment
-            );
-              $where = array('serial_no'=>$id); 
-              $this->CRUDModel->update('hr_head_department',$data,$where);
-              redirect('HrController/head_of_dept'); 
-           endif;
-        if($id):
-            $where = array('serial_no'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_head_department',$where);
-
-            $this->data['page_title']        = 'Updae Head of Department | ECP';
-            $this->data['page']        =  'hr/update_head_of_dept';
-            $this->load->view('common/common',$this->data);
-        else:
-        redirect('/');
-        endif;
-    }
-    public function delete_bank()
-    {	    
-        $id         = $this->uri->segment(3);
-        $where      = array('bank_id'=>$id);
-        $this->CRUDModel->deleteid('bank',$where);
-        redirect('HrController/bank');
-	} 
-    
-    public function delete_head_of_dept()
-    {	    
-        $id         = $this->uri->segment(3);
-        $where      = array('serial_no'=>$id);
-        $this->CRUDModel->deleteid('hr_head_department',$where);
-        redirect('HrController/head_of_dept');
-	} 
-    
-    public function department()
-    {       
-        $this->data['result']       = $this->HrModel->getdepartment();
-        $this->data['page_title']   = 'Departments | ECP';
-        $this->data['page']         = 'hr/department';
-        $this->load->view('common/common',$this->data);
-    }
-    
-    public function add_department()
-    {	  	
-        if($this->input->post()):
-            $name      = $this->input->post('title');
-            $comment      = $this->input->post('comment');
-            $data       = array(
-                'title' =>$name,
-                'comment' =>$comment
-            );
-            $this->CRUDModel->insert('department',$data);
-            $this->data['page_title']   = 'departments | ECP';
-            $this->data['page']         = 'hr/department';
-            $this->load->view('common/common',$this->data);
-            redirect('HrController/department');
-          else:
-              redirect('/');
-        endif;	 
-	} 
-    
-    public function update_department()
-    {		
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $name      = $this->input->post('title');
-            $comment    = $this->input->post('comment');
-            $department_id =$this->input->post('department_id');
-              $data = array(
-                'title' =>$name,
-                'comment' =>$comment
-                  );
-              $where = array('department_id'=>$department_id); 
-              $this->CRUDModel->update('department',$data,$where);
-              redirect('HrController/department'); 
-           endif;
-        if($id):
-            $where = array('department_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('department',$where);
-
-            $this->data['page_title']        = 'Updae department | ECP';
-            $this->data['page']        =  'hr/update_department';
-            $this->load->view('common/common',$this->data);
-        else:
-        redirect('/');
-        endif;
-    }
-    public function delete_department()
-    {	    
-        $id         = $this->uri->segment(3);
-        $where      = array('department_id'=>$id);
-        $this->CRUDModel->deleteid('department',$where);
-        redirect('HrController/department');
-	}
-    
-    public function employee_reocrd($start=0)
-    {
-           $this->data['limit']            = $this->CRUDModel->dropDown('show_limit', 'â†? Select Limit  â†’', 'limitId', 'limit_value');
-            $config['base_url']         = base_url('HrController/employee_reocrd');
-            $config['total_rows']       = count($this->HrModel->getEmployee());  
-            $config['per_page']         = 50;
-            $config["num_links"]        = 2;
-            $config['uri_segment']      = 3;
-            $config['full_tag_open']    = "<ul class='pagination'>";
-            $config['full_tag_close']   = "</ul>";
-            $config['num_tag_open']     = '<li>';
-            $config['num_tag_close']    = '</li>';
-            $config['cur_tag_open']     = "<li class='disabled'><li class='active'><a href='javascript:vodid(0)'>";
-            $config['cur_tag_close']    = "</a></li>";
-            $config['next_tag_open']    = "<li>";
-            $config['next_tag_close']   = "</li>";
-            $config['prev_tag_open']    = "<li>";
-            $config['prev_tag_close']   = "</li>";
-            $config['first_tag_open']   = "<li>";
-            $config['first_tag_close']  = "</li>";
-            $config['last_tag_open']    = "<li>";
-            $config['last_tag_close']   = "</li>";
-            $config['first_link']       = "<i class='fa fa-angle-left'></i>";
-            $config['last_link']        = "<i class='fa fa-angle-right'></i>";
-
-
-            $this->pagination->initialize($config);
-            $page                       = is_numeric($this->uri->segment(3)) ? $this->uri->segment(3) :  0;
-            $this->data['pages']        = $this->pagination->create_links();
-            $custom['column']    ='emp_id';
-            $custom['order']     ='desc';          
-        $this->data['result']=$this->HrModel->getEmployeePg($config['per_page'], $page,null,$custom);
-            $this->data['count']     =$config['total_rows']; 
-           $this->data['page_title']   = 'All Employees Record | ECMS';
-           $this->data['page']         = 'hr/employee_record';
-           $this->load->view('common/common',$this->data);  
-    }
-    
-    public function retired_employee_reocrd($start=0)
-    {
-           $this->data['limit']            = $this->CRUDModel->dropDown('show_limit', 'â†? Select Limit  â†’', 'limitId', 'limit_value');
-            $config['base_url']         = base_url('HrController/retired_employee_reocrd');
-            $config['total_rows']       = count($this->HrModel->getEmployeeRetire());  
-            $config['per_page']         = 50;
-            $config["num_links"]        = 2;
-            $config['uri_segment']      = 3;
-            $config['full_tag_open']    = "<ul class='pagination'>";
-            $config['full_tag_close']   = "</ul>";
-            $config['num_tag_open']     = '<li>';
-            $config['num_tag_close']    = '</li>';
-            $config['cur_tag_open']     = "<li class='disabled'><li class='active'><a href='javascript:vodid(0)'>";
-            $config['cur_tag_close']    = "</a></li>";
-            $config['next_tag_open']    = "<li>";
-            $config['next_tag_close']   = "</li>";
-            $config['prev_tag_open']    = "<li>";
-            $config['prev_tag_close']   = "</li>";
-            $config['first_tag_open']   = "<li>";
-            $config['first_tag_close']  = "</li>";
-            $config['last_tag_open']    = "<li>";
-            $config['last_tag_close']   = "</li>";
-            $config['first_link']       = "<i class='fa fa-angle-left'></i>";
-            $config['last_link']        = "<i class='fa fa-angle-right'></i>";
-
-
-            $this->pagination->initialize($config);
-            $page                       = is_numeric($this->uri->segment(3)) ? $this->uri->segment(3) :  0;
-            $this->data['pages']        = $this->pagination->create_links();
-            $custom['column']    ='emp_id';
-            $custom['order']     ='desc';          
-        $this->data['result']=$this->HrModel->getEmployeeRetired($config['per_page'], $page,null,$custom);
-            $this->data['count']     =$config['total_rows']; 
-           $this->data['page_title']   = 'All Retired Employees | ECMS';
-           $this->data['page']         = 'hr/retired_employee_reocrd';
-           $this->load->view('common/common',$this->data);  
-    }
-    
-    public function employee_promotion_demotion($start=0)
-    {
-           $this->data['limit']            = $this->CRUDModel->dropDown('show_limit', 'â†? Select Limit  â†’', 'limitId', 'limit_value');
-            $config['base_url']         = base_url('HrController/employee_promotion_demotion');
-            $config['total_rows']       = count($this->HrModel->getEmployeePromote());  
-            $config['per_page']         = 50;
-            $config["num_links"]        = 2;
-            $config['uri_segment']      = 3;
-            $config['full_tag_open']    = "<ul class='pagination'>";
-            $config['full_tag_close']   = "</ul>";
-            $config['num_tag_open']     = '<li>';
-            $config['num_tag_close']    = '</li>';
-            $config['cur_tag_open']     = "<li class='disabled'><li class='active'><a href='javascript:vodid(0)'>";
-            $config['cur_tag_close']    = "</a></li>";
-            $config['next_tag_open']    = "<li>";
-            $config['next_tag_close']   = "</li>";
-            $config['prev_tag_open']    = "<li>";
-            $config['prev_tag_close']   = "</li>";
-            $config['first_tag_open']   = "<li>";
-            $config['first_tag_close']  = "</li>";
-            $config['last_tag_open']    = "<li>";
-            $config['last_tag_close']   = "</li>";
-            $config['first_link']       = "<i class='fa fa-angle-left'></i>";
-            $config['last_link']        = "<i class='fa fa-angle-right'></i>";
-
-
-            $this->pagination->initialize($config);
-            $page                       = is_numeric($this->uri->segment(3)) ? $this->uri->segment(3) :  0;
-            $this->data['pages']        = $this->pagination->create_links();
-            $custom['column']    ='emp_id';
-            $custom['order']     ='desc';          
-        $this->data['result']=$this->HrModel->getEmployeePromoted($config['per_page'], $page,null,$custom);
-            $this->data['count']     =$config['total_rows']; 
-           $this->data['page_title']   = 'All Promotion/Demotion Employees Record | ECMS';
-           $this->data['page']         = 'hr/employee_promotion_demotion';
-           $this->load->view('common/common',$this->data);  
-    }
-        
-    public function add_employee_record()
-	{	
-       $session = $this->session->all_userdata();
-        $user_id =$session['userData']['user_id'];
-        if($this->input->post()):
-            $employee = ucwords(strtolower(ucwords($this->input->post('emp_name'))));
-            $father = ucwords(strtolower(ucwords($this->input->post('father_name'))));
-            $husband = ucwords(strtolower(ucwords($this->input->post('emp_husband_name'))));
-            $date1 = date('Y-m-d', strtotime($this->input->post('dob')));
-            $date2 = date('Y-m-d', strtotime($this->input->post('joining_date')));
-            $date3 = date('Y-m-d', strtotime($this->input->post('retirement_date')));
-            $data = array(
-                'emp_name'=>$employee,
-                'father_name'=>$father,
-                'emp_husband_name'=>$husband,
-                'gender_id'=>$this->input->post('gender_id'),
-                'dob'=>$date1,
-                'nic'=>$this->input->post('nic'),
-                'postal_address'=>$this->input->post('postal_address'),
-                'permanent_address'=>$this->input->post('permanent_address'),
-                'district_id'=>$this->input->post('district_id'),
-                'post_office'=>$this->input->post('post_office'),
-                'country_id'=>$this->input->post('country_id'),
-                'bg_id'=>$this->input->post('bg_id'),
-                'ptcl_number'=>$this->input->post('ptcl_number'),
-                'contact1'=>$this->input->post('contact1'),
-                'net_id'=>$this->input->post('net_id'),
-                'contact2'=>$this->input->post('contact2'),
-                'religion_id'=>$this->input->post('religion_id'),
-                'marital_status_id'=>$this->input->post('marital_status_id'),
-                'emp_personal_no'=>$this->input->post('emp_personal_no'),
-                'gp_fund_no'=>$this->input->post('gp_fund_no'),
-                'email'=>$this->input->post('email'),
-                'contract_type_id'=>$this->input->post('contract_type_id'),
-                'j_emp_scale_id'=>$this->input->post('j_emp_scale_id'),
-                'joining_designation'=>$this->input->post('joining_designation'),
-                'joining_date'=>$date2,
-                'retirement_date'=>$date3,
-                'cat_id'=>$this->input->post('cat_id'),
-                'c_emp_scale_id'=>$this->input->post('c_emp_scale_id'),
-                'current_designation'=>$this->input->post('current_designation'),
-                'department_id'=>$this->input->post('department_id'),
-                'subject_id'=>$this->input->post('subject_id'),
-                'shift_id'=>$this->input->post('shift_id'),
-                'bank_id'=>$this->input->post('bank_id'),
-                'account_no'=>$this->input->post('account_no'),
-                'emp_status_id'=>$this->input->post('emp_status_id'),
-                'comment'=>$this->input->post('comment'),
-                'additional_responsibilty'=>$this->input->post('additional_responsibilty'),
-                'user_id'=>$user_id
-
-            );
-//            echo '<pre>'; print_r($data); die;
-            $id = $this->CRUDModel->insert('hr_emp_record',$data);
-          
-            redirect('HrController/employee_academic_record/'.$id);
-          else:
-            $this->data['page_title']   = 'Add New Employee | ECP';
-            $this->data['page']         = 'hr/add_employee_record';
-            $this->load->view('common/common',$this->data);
-        endif;
-	}
-    
-    public function employee_academic_record()
-	{		
-        $id = $this->uri->segment(3);
-        $this->data['emp_id'] = $id;
-        
-       if($this->input->post()):
-                $data = array
-                (
-                    'emp_id'=>$this->input->post('emp_id'),
-                    'degree_id'=>$this->input->post('degree_id'),
-                    'bu_id'=>$this->input->post('bu_id'),
-                    'passing_year'=>$this->input->post('passing_year'),
-                    'cgpa'=>$this->input->post('cgpa'),
-                    'div_id'=>$this->input->post('div_id'),
-                    'hec_verified'=>$this->input->post('hec_verified')
-                );
-            $this->CRUDModel->insert('hr_emp_education',$data);
-            redirect('HrController/employee_academic_record/'.$this->input->post('emp_id'));
-        endif;
-            $this->data['degree']  = $this->CRUDModel->dropDown('degree', 'â†? Select degree  â†’', 'degree_id', 'title');
-            $this->data['board_university']  = $this->CRUDModel->dropDown('board_university', 'â†? Select Board  â†’', 'bu_id', 'title');
-$this->data['division']  = $this->CRUDModel->dropDown('hr_emp_division', 'â†? Select Division  â†’', 'devision_id', 'name');
-        
-            $where = array('hr_emp_education.emp_id'=>$this->uri->segment(3));
-            $this->data['employee_records'] =$this->HrModel->hr_edu_record($where);
-            $this->data['page_title']   = 'Employee Academic Record | ECP';
-            $this->data['page']         = 'hr/employee_academic_record';
-            $this->load->view('common/common',$this->data); 
-	}
-    
-    public function employee_profile()
-    {
-        $id = $this->uri->segment(3);
-        $this->data['emp_id'] = $id;
-        $where = array('hr_emp_record.emp_id'=>$id);
-        $this->data['result']       = $this->HrModel->profileEmployee($where);
-        $this->data['employee_records'] =$this->HrModel->hr_edu_record($where);
-        $this->data['page_title']   = 'Employees Profile  | ECP';
-        $this->data['page']         = 'hr/employee_profile';
-        $this->load->view('common/common',$this->data);
-    }
-    
-    public function update_employee()
-    {		
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $employee = ucwords(strtolower(ucwords($this->input->post('emp_name'))));
-            $father = ucwords(strtolower(ucwords($this->input->post('father_name'))));
-            $husband = ucwords(strtolower(ucwords($this->input->post('emp_husband_name'))));
-            $dob = $this->input->post('dob'); 
-            $joining_date = $this->input->post('joining_date'); 
-            $retirement_date = $this->input->post('retirement_date'); 
-            $date1 = date('Y-m-d', strtotime($dob));
-            $date2 = date('Y-m-d', strtotime($joining_date));
-            $date3 = date('Y-m-d', strtotime($retirement_date));
-            $data       = array(
-                'emp_name'=>$employee,
-                'father_name'=>$father,
-                'emp_husband_name'=>$husband,
-                'gender_id'=>$this->input->post('gender_id'),
-                'dob'=>$date1,
-                'nic'=>$this->input->post('nic'),
-                'postal_address'=>$this->input->post('postal_address'),
-                'permanent_address'=>$this->input->post('permanent_address'),
-                'district_id'=>$this->input->post('district_id'),
-                'post_office'=>$this->input->post('post_office'),
-                'country_id'=>$this->input->post('country_id'),
-                'bg_id'=>$this->input->post('bg_id'),
-                'ptcl_number'=>$this->input->post('ptcl_number'),
-                'contact1'=>$this->input->post('contact1'),
-				'net_id'=>$this->input->post('net_id'),
-                'contact2'=>$this->input->post('contact2'),
-                'religion_id'=>$this->input->post('religion_id'),
-                'marital_status_id'=>$this->input->post('marital_status_id'),
-                'emp_personal_no'=>$this->input->post('emp_personal_no'),
-                'gp_fund_no'=>$this->input->post('gp_fund_no'),
-                'email'=>$this->input->post('email'),
-                'contract_type_id'=>$this->input->post('contract_type_id'),
-                'j_emp_scale_id'=>$this->input->post('j_emp_scale_id'),
-                'joining_designation'=>$this->input->post('joining_designation'),
-                'joining_date'=>$date2,
-                'retirement_date'=>$date3,
-                'cat_id'=>$this->input->post('cat_id'),
-                'c_emp_scale_id'=>$this->input->post('c_emp_scale_id'),
-                'current_designation'=>$this->input->post('current_designation'),
-                'department_id'=>$this->input->post('department_id'),
-                'subject_id'=>$this->input->post('subject_id'),
-                'shift_id'=>$this->input->post('shift_id'),
-                'bank_id'=>$this->input->post('bank_id'),
-                'account_no'=>$this->input->post('account_no'),
-                'emp_status_id'=>$this->input->post('emp_status_id'),
-                'comment'=>$this->input->post('comment'),
-                'additional_responsibilty'=>$this->input->post('additional_responsibilty')
-            );
-              $where = array('emp_id'=>$id);
-              $this->CRUDModel->update('hr_emp_record',$data,$where);
-              redirect('HrController/employee_reocrd'); 
-           endif;
-        if($id):
-            $where = array('hr_emp_record.emp_id'=>$id);
-            $where1 = array('emp_id'=>$id);
-			$where2 = array('hr_emp_grant_in_aid.emp_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_emp_record',$where);
-            
-            $this->data['employee_records'] =$this->HrModel->hr_edu_record($where);
-            $this->data['research'] = $this->CRUDModel->get_where_result('hr_research_paper',$where1);
-            $this->data['professional'] = $this->CRUDModel->get_where_result('hr_professional_edu',$where1);
-            $this->data['employee_grant'] = $this->HrModel->hr_grant_in_add($where2);
-            $this->data['page_title']        = 'Update Employee Record | ECMS';
-            $this->data['page']        =  'hr/update_employee';
-            $this->load->view('common/common',$this->data);
-        endif;
-    }
-	
-	public function update_grant_in_aid()
-	{		
-        $id = $this->uri->segment(3);
-        $emp_id = $this->uri->segment(4);
-        $this->data['grant_id'] = $id;
-        $this->data['emp_id'] = $emp_id;
-        
-       if($this->input->post()):
-			$start_date = $this->input->post('start_date');
-			$date1 = date('Y-m-d', strtotime($start_date));
-			$end_date = $this->input->post('end_date');
-			$date2 = date('Y-m-d', strtotime($end_date));
-			$amount_coll_date = $this->input->post('amount_coll_date');
-			$date3 = date('Y-m-d', strtotime($amount_coll_date));
-                $data = array
-                (
-                    'file_no'=>$this->input->post('file_no'),
-                    'emp_id'=>$this->input->post('emp_id'),
-                    'degree_id'=>$this->input->post('degree_id'),
-                    'start_date'=>$date1,
-                    'end_date'=>$date2,
-                    'amount_received'=>$this->input->post('amount_received'),
-                    'amount_coll_date'=>$date3,
-                    'status_bond_id'=>$this->input->post('status_bond_id'),
-                    'remarks'=>$this->input->post('remarks'),
-                );
-			$where = array('grant_id'=>$this->uri->segment(3));	
-            $this->CRUDModel->update('hr_emp_grant_in_aid',$data,$where);
-            redirect('HrController/employee_reocrd/'.$this->uri->segment(4));
-        endif;
-            $this->data['degree']  = $this->CRUDModel->dropDown('degree', 'Select degree ', 'degree_id', 'title');
-        
-            $where = array('hr_emp_grant_in_aid.grant_id'=>$this->uri->segment(3));
-            $this->data['employee_grant'] = $this->HrModel->hr_grant_in_add_row($where);
-            $this->data['page_title']   = 'Employee Update Grant in Aid | ECMS';
-            $this->data['page']         = 'hr/update_grant_in_add';
-            $this->load->view('common/common',$this->data); 
-	}
-	
-	public function delete_grant_in_aid()
-    {	    
-        $id    = $this->uri->segment(3);
-        $emp_id    = $this->uri->segment(4);
-        $where = array('grant_id'=>$id);
-        $this->CRUDModel->deleteid('hr_emp_grant_in_aid',$where);
-        redirect('HrController/update_employee/'.$emp_id);
-	}
-    
-    public function update_employee_status()
-    {		
-        $session = $this->session->all_userdata();
-        $user_id =$session['userData']['user_id'];
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $date = $this->input->post('date'); 
-            $date1 = date('Y-m-d', strtotime($date));
-            $image = $this->CRUDModel->hr_do_resize('file','assets/images/employee');
-            $file_name = $image['file_name'];
-            $data       = array(
-                'emp_status_id'=>2,
-                'retire_flag'=>2,
-            );
-              $where = array('emp_id'=>$id);
-              $this->CRUDModel->update('hr_emp_record',$data,$where);
-              $retire_data = array(
-                'emp_id'=>$this->input->post('emp_id'),
-                'retire_status_id'=>$this->input->post('retire_status_id'),
-                'date'=>$date1,
-                'remarks'=>$this->input->post('remarks'),
-                'attach_file'=>$file_name,
-                'user_id'=>$user_id,
-              );  
-            $this->CRUDModel->insert('hr_emp_retire',$retire_data);    
-              redirect('HrController/retired_employee_reocrd'); 
-           endif;
-        if($id):
-            $where = array('hr_emp_record.emp_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_emp_record',$where);
-            
-            $this->data['employee_records'] =$this->HrModel->hr_edu_record($where);
-            
-            $this->data['page_title']        = 'Updae Employee Status | ECMS';
-            $this->data['page']        =  'hr/update_employee_status';
-            $this->load->view('common/common',$this->data);
-        else:
-        redirect('/');
-        endif;
-    }
-    
-    public function staff_promotion_demotion()
-    {		
-        $session = $this->session->all_userdata();
-        $user_id =$session['userData']['user_id'];
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $old_desig_id = $this->input->post('old_desig_id'); 
-            $old_scale_id = $this->input->post('old_scale_id'); 
-            $pro_scale_id = $this->input->post('pro_scale_id'); 
-            $pro_desig_id = $this->input->post('pro_desig_id'); 
-            $remarks = $this->input->post('remarks'); 
-            $emp_id = $this->input->post('emp_id'); 
-            $date = $this->input->post('promotion_date'); 
-            $promotion_type = $this->input->post('promotion_type'); 
-            $date1 = date('Y-m-d', strtotime($date));
-            $data       = array(
-                'current_designation'=>$pro_desig_id,
-                'c_emp_scale_id'=>$pro_scale_id,
-            );
-              $where = array('emp_id'=>$emp_id);
-              $this->CRUDModel->update('hr_emp_record',$data,$where);
-              $promotion_data = array(
-                'emp_id'=>$emp_id,
-                'promotion_type'=>$promotion_type,
-                'promotion_date'=>$date1,
-                'old_desig_id'=>$this->input->post('old_desig_id'),
-                'old_scale_id'=>$this->input->post('old_scale_id'),
-                'pro_desig_id'=>$this->input->post('pro_desig_id'),
-                'pro_scale_id'=>$this->input->post('pro_scale_id'),
-                'remarks'=>$this->input->post('remarks'),
-                'user_id'=>$user_id,
-              );  
-            $this->CRUDModel->insert('hr_promotion_demotion',$promotion_data);    
-              redirect('HrController/employee_promotion_demotion'); 
-           endif;
-        if($id):
-            $where = array('hr_emp_record.emp_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_emp_record',$where);
-            
-            $this->data['page_title']        = 'staff promotion demotion | ECMS';
-            $this->data['page']        =  'hr/staff_promotion_demotion';
-            $this->load->view('common/common',$this->data);
-        else:
-        redirect('/');
-        endif;
-    }
-    
-    public function update_emp_edu()
-    {
-       $id = $this->uri->segment(3);
-       $emp_id = $this->uri->segment(4);
-        if($this->input->post()):
-            $emp_id      = $this->input->post('emp_id');
-            $degree_id      = $this->input->post('degree_id');
-            $bu_id      = $this->input->post('bu_id');
-            $passing_year      = $this->input->post('passing_year');
-            $cgpa      = $this->input->post('cgpa');
-            $div_id      = $this->input->post('div_id');
-            $hec_verified      = $this->input->post('hec_verified');
-            $data       = array(
-                'emp_id' =>$emp_id,
-                'degree_id' =>$degree_id,
-                'bu_id' =>$bu_id,
-                'passing_year' =>$passing_year,
-                'percentage' =>$percentage,
-                'cgpa' =>$cgpa,
-                'div_id' =>$div_id,
-                'hec_verified' =>$hec_verified    
-            );
-              $where = array('emp_edu_id'=>$id); 
-              $this->CRUDModel->update('hr_emp_education',$data,$where);
-              redirect('HrController/update_employee/'.$emp_id); 
-           endif;
-        if($id):
-            $where = array('emp_edu_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_emp_education',$where);
-
-            $this->data['page_title']        = 'Update Employee Qualification | ECP';
-            $this->data['page']        =  'hr/update_emp_academic';
-            $this->load->view('common/common',$this->data);
-        else:
-        redirect('/');
-        endif; 
-    }
-    
-    public function delete_emp_edu()
-    {	    
-        $id         = $this->uri->segment(3);
-        $emp_id         = $this->uri->segment(4);
-        $where      = array('emp_edu_id'=>$id);
-        $this->CRUDModel->deleteid('hr_emp_education',$where);
-        redirect('HrController/update_employee/'.$emp_id);
-	} 
-    
-    public function upload_employee_pic()
-    {
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $image = $this->CRUDModel->do_resize('file','assets/images/employee');
-            $file_name = $image['file_name'];
-            $data = array('picture'=>$file_name);
-            $where = array('emp_id'=>$id); 
-            $this->CRUDModel->update('hr_emp_record',$data,$where);
-            redirect('HrController/employee_reocrd'); 
-        endif;
-        if($id):
-            $where = array('emp_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_emp_record',$where);
-
-            $this->data['page_title']        = 'Upload Employee Picture | ECP';
-            $this->data['page']        =  'hr/upload_employee_pic';
-            $this->load->view('common/common',$this->data);
-        else:
-        redirect('/');
-        endif;
-    }
-    
-    public function head_of_dept(){
-        
-         $this->data['result']       = $this->HrModel->gethead_of_dept();
-        $this->data['page_title']   = 'head of deparment | ECP';
-        $this->data['page']         = 'hr/head_of_department';
-        $this->load->view('common/common',$this->data);
-    }
-    
-    public function category()
-    {
-        $this->data['result']       = $this->HrModel->getcategory();
-        $this->data['page_title']   = 'HR Category | ECP';
-        $this->data['page']         = 'hr/hr_category';
-        $this->load->view('common/common',$this->data);
-    }
-    
-    public function delete_category()
-    {	    
-        $id         = $this->uri->segment(3);
-        $where      = array('cat_id'=>$id);
-        $this->CRUDModel->deleteid('hr_emp_category',$where);
-        redirect('admin/category');
-	}
-    
-    public function designation()
-    {
-        $this->data['result']       = $this->HrModel->getdesignation();
-        $this->data['page_title']   = 'HR Designation | ECP';
-        $this->data['page']         = 'hr/designation';
-        $this->load->view('common/common',$this->data);
-    }
-    
-    public function add_designation()
-    {	  	
-        if($this->input->post()):
-            $name      = $this->input->post('title');
-            $data       = array(
-                'title' =>$name,
-            );
-            $this->CRUDModel->insert('hr_emp_designation',$data);
-            $this->data['page_title']   = 'Designation | ECP';
-            $this->data['page']         = 'hr/designation';
-            $this->load->view('common/common',$this->data);
-            redirect('HrController/designation');
-          else:
-              redirect('/');
-        endif;	 
-	} 
-    
-    public function update_designation()
-    {		
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $name      = $this->input->post('title');
-            $department_id =$this->input->post('emp_desg_id');
-              $data = array(
-                'title' =>$name,
-                  );
-              $where = array('emp_desg_id'=>$department_id); 
-              $this->CRUDModel->update('hr_emp_designation',$data,$where);
-              redirect('HrController/designation'); 
-           endif;
-        if($id):
-            $where = array('emp_desg_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_emp_designation',$where);
-
-            $this->data['page_title']        = 'Updae Designation | ECP';
-            $this->data['page']        =  'hr/update_designation';
-            $this->load->view('common/common',$this->data);
-        else:
-        redirect('/');
-        endif;
-    }
-    
-    public function delete_designation()
-    {	    
-        $id         = $this->uri->segment(3);
-        $where      = array('emp_desg_id'=>$id);
-        $this->CRUDModel->deleteid('hr_emp_designation',$where);
-        redirect('HrController/designation');
-	}
-    
-    public function division()
-    {
-        $this->data['result']       = $this->HrModel->getdivision();
-        $this->data['page_title']   = 'HR Division | ECP';
-        $this->data['page']         = 'hr/division';
-        $this->load->view('common/common',$this->data);
-    }
-    
-    public function add_division()
-    {	  	
-        if($this->input->post()):
-            $name      = $this->input->post('name');
-            $data       = array(
-                'name' =>$name,
-            );
-            $this->CRUDModel->insert('hr_emp_division',$data);
-            $this->data['page_title']   = 'Division | ECP';
-            $this->data['page']         = 'hr/division';
-            $this->load->view('common/common',$this->data);
-            redirect('HrController/division');
-          else:
-              redirect('/');
-        endif;	 
-	}
-    
-    public function delete_division()
-    {	    
-        $id         = $this->uri->segment(3);
-        $where      = array('devision_id'=>$id);
-        $this->CRUDModel->deleteid('hr_emp_division',$where);
-        redirect('HrController/division');
-	}
-    
-    public function employee_scale()
-    {
-        $this->data['result']       = $this->HrModel->getscale();
-        $this->data['page_title']   = 'HR Employee Scale | ECP';
-        $this->data['page']         = 'hr/employee_scale';
-        $this->load->view('common/common',$this->data);
-    }
-    
-    public function add_employee_scale()
-    {	  	
-        if($this->input->post()):
-            $name      = $this->input->post('title');
-            $data       = array(
-                'title' =>$name,
-            );
-            $this->CRUDModel->insert('hr_emp_scale',$data);
-            $this->data['page_title']   = 'HR Employee Scale | ECP';
-            $this->data['page']         = 'hr/employee_scale';
-            $this->load->view('common/common',$this->data);
-            redirect('HrController/employee_scale');
-          else:
-              redirect('/');
-        endif;	 
-	}
-    
-    public function delete_scale()
-    {	    
-        $id         = $this->uri->segment(3);
-        $where      = array('emp_scale_id'=>$id);
-        $this->CRUDModel->deleteid('hr_emp_scale',$where);
-        redirect('HrController/employee_scale');
-	}
-    
-    public function employee_status()
-    {
-        $this->data['result']       = $this->HrModel->getemp_status();
-        $this->data['page_title']   = 'HR Employee Status | ECP';
-        $this->data['page']         = 'hr/employee_status';
-        $this->load->view('common/common',$this->data);
-    }
-    
-    public function delete_emp_status()
-    {	    
-        $id         = $this->uri->segment(3);
-        $where      = array('emp_status_id'=>$id);
-        $this->CRUDModel->deleteid('hr_emp_status',$where);
-        redirect('admin/employee_status');
-	} 
-    
-    public function contract_type()
-    {
-        $this->data['result']       = $this->HrModel->getemp_contract();
-        $this->data['page_title']   = 'HR Employee Contract | ECP';
-        $this->data['page']         = 'hr/contract_type';
-        $this->load->view('common/common',$this->data);
-    }
-    
-    public function delete_contract_type()
-    {	    
-        $id         = $this->uri->segment(3);
-        $where      = array('contract_type_id'=>$id);
-        $this->CRUDModel->deleteid(' hr_emp_contract_type',$where);
-        redirect('admin/contract_type');
-	} 
-    
-    Public function search_employee_records(){
-$this->data['department']    = $this->CRUDModel->dropDown('department', 'Department', 'department_id', 'title');
-$this->data['gender']    = $this->CRUDModel->dropDown('gender', 'Gender', 'gender_id', 'title');
-$this->data['subject']    = $this->CRUDModel->dropDown('subject', 'Subject', 'subject_id', 'title');
-$this->data['scale']    = $this->CRUDModel->dropDown('hr_emp_scale', 'Scale', 'emp_scale_id', 'title');
-$this->data['status']    = $this->CRUDModel->dropDown('hr_emp_status', 'Status', 'emp_status_id', 'title');
-$this->data['designation']    = $this->CRUDModel->dropDown('hr_emp_designation', 'Designation', 'emp_desg_id', 'title');
-$this->data['contract']    = $this->CRUDModel->dropDown('hr_emp_contract_type', 'Contract Type', 'contract_type_id', 'title');
-$this->data['category']    = $this->CRUDModel->dropDown('hr_emp_category', 'Category', 'cat_id', 'title');
-$this->data['limit']            = $this->CRUDModel->dropDown('show_limit', 'Select Limit', 'limitId', 'limit_value');        
-        
-        if($this->input->post('search')):
-        $emp_name       =  $this->input->post('emp_name');
-        $father_name        =  $this->input->post('father_name');
-        $gender_id             =  $this->input->post('gender_id');
-        $department_id            =  $this->input->post('department_id');
-        $current_designation        =  $this->input->post('current_designation');
-        $c_emp_scale_id      =  $this->input->post('c_emp_scale_id');
-        $emp_status_id      =  $this->input->post('emp_status_id');
-        $cat_id      =  $this->input->post('cat_id');
-        $subject_id      =  $this->input->post('subject_id');
-        $contract_type_id      =  $this->input->post('contract_type_id');
-        $limit              =  $this->input->post('limit');  
-        //like Array
-        $like = '';
-        $where = '';
-        $this->data['emp_name'] = '';
-        $this->data['father_name']  = '';
-        $this->data['gender_id']  = '';
-        $this->data['department_id']  = '';
-        $this->data['current_designation']  = '';
-        $this->data['c_emp_scale_id']  = '';
-        $this->data['emp_status_id']  = '';
-        $this->data['cat_id']  = '';
-        $this->data['subject_id']  = '';
-        $this->data['contract_type_id']  = '';
-        $this->data['limitId']  = ''; 
-        
-            if(!empty($emp_name)):
-                $like['emp_name'] = $emp_name;
-                $this->data['emp_name'] =$emp_name;
-            endif;
-            if(!empty($father_name)):
-                $like['father_name'] = $father_name;
-            $this->data['father_name'] =$father_name;
-            endif;
-            
-            //where array 
-            if(!empty($gender_id)):
-                $where['gender.gender_id'] = $gender_id;
-                $this->data['gender_id']  = $gender_id;
-            endif;
-            if(!empty($department_id)):
-                $where['department.department_id'] = $department_id;
-                $this->data['department_id']  = $department_id;
-            endif;
-            if(!empty($current_designation)):
-                $where['hr_emp_designation.emp_desg_id'] = $current_designation;
-                $this->data['current_designation']  = $current_designation;
-            endif;
-            if(!empty($emp_status_id)):
-                $where['hr_emp_record.emp_status_id'] = $emp_status_id;
-                $this->data['emp_status_id']  = $emp_status_id;
-            endif;
-            if(!empty($c_emp_scale_id)):
-                $where['hr_emp_scale.emp_scale_id'] = $c_emp_scale_id;
-                $this->data['c_emp_scale_id']  = $c_emp_scale_id;
-            endif;
-        if(!empty($cat_id)):
-                $where['hr_emp_category.cat_id'] = $cat_id;
-                $this->data['cat_id']  = $cat_id;
-            endif;
-            if(!empty($contract_type_id)):
-                $where['hr_emp_contract_type.contract_type_id'] = $contract_type_id;
-                $this->data['contract_type_id']  = $contract_type_id;
-            endif;
-        if(!empty($subject_id)):
-                $where['subject.subject_id'] = $subject_id;
-                $this->data['subject_id']  = $subject_id;
-            endif;
-                $limitVale = $this->CRUDModel->get_where_row('show_limit',array('limitId'=>$limit));
-              
-                if($limitVale):
-                    $limitD = $limitVale->limit_value;
-                else:
-                    $limitD = 50;
-                endif;
-                $custom['limit']        = $limitD;
-                $custom['start']        = 0;
-                $custom['column']       = '';
-                $custom['order']        = 'desc';
-                $this->data['limitId']  = $limit;
-                $this->data['result']   = $this->HrModel->get_empData('hr_emp_record',$where,$like,NULL);
-                $this->data['page']     = "hr/employee_record_list";
-                $this->data['title']    = 'Employee List 2016 | ECP';
-                $this->load->view('common/common',$this->data); 
-        
-            elseif($this->input->post('export')):    
-                $this->load->library('excel');
-                $this->excel->setActiveSheetIndex(0);
-                //name the worksheet
-                $this->excel->getActiveSheet()->setTitle('Employees List');
-                //set cell A1 content with some text
-                $this->excel->getActiveSheet()->setCellValue('A1', 'Employee Name');
-                $this->excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(16);
-            
-                $this->excel->getActiveSheet()->setCellValue('B1', 'Father Name');
-                $this->excel->getActiveSheet()->getStyle('B1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('B1')->getFont()->setSize(16);
-                
-                $this->excel->getActiveSheet()->setCellValue('C1', 'CNIC #');
-                $this->excel->getActiveSheet()->getStyle('C1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('C1')->getFont()->setSize(16);
-                
-                $this->excel->getActiveSheet()->setCellValue('D1','Postal Address'); 
-                $this->excel->getActiveSheet()->getStyle('D1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('D1')->getFont()->setSize(16);
-                
-               
-                $this->excel->getActiveSheet()->setCellValue('E1', 'Permanent Address');
-                $this->excel->getActiveSheet()->getStyle('E1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('E1')->getFont()->setSize(16);
-                
-        
-                $this->excel->getActiveSheet()->setCellValue('F1','Post Office');
-                $this->excel->getActiveSheet()->getStyle('F1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('F1')->getFont()->setSize(16);                
-        
-                $this->excel->getActiveSheet()->setCellValue('G1','District');
-                $this->excel->getActiveSheet()->getStyle('G1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('G1')->getFont()->setSize(16);
-                
-                $this->excel->getActiveSheet()->setCellValue('H1','Designation');
-                $this->excel->getActiveSheet()->getStyle('H1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('H1')->getFont()->setSize(16);
-                
-                
-                $this->excel->getActiveSheet()->setCellValue('I1','Gender');
-                $this->excel->getActiveSheet()->getStyle('I1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('I1')->getFont()->setSize(16);
-        
-                $this->excel->getActiveSheet()->setCellValue('J1','Department');
-                $this->excel->getActiveSheet()->getStyle('J1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('J1')->getFont()->setSize(16);
-                
-                $this->excel->getActiveSheet()->setCellValue('K1','Scale');
-                $this->excel->getActiveSheet()->getStyle('K1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('K1')->getFont()->setSize(16);
-        
-                $this->excel->getActiveSheet()->setCellValue('L1','Category');
-                $this->excel->getActiveSheet()->getStyle('L1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('L1')->getFont()->setSize(16);
-        
-                $this->excel->getActiveSheet()->setCellValue('M1','Contract');
-                $this->excel->getActiveSheet()->getStyle('M1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('M1')->getFont()->setSize(16);
-        
-                $this->excel->getActiveSheet()->setCellValue('N1','Additional Responsibility');
-                $this->excel->getActiveSheet()->getStyle('N1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('N1')->getFont()->setSize(16);
-        
-                $this->excel->getActiveSheet()->setCellValue('O1','Status');
-                $this->excel->getActiveSheet()->getStyle('O1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('O1')->getFont()->setSize(16);
-                
-                $this->excel->getActiveSheet()->setCellValue('P1','Contact 1');
-                $this->excel->getActiveSheet()->getStyle('P1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('P1')->getFont()->setSize(16);
-               
-                $this->excel->getActiveSheet()->setCellValue('Q1','Contact 2');
-                $this->excel->getActiveSheet()->getStyle('Q1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('Q1')->getFont()->setSize(16);
-                
-				$this->excel->getActiveSheet()->setCellValue('R1','Birth');
-                $this->excel->getActiveSheet()->getStyle('R1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('R1')->getFont()->setSize(16);
-				
-				$this->excel->getActiveSheet()->setCellValue('S1','Appointment');
-                $this->excel->getActiveSheet()->getStyle('S1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('S1')->getFont()->setSize(16);
-				
-				$this->excel->getActiveSheet()->setCellValue('T1','Retirement');
-                $this->excel->getActiveSheet()->getStyle('T1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('T1')->getFont()->setSize(16);
-        
-                $this->excel->getActiveSheet()->setCellValue('U1','Religion');
-                $this->excel->getActiveSheet()->getStyle('U1')->getFont()->setBold(true);
-                $this->excel->getActiveSheet()->getStyle('U1')->getFont()->setSize(16);
-				
-                
-				for($col = ord('A'); $col <= ord('U'); $col++){
-                //set column dimension
-                $this->excel->getActiveSheet()->getColumnDimension(chr($col))->setAutoSize(true);
-                 //change the font size
-                $this->excel->getActiveSheet()->getStyle(chr($col))->getFont()->setSize(12);
-                  
-                $this->excel->getActiveSheet()->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-        }
-        
-        $emp_id      =  $this->input->post('emp_id');
-        $emp_name       =  $this->input->post('emp_name');
-        $father_name        =  $this->input->post('father_name');
-        $gender_id             =  $this->input->post('gender_id');
-        $department_id            =  $this->input->post('department_id');
-        $current_designation        =  $this->input->post('current_designation');
-        $c_emp_scale_id      =  $this->input->post('c_emp_scale_id');
-        $emp_status_id      =  $this->input->post('emp_status_id');
-        $cat_id      =  $this->input->post('cat_id');
-        $subject_id      =  $this->input->post('subject_id');
-        $contract_type_id      =  $this->input->post('contract_type_id');
-        $limit              =  $this->input->post('limit'); 
-          
-        $like = '';
-        $where = '';
-        $this->data['emp_id'] = '';
-        $this->data['emp_name'] = '';
-        $this->data['father_name']  = '';
-        $this->data['gender_id']  = '';
-        $this->data['department_id']  = '';
-        $this->data['current_designation']  = '';
-        $this->data['c_emp_scale_id']  = '';
-        $this->data['emp_status_id']  = '';
-        $this->data['cat_id']  = '';
-        $this->data['subject_id']  = '';
-        $this->data['contract_type_id']  = '';
-        $this->data['limitId']  = '';
-            
-           if(!empty($emp_id)):
-                $like['hr_emp_record.emp_id'] = $emp_id;
-                $this->data['emp_id'] =$emp_id;
-            endif;
-            if(!empty($emp_name)):
-                $like['emp_name'] = $emp_name;
-                $this->data['emp_name'] =$emp_name;
-            endif;
-            if(!empty($father_name)):
-                $like['father_name'] = $father_name;
-            $this->data['father_name'] =$father_name;
-            endif;
-            
-            //where array 
-            if(!empty($gender_id)):
-                $where['gender.gender_id'] = $gender_id;
-                $this->data['gender_id']  = $gender_id;
-            endif;
-            if(!empty($department_id)):
-                $where['department.department_id'] = $department_id;
-                $this->data['department_id']  = $department_id;
-            endif;
-            if(!empty($current_designation)):
-                $where['hr_emp_designation.emp_desg_id'] = $current_designation;
-                $this->data['current_designation']  = $current_designation;
-            endif;
-            if(!empty($c_emp_scale_id)):
-                $where['hr_emp_scale.emp_scale_id'] = $c_emp_scale_id;
-                $this->data['c_emp_scale_id']  = $c_emp_scale_id;
-            endif;
-        if(!empty($emp_status_id)):
-                $where['hr_emp_record.emp_status_id'] = $emp_status_id;
-                $this->data['emp_status_id']  = $emp_status_id;
-            endif;
-        if(!empty($cat_id)):
-                $where['hr_emp_category.cat_id'] = $cat_id;
-                $this->data['cat_id']  = $cat_id;
-            endif;
-            if(!empty($contract_type_id)):
-                $where['hr_emp_contract_type.contract_type_id'] = $contract_type_id;
-                $this->data['contract_type_id']  = $contract_type_id;
-            endif;
-        if(!empty($subject_id)):
-                $where['subject.subject_id'] = $subject_id;
-                $this->data['subject_id']  = $subject_id;
-            endif;
-            $limitVale = $this->CRUDModel->get_where_row('show_limit',array('limitId'=>$limit));
-              
-                if($limitVale):
-                    $limitD = $limitVale->limit_value;
-                else:
-                    $limitD = 50;
-                endif;
-                $custom['limit']        = $limitD;
-                $custom['start']        = 0;
-               // $custom['column']       = 'applicant_edu_detail.percentage';
-                $custom['order']        = 'desc';
-                $this->data['limitId']  = $limit;
-            
-                $this->db->select('
-                hr_emp_record.emp_name,
-                hr_emp_record.father_name,
-                hr_emp_record.nic,
-                hr_emp_record.postal_address,
-                hr_emp_record.permanent_address,
-                hr_emp_record.post_office,
-                district.name as district,
-                hr_emp_designation.title as designation,
-                gender.title as genderName,
-                department.title as department,
-                hr_emp_scale.title as scale,
-                hr_emp_category.title as category,
-                hr_emp_contract_type.title as contract,
-                hr_emp_record.additional_responsibilty,
-                hr_emp_status.title as status,
-                hr_emp_record.contact1,
-                hr_emp_record.contact2,
-				DATE_FORMAT(hr_emp_record.dob,"%d-%m-%Y") as emp_dob,
-				DATE_FORMAT(hr_emp_record.joining_date,"%d-%m-%Y") as jdate,
-				DATE_FORMAT(hr_emp_record.retirement_date,"%d-%m-%Y") as emp_r,
-                religion.title as rel
-                ');
-                $this->db->FROM('hr_emp_record');
-                if($where):
-                    $this->db->where($where);
-                endif;
-                if($like):
-                    $this->db->like($like);
-                endif;
-                $this->db->order_by('hr_emp_record.emp_id','asc');
-                $this->db->limit($custom['start'],$custom['limit']);
-     
-        $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
-        $this->db->join('hr_emp_status','hr_emp_status.emp_status_id=hr_emp_record.emp_status_id', 'left outer');
-        $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation', 'left outer');
-        $this->db->join('district','district.district_id=hr_emp_record.district_id', 'left outer');
-        $this->db->join('gender','gender.gender_id=hr_emp_record.gender_id', 'left outer');
-        $this->db->join('subject','subject.subject_id=hr_emp_record.subject_id', 'left outer');
-        $this->db->join('hr_emp_category','hr_emp_category.cat_id=hr_emp_record.cat_id', 'left outer');
-        $this->db->join('hr_emp_scale','hr_emp_scale.emp_scale_id=hr_emp_record.c_emp_scale_id', 'left outer');
-        $this->db->join('hr_emp_contract_type','hr_emp_contract_type.contract_type_id=hr_emp_record.contract_type_id', 'left outer');
-        $this->db->join('religion','religion.religion_id=hr_emp_record.religion_id', 'left outer');
-                $rs =  $this->db->get();
-        
-                $exceldata="";
-                foreach ($rs->result_array() as $row)
-                {
-                $exceldata[] = $row;
-                }      
-        
-                $this->excel->getActiveSheet()->fromArray($exceldata, null, 'A2');        
-                $filename='Employee_List.xls'; 
-                header('Content-Type: application/vnd.ms-excel');
-                header('Content-Disposition: attachment;filename="'.$filename.'"');
-                header('Cache-Control: max-age=0'); 
-                $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');  
-                $objWriter->save('php://output');
-                else:
-
-                $this->data['emp_id'] = '';
-                $this->data['emp_name'] = '';
-                $this->data['father_name']  = '';
-                $this->data['gender_id']  = '';
-                $this->data['department_id']  = '';
-                $this->data['current_designation']  = '';
-                $this->data['c_emp_scale_id']  = '';
-                $this->data['cat_id']  = '';
-                $this->data['subject_id']  = '';
-                $this->data['contract_type_id']  = '';
-                $this->data['limitId']  = '';
-        
-           endif; 
-        }
-    
-    Public function search_retire_employee(){
-$this->data['department']    = $this->CRUDModel->dropDown('department', 'Department', 'department_id', 'title');
-$this->data['gender']    = $this->CRUDModel->dropDown('gender', 'Gender', 'gender_id', 'title');
-$this->data['subject']    = $this->CRUDModel->dropDown('subject', 'Subject', 'subject_id', 'title');
-$this->data['scale']    = $this->CRUDModel->dropDown('hr_emp_scale', 'Scale', 'emp_scale_id', 'title');
-$this->data['designation']    = $this->CRUDModel->dropDown('hr_emp_designation', 'Designation', 'emp_desg_id', 'title');
-$this->data['contract']    = $this->CRUDModel->dropDown('hr_emp_contract_type', 'Contract', 'contract_type_id', 'title');
-$this->data['category']    = $this->CRUDModel->dropDown('hr_emp_category', 'Category', 'cat_id', 'title');
-$this->data['limit']            = $this->CRUDModel->dropDown('show_limit', 'Select Limit', 'limitId', 'limit_value');        
-        
-        if($this->input->post('search')):
-        $emp_name       =  $this->input->post('emp_name');
-        $father_name        =  $this->input->post('father_name');
-        $gender_id             =  $this->input->post('gender_id');
-        $department_id            =  $this->input->post('department_id');
-        $current_designation        =  $this->input->post('current_designation');
-        $c_emp_scale_id      =  $this->input->post('c_emp_scale_id');
-        $cat_id      =  $this->input->post('cat_id');
-        $subject_id      =  $this->input->post('subject_id');
-        $contract_type_id      =  $this->input->post('contract_type_id');
-        $limit              =  $this->input->post('limit');  
-        //like Array
-        $like = '';
-        $where = '';
-        $this->data['emp_name'] = '';
-        $this->data['father_name']  = '';
-        $this->data['gender_id']  = '';
-        $this->data['department_id']  = '';
-        $this->data['current_designation']  = '';
-        $this->data['c_emp_scale_id']  = '';
-        $this->data['cat_id']  = '';
-        $this->data['subject_id']  = '';
-        $this->data['contract_type_id']  = '';
-        $this->data['limitId']  = ''; 
-        
-            if(!empty($emp_name)):
-                $like['emp_name'] = $emp_name;
-                $this->data['emp_name'] =$emp_name;
-            endif;
-            if(!empty($father_name)):
-                $like['father_name'] = $father_name;
-            $this->data['father_name'] =$father_name;
-            endif;
-            
-            //where array 
-            if(!empty($gender_id)):
-                $where['gender.gender_id'] = $gender_id;
-                $this->data['gender_id']  = $gender_id;
-            endif;
-            if(!empty($department_id)):
-                $where['department.department_id'] = $department_id;
-                $this->data['department_id']  = $department_id;
-            endif;
-            if(!empty($current_designation)):
-                $where['hr_emp_designation.emp_desg_id'] = $current_designation;
-                $this->data['current_designation']  = $current_designation;
-            endif;
-            if(!empty($c_emp_scale_id)):
-                $where['hr_emp_scale.emp_scale_id'] = $c_emp_scale_id;
-                $this->data['c_emp_scale_id']  = $c_emp_scale_id;
-            endif;
-        if(!empty($cat_id)):
-                $where['hr_emp_category.cat_id'] = $cat_id;
-                $this->data['cat_id']  = $cat_id;
-            endif;
-            if(!empty($contract_type_id)):
-                $where['hr_emp_contract.contract_type_id'] = $contract_type_id;
-                $this->data['contract_type_id']  = $contract_type_id;
-            endif;
-        if(!empty($subject_id)):
-                $where['subject.subject_id'] = $subject_id;
-                $this->data['subject_id']  = $subject_id;
-            endif;
-                $limitVale = $this->CRUDModel->get_where_row('show_limit',array('limitId'=>$limit));
-              
-                if($limitVale):
-                    $limitD = $limitVale->limit_value;
-                else:
-                    $limitD = 50;
-                endif;
-                $custom['limit']        = $limitD;
-                $custom['start']        = 0;
-                $custom['column']       = '';
-                $custom['order']        = 'desc';
-                $this->data['limitId']  = $limit;
-                $this->data['result']   = $this->HrModel->get_empretireData('hr_emp_record',$where,$like,NULL);
-                $this->data['page']     = "hr/retire_employee_record_list";
-                $this->data['title']    = 'Employee List 2016 | ECMS';
-                $this->load->view('common/common',$this->data); 
-        endif;
-        }
-    
-    Public function search_promotion_employee(){
-$this->data['department']    = $this->CRUDModel->dropDown('department', 'Department', 'department_id', 'title');
-$this->data['gender']    = $this->CRUDModel->dropDown('gender', 'Gender', 'gender_id', 'title');
-$this->data['subject']    = $this->CRUDModel->dropDown('subject', 'Subject', 'subject_id', 'title');
-$this->data['scale']    = $this->CRUDModel->dropDown('hr_emp_scale', 'Scale', 'emp_scale_id', 'title');
-$this->data['designation']    = $this->CRUDModel->dropDown('hr_emp_designation', 'Designation', 'emp_desg_id', 'title');
-$this->data['contract']    = $this->CRUDModel->dropDown('hr_emp_contract_type', 'Contract', 'contract_type_id', 'title');
-$this->data['category']    = $this->CRUDModel->dropDown('hr_emp_category', 'Category', 'cat_id', 'title');
-$this->data['limit']            = $this->CRUDModel->dropDown('show_limit', 'Select Limit', 'limitId', 'limit_value');        
-        
-        if($this->input->post('search')):
-        $emp_name       =  $this->input->post('emp_name');
-        $father_name        =  $this->input->post('father_name');
-        $gender_id             =  $this->input->post('gender_id');
-        $department_id            =  $this->input->post('department_id');
-        $current_designation        =  $this->input->post('current_designation');
-        $c_emp_scale_id      =  $this->input->post('c_emp_scale_id');
-        $cat_id      =  $this->input->post('cat_id');
-        $subject_id      =  $this->input->post('subject_id');
-        $contract_type_id      =  $this->input->post('contract_type_id');
-        $limit              =  $this->input->post('limit');  
-        //like Array
-        $like = '';
-        $where = '';
-        $this->data['emp_name'] = '';
-        $this->data['father_name']  = '';
-        $this->data['gender_id']  = '';
-        $this->data['department_id']  = '';
-        $this->data['current_designation']  = '';
-        $this->data['c_emp_scale_id']  = '';
-        $this->data['cat_id']  = '';
-        $this->data['subject_id']  = '';
-        $this->data['contract_type_id']  = '';
-        $this->data['limitId']  = ''; 
-        
-            if(!empty($emp_name)):
-                $like['emp_name'] = $emp_name;
-                $this->data['emp_name'] =$emp_name;
-            endif;
-            if(!empty($father_name)):
-                $like['father_name'] = $father_name;
-            $this->data['father_name'] =$father_name;
-            endif;
-            
-            //where array 
-            if(!empty($gender_id)):
-                $where['gender.gender_id'] = $gender_id;
-                $this->data['gender_id']  = $gender_id;
-            endif;
-            if(!empty($department_id)):
-                $where['department.department_id'] = $department_id;
-                $this->data['department_id']  = $department_id;
-            endif;
-            if(!empty($current_designation)):
-                $where['hr_emp_designation.emp_desg_id'] = $current_designation;
-                $this->data['current_designation']  = $current_designation;
-            endif;
-            if(!empty($c_emp_scale_id)):
-                $where['hr_emp_scale.emp_scale_id'] = $c_emp_scale_id;
-                $this->data['c_emp_scale_id']  = $c_emp_scale_id;
-            endif;
-        if(!empty($cat_id)):
-                $where['hr_emp_category.cat_id'] = $cat_id;
-                $this->data['cat_id']  = $cat_id;
-            endif;
-            if(!empty($contract_type_id)):
-                $where['hr_emp_contract.contract_type_id'] = $contract_type_id;
-                $this->data['contract_type_id']  = $contract_type_id;
-            endif;
-        if(!empty($subject_id)):
-                $where['subject.subject_id'] = $subject_id;
-                $this->data['subject_id']  = $subject_id;
-            endif;
-                $limitVale = $this->CRUDModel->get_where_row('show_limit',array('limitId'=>$limit));
-              
-                if($limitVale):
-                    $limitD = $limitVale->limit_value;
-                else:
-                    $limitD = 50;
-                endif;
-                $custom['limit']        = $limitD;
-                $custom['start']        = 0;
-                $custom['column']       = '';
-                $custom['order']        = 'desc';
-                $this->data['limitId']  = $limit;
-                $this->data['result']   = $this->HrModel->get_empretireData('hr_emp_record',$where,$like,NULL);
-                $this->data['page']     = "hr/search_promotion_employee";
-                $this->data['title']    = 'Promotion/Demotion Employees List | ECMS';
-                $this->load->view('common/common',$this->data); 
-        endif;
-        }
-        
-        public function checkCnic(){
+                'emp_name'              => strtoupper($this->input->post('emp_name')),
+                'father_name'           => strtoupper($this->input->post('father_name')),
+                'emp_husband_name'      => strtoupper($this->input->post('emp_husband_name')),
+                'nic'                   => $this->input->post('emp_cnic'),
+                'gender_id'             => $this->input->post('gender_id'),
+                'dob'                   => $dob_Y.'-'.$dob_M.'-'.$dob_D,
+                'postal_address'        => $this->input->post('postal_address'),
+                'permanent_address'     => $this->input->post('permanent_address'),
+                'district_id'           => $this->input->post('district_id'),
+                'post_office'           => $this->input->post('post_office'),
+                'country_id'            => $this->input->post('country_id'),
+                'ptcl_number'           => $this->input->post('ptcl_number'),
+                'contact1'              => $this->input->post('contact1'),
+                'net_id'                => $this->input->post('net_id'),
+                'religion_id'           => $this->input->post('religion_id'),
+                'marital_status_id'     => $this->input->post('marital_status_id'),
+                'email'                 => $this->input->post('email'),
+                'emp_status_id'         => $this->input->post('emp_status_id'),
+                'comment'               => $this->input->post('emp_remarks'),
+                'picture'               => $file_name,
+                'retirement_date'       => $retur_year.'-'.$dob_M.'-'.$dob_D,
+                'hr_emp_create_date_time'=> date('Y-m-d H:i:s'),
+                'hr_emp_create_by'      => $this->UserInfo->user_id
+                    );
+                $EmpId                  = $this->CRUDModel->insert('hr_emp_record',$data);
            
-            $query = $this->CRUDModel->get_where_row('hr_emp_record',array('nic'=>$this->input->post('emp_cnic')));
-            if($query):
-                echo true;
-                else:
-                echo false;
-            endif;
-        }
-    
-    public function add_employee_picture($start=0)
-    {
-           $this->data['limit']            = $this->CRUDModel->dropDown('show_limit', 'â†? Select Limit  â†’', 'limitId', 'limit_value');
-            $config['base_url']         = base_url('HrController/add_employee_picture');
-            $config['total_rows']       = count($this->HrModel->getEmployee());  
-            $config['per_page']         = 50;
-            $config["num_links"]        = 2;
-            $config['uri_segment']      = 3;
-            $config['full_tag_open']    = "<ul class='pagination'>";
-            $config['full_tag_close']   = "</ul>";
-            $config['num_tag_open']     = '<li>';
-            $config['num_tag_close']    = '</li>';
-            $config['cur_tag_open']     = "<li class='disabled'><li class='active'><a href='javascript:vodid(0)'>";
-            $config['cur_tag_close']    = "</a></li>";
-            $config['next_tag_open']    = "<li>";
-            $config['next_tag_close']   = "</li>";
-            $config['prev_tag_open']    = "<li>";
-            $config['prev_tag_close']   = "</li>";
-            $config['first_tag_open']   = "<li>";
-            $config['first_tag_close']  = "</li>";
-            $config['last_tag_open']    = "<li>";
-            $config['last_tag_close']   = "</li>";
-            $config['first_link']       = "<i class='fa fa-angle-left'></i>";
-            $config['last_link']        = "<i class='fa fa-angle-right'></i>";
-
-
-            $this->pagination->initialize($config);
-            $page                       = is_numeric($this->uri->segment(3)) ? $this->uri->segment(3) :  0;
-            $this->data['pages']        = $this->pagination->create_links();
-            $custom['column']    ='emp_id';
-            $custom['order']     ='desc';          
-            $this->data['result']=$this->HrModel->getEmployeePg($config['per_page'], $page,null,$custom);
-            $this->data['count']     =$config['total_rows']; 
-           $this->data['page_title']   = 'All Employees Record | ECMS';
-           $this->data['page']         = 'hr/add_employee_picture';
-           $this->load->view('common/common',$this->data);  
-    }
-    
-    Public function search_add_employee_pic(){
-$this->data['department']    = $this->CRUDModel->dropDown('department', 'Department', 'department_id', 'title');
-$this->data['gender']    = $this->CRUDModel->dropDown('gender', 'Gender', 'gender_id', 'title');
-$this->data['subject']    = $this->CRUDModel->dropDown('subject', 'Subject', 'subject_id', 'title');
-$this->data['scale']    = $this->CRUDModel->dropDown('hr_emp_scale', 'Scale', 'emp_scale_id', 'title');
-$this->data['status']    = $this->CRUDModel->dropDown('hr_emp_status', 'Status', 'emp_status_id', 'title');
-$this->data['designation']    = $this->CRUDModel->dropDown('hr_emp_designation', 'Designation', 'emp_desg_id', 'title');
-$this->data['contract']    = $this->CRUDModel->dropDown('hr_emp_contract_type', 'Contract', 'contract_type_id', 'title');
-$this->data['category']    = $this->CRUDModel->dropDown('hr_emp_category', 'Category', 'cat_id', 'title');
-$this->data['limit']            = $this->CRUDModel->dropDown('show_limit', 'Select Limit', 'limitId', 'limit_value');        
-        
-        if($this->input->post('search')):
-        $emp_name       =  $this->input->post('emp_name');
-        $father_name        =  $this->input->post('father_name');
-        $gender_id             =  $this->input->post('gender_id');
-        $department_id            =  $this->input->post('department_id');
-        $current_designation        =  $this->input->post('current_designation');
-        $c_emp_scale_id      =  $this->input->post('c_emp_scale_id');
-        $emp_status_id      =  $this->input->post('emp_status_id');
-        $cat_id      =  $this->input->post('cat_id');
-        $subject_id      =  $this->input->post('subject_id');
-        $contract_type_id      =  $this->input->post('contract_type_id');
-        $limit              =  $this->input->post('limit');  
-        //like Array
-        $like = '';
-        $where = '';
-        $this->data['emp_name'] = '';
-        $this->data['father_name']  = '';
-        $this->data['gender_id']  = '';
-        $this->data['department_id']  = '';
-        $this->data['current_designation']  = '';
-        $this->data['c_emp_scale_id']  = '';
-        $this->data['emp_status_id']  = '';
-        $this->data['cat_id']  = '';
-        $this->data['subject_id']  = '';
-        $this->data['contract_type_id']  = '';
-        $this->data['limitId']  = ''; 
-        
-            if(!empty($emp_name)):
-                $like['emp_name'] = $emp_name;
-                $this->data['emp_name'] =$emp_name;
-            endif;
-            if(!empty($father_name)):
-                $like['father_name'] = $father_name;
-            $this->data['father_name'] =$father_name;
-            endif;
-            
-            //where array 
-            if(!empty($gender_id)):
-                $where['gender.gender_id'] = $gender_id;
-                $this->data['gender_id']  = $gender_id;
-            endif;
-            if(!empty($department_id)):
-                $where['department.department_id'] = $department_id;
-                $this->data['department_id']  = $department_id;
-            endif;
-            if(!empty($current_designation)):
-                $where['hr_emp_designation.emp_desg_id'] = $current_designation;
-                $this->data['current_designation']  = $current_designation;
-            endif;
-            if(!empty($emp_status_id)):
-                $where['hr_emp_record.emp_status_id'] = $emp_status_id;
-                $this->data['emp_status_id']  = $emp_status_id;
-            endif;
-            if(!empty($c_emp_scale_id)):
-                $where['hr_emp_scale.emp_scale_id'] = $c_emp_scale_id;
-                $this->data['c_emp_scale_id']  = $c_emp_scale_id;
-            endif;
-        if(!empty($cat_id)):
-                $where['hr_emp_category.cat_id'] = $cat_id;
-                $this->data['cat_id']  = $cat_id;
-            endif;
-            if(!empty($contract_type_id)):
-                $where['hr_emp_contract.contract_type_id'] = $contract_type_id;
-                $this->data['contract_type_id']  = $contract_type_id;
-            endif;
-        if(!empty($subject_id)):
-                $where['subject.subject_id'] = $subject_id;
-                $this->data['subject_id']  = $subject_id;
-            endif;
-                $limitVale = $this->CRUDModel->get_where_row('show_limit',array('limitId'=>$limit));
-              
-                if($limitVale):
-                    $limitD = $limitVale->limit_value;
-                else:
-                    $limitD = 50;
+                $return_json = array(
+                    'e_status'  => true,
+                    'emp_id'    => $EmpId,
+                    'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                    'e_type'    => 'SUCCESS',
+                    'e_text'    => 'Employee record saved successfully.'
+                );    
                 endif;
-                $custom['limit']        = $limitD;
-                $custom['start']        = 0;
-                $custom['column']       = '';
-                $custom['order']        = 'desc';
-                $this->data['limitId']  = $limit;
-                $this->data['result']   = $this->HrModel->get_empData('hr_emp_record',$where,$like,NULL);
-                $this->data['page']     = "hr/search_add_employee_pic";
-                $this->data['title']    = 'Employee List | ECMS';
-                $this->load->view('common/common',$this->data); 
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('UpdateEmployee') =='UpdateEmployee'):
+                        
+                $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']     = 'WARNING';
+                
+                $this->form_validation->set_rules('emp_name', 'Employee Name', 'required', array('required'=>'1'));
+//                $this->form_validation->set_rules('father_name', 'Father Name', 'required', array('required'=>'2'));
+//                $this->form_validation->set_rules('emp_cnic', 'CNIC', 'required|min_length[15]', array('required'=>'3','min_length'=>'4'));
+                $this->form_validation->set_rules('gender_id', 'Gender', 'required', array('required'=>'5'));       
+                $this->form_validation->set_rules('dob_day', 'DoB Day', 'required', array('required'=>'6'));
+                $this->form_validation->set_rules('dob_month', 'DoB Month', 'required', array('required'=>'6'));
+                $this->form_validation->set_rules('dob_year', 'DoB Year', 'required', array('required'=>'6'));
+//                $this->form_validation->set_rules('permanent_address', 'Permanent Address', 'required', array('required'=>'7'));
+//                $this->form_validation->set_rules('district_id', 'District', 'required', array('required'=>'8'));
+//                $this->form_validation->set_rules('country_id', 'Country', 'required', array('required'=>'9'));
+//                $this->form_validation->set_rules('contact1', 'Contact No', 'required|min_length[11]', array('required'=>'10','min_length'=>'11'));
+//                $this->form_validation->set_rules('net_id', 'Network', 'required', array('required'=>'12'));
+//                $this->form_validation->set_rules('religion_id', 'Religion', 'required', array('required'=>'13'));
+//                $this->form_validation->set_rules('email', 'Email', 'required', array('required'=>'14'));
+//                $this->form_validation->set_rules('email', 'Email', 'required|valid_email', array('required'=>'14','valid_email'=>'15'));
+//                $this->form_validation->set_rules('department_id', 'Department', 'required', array('required'=>'16'));
+//                $this->form_validation->set_rules('shift_id', 'Shift', 'required', array('required'=>'17'));
+//                $this->form_validation->set_rules('bank_id', 'Bank', 'required', array('required'=>'18'));
+//                $this->form_validation->set_rules('account_no', 'Account No', 'required', array('required'=>'19'));
+//                $this->form_validation->set_rules('cat_id', 'Employee Category', 'required', array('required'=>'20'));
+//                $this->form_validation->set_rules('contract_type_id', 'Employee Type', 'required', array('required'=>'21'));
+                $this->form_validation->set_rules('emp_status_id', 'Employee Type', 'required', array('required'=>'22'));
+                
+                
+                if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Employee name is required.'; break;
+//                        case 2: $return_json['e_text'] = 'Father name is required.'; break;
+//                        case 3: $return_json['e_text'] = 'CNIC is required.'; break;
+//                        case 4: $return_json['e_text'] = 'Enter valid CINC.'; break;
+                        case 5: $return_json['e_text'] = 'Gender is required.'; break;
+                        case 6: $return_json['e_text'] = 'Date of birth is required.'; break;
+//                        case 7: $return_json['e_text'] = 'Permanent address isrequired.'; break;
+//                        case 8: $return_json['e_text'] = 'District is required.'; break;
+//                        case 9: $return_json['e_text'] = 'Country is required.'; break;
+//                        case 10: $return_json['e_text'] = 'Contact no is required.'; break;
+//                        case 11: $return_json['e_text'] = 'Enter valid number 0000-0000000'; break;
+//                        case 12: $return_json['e_text'] = 'Network is required.'; break;
+//                        case 13: $return_json['e_text'] = 'Religion is required.'; break;
+//                        case 14: $return_json['e_text'] = 'Email is required.'; break;
+//                        case 15: $return_json['e_text'] = 'Enter valid email'; break;
+//                        case 16: $return_json['e_text'] = 'Department is required.'; break;
+//                        case 17: $return_json['e_text'] = 'Shift is required.'; break;
+//                        case 18: $return_json['e_text'] = 'Bank is required'; break;
+//                        case 19: $return_json['e_text'] = 'Account no is required'; break;
+//                        case 20: $return_json['e_text'] = 'Employee category is required'; break;
+//                        case 21: $return_json['e_text'] = 'Employee type is required'; break;
+//                        case 22: $return_json['e_text'] = 'Employee status is required'; break;
+                    endswitch;
+            else:
+
+                 $dob_Y         = $this->input->post('dob_year');
+                 $dob_M         = $this->input->post('dob_month');
+                 $dob_D         = $this->input->post('dob_day');
+                $retur_year     = $dob_Y+'60';
+                        
+            $file_name = '';
+          
+            
+            if($_FILES['file']['name']):
+                 $image      = $this->CRUDModel->do_resize('file','assets/images/employee');
+                 $file_name  = $image['file_name'];
+                        
+            else:
+                $file_name = $this->input->post('old_picture');     
+                        
             endif;
+                        
+            $data = array(
+                'emp_name'              => strtoupper($this->input->post('emp_name')),
+                'father_name'           => strtoupper($this->input->post('father_name')),
+                'emp_husband_name'      => strtoupper($this->input->post('emp_husband_name')),
+                'nic'                   => $this->input->post('emp_cnic'),
+                'gender_id'             => $this->input->post('gender_id'),
+                'dob'                   => $dob_Y.'-'.$dob_M.'-'.$dob_D,
+                'postal_address'        => $this->input->post('postal_address'),
+                'permanent_address'     => $this->input->post('permanent_address'),
+                'district_id'           => $this->input->post('district_id'),
+                'post_office'           => $this->input->post('post_office'),
+                'country_id'            => $this->input->post('country_id'),
+                'ptcl_number'           => $this->input->post('ptcl_number'),
+                'contact1'              => $this->input->post('contact1'),
+                'net_id'                => $this->input->post('net_id'),
+                'religion_id'           => $this->input->post('religion_id'),
+                'marital_status_id'     => $this->input->post('marital_status_id'),
+                'email'                 => $this->input->post('email'),
+                'emp_status_id'         => $this->input->post('emp_status_id'),
+                'comment'               => $this->input->post('emp_remarks'),
+                'picture'               => $file_name,
+                'retirement_date'       => $retur_year.'-'.$dob_M.'-'.$dob_D,
+                );
+               $this->CRUDModel->update('hr_emp_record',$data,array('emp_id'=>$this->input->post('employee_id')));
+           
+                $return_json = array(
+                    'e_status'  => true,
+                    'emp_id'    => $this->input->post('employee_id'),
+                    'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                    'e_type'    => 'SUCCESS',
+                    'e_text'    => 'Employee record update successfully.'
+                );    
+                endif;
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('SaveAcademic') =='SaveAcademic'):
+                $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                
+                $employee_id                = $this->input->post('employee_id');
+                $degree_id                  = $this->input->post('degree_id');
+                $board_university_id        = $this->input->post('board_university_id');
+                
+
+                $this->form_validation->set_rules('degree_id', 'Degree', 'required|is_where_unique[hr_emp_education,edu_degree_id,'.$degree_id.',edu_emp_id,'.$employee_id.']', array('required'=>'1','is_where_unique'=>'2'));
+//                $this->form_validation->set_rules('board_university_id', 'Board', 'required', array('required'=>'3'));
+//                $this->form_validation->set_rules('passing_year', 'Board', 'required', array('required'=>'4'));
+//                $this->form_validation->set_rules('cgpa', 'GPA', 'required', array('required'=>'5'));
+//                $this->form_validation->set_rules('div_id', 'Division', 'required', array('required'=>'6'));
+                if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Degree / Certificate is required.'; break;
+                        case 2: $return_json['e_text'] = 'Degree / Certificate is already exist.'; break;
+//                        case 3: $return_json['e_text'] = 'Board / University is required.'; break;
+//                        case 4: $return_json['e_text'] = 'Year of Passing is required.'; break;
+//                        case 5: $return_json['e_text'] = 'GPA is required.'; break;
+//                        case 6: $return_json['e_text'] = 'Division is required.'; break;
+                    endswitch;
+            else:
+                
+                $where = array(
+                  'edu_emp_id'          => $employee_id,  
+                  'edu_degree_id'       => $degree_id,  
+                  'edu_bu_id'           => $board_university_id,  
+                );
+                $check_univer = $this->CRUDModel->get_where_row('hr_emp_education',$where);
+                if($check_univer):
+                    $return_json['e_status']    = false;
+                    $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                    $return_json['e_text']      = 'Board / University is already exist';
+                    $return_json['e_type']      = 'WARNING';
+                    else:
+                     $data = array(
+                        'edu_emp_id'          => $employee_id,  
+                        'edu_degree_id'       => $degree_id,  
+                        'edu_bu_id'           => $board_university_id,  
+                        'edu_passing_year'    => $this->input->post('passing_year'),  
+                        'edu_cgpa'            => $this->input->post('cgpa'),  
+                        'edu_div_id'          => $this->input->post('div_id'),  
+                        'edu_hec_verified'    => $this->input->post('hec_verified'),  
+                        'edu_remarks'         => $this->input->post('edu_remarks'),  
+                        'edu_create_by'       => $this->UserInfo->user_id,  
+                        'edu_create_date_time'=> date('Y-m-d H:i:s'),  
+                      );
+                   $this->CRUDModel->insert('hr_emp_education',$data);
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record saved successfully.'
+                      ); 
+                endif;
+                
+//               $this->UserInfo->user_id
+            
+                endif;
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('UpdateAcademic') =='UpdateAcademic'):
+                $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                
+                $employee_id                = $this->input->post('employee_id');
+                $degree_id                  = $this->input->post('degree_id');
+                $board_university_id        = $this->input->post('board_university_id');
+                
+
+                $this->form_validation->set_rules('degree_id', 'Degree', 'required|callback_education_degree_check', array('required'=>'1','education_degree_check'=>'2'));
+//                $this->form_validation->set_rules('board_university_id', 'Board', 'required', array('required'=>'3'));
+//                $this->form_validation->set_rules('passing_year', 'Board', 'required', array('required'=>'4'));
+//                $this->form_validation->set_rules('cgpa', 'GPA', 'required', array('required'=>'5'));
+//                $this->form_validation->set_rules('div_id', 'Division', 'required', array('required'=>'6'));
+                if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Degree / Certificate is required.'; break;
+                        case 2: $return_json['e_text'] = 'Degree / Certificate is already exist.'; break;
+//                        case 3: $return_json['e_text'] = 'Board / University is required.'; break;
+//                        case 4: $return_json['e_text'] = 'Year of Passing is required.'; break;
+//                        case 5: $return_json['e_text'] = 'GPA is required.'; break;
+//                        case 6: $return_json['e_text'] = 'Division is required.'; break;
+                    endswitch;
+            else:
+                        
+//                $where = array(
+//                  'edu_emp_id'          => $employee_id,  
+//                  'edu_degree_id'       => $degree_id,  
+//                  'edu_bu_id'           => $board_university_id,
+//                  'emp_edu_id !='       =>$this->input->post('emp_edu_id')
+//                );
+//                $check_univer = $this->CRUDModel->get_where_row('hr_emp_education',$where);
+//                if($check_univer):
+//                    $return_json['e_status']    = false;
+//                    $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+//                    $return_json['e_text']      = 'Board / University is already exist';
+//                    $return_json['e_type']      = 'WARNING';
+//                    else:
+                     $data = array(
+//                        'edu_emp_id'          => $employee_id,  
+                        'edu_degree_id'       => $degree_id,  
+                        'edu_bu_id'           => $board_university_id,  
+                        'edu_passing_year'    => $this->input->post('passing_year'),  
+                        'edu_cgpa'            => $this->input->post('cgpa'),  
+                        'edu_div_id'          => $this->input->post('div_id'),
+                         'edu_remarks'         => $this->input->post('edu_remarks'),  
+                        'edu_hec_verified'    => $this->input->post('hec_verified')  
+                      );
+                   $this->CRUDModel->update('hr_emp_education',$data,array('emp_edu_id'=>$this->input->post('emp_academic_id')));
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record update successfully.'
+                      ); 
+//                endif;
+                endif;
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('saveExperience') =='saveExperience'):
+                $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                
+                $employee_id                = $this->input->post('employee_id');
+                $degree_id                  = $this->input->post('degree_id');
+                $board_university_id        = $this->input->post('board_university_id');
+                
+                $this->form_validation->set_rules('Department', 'Department', 'required', array('required'=>'1'));
+                $this->form_validation->set_rules('jb_title', 'Department', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('from_exp_day', 'from_exp_day', 'required', array('required'=>'3'));
+                $this->form_validation->set_rules('from_exp_month', 'from_exp_month', 'required', array('required'=>'3'));
+                $this->form_validation->set_rules('from_exp_year', 'from_exp_year', 'required', array('required'=>'3'));
+                
+                $this->form_validation->set_rules('to_exp_day', 'from_exp_day', 'required', array('required'=>'4'));
+                $this->form_validation->set_rules('to_exp_month', 'from_exp_month', 'required', array('required'=>'4'));
+                $this->form_validation->set_rules('to_exp_year', 'from_exp_year', 'required', array('required'=>'4'));
+//                $this->form_validation->set_rules('remarks', 'remarks', 'required', array('required'=>'4'));
+                        
+                if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Department is required.'; break;
+                        case 2: $return_json['e_text'] = 'Job title is required.'; break;
+                        case 3: $return_json['e_text'] = 'Experince From is required'; break;
+                        case 4: $return_json['e_text'] = 'Experince To is required'; break;
+//                        case 4: $return_json['e_text'] = 'Remarks required'; break;
+                        
+                    endswitch;
+            else:
+                $from_date =  $this->input->post('from_exp_year').'-'.$this->input->post('from_exp_month').'-'.$this->input->post('from_exp_day');    
+                $to_date    = $this->input->post('to_exp_year').'-'.$this->input->post('to_exp_month').'-'.$this->input->post('to_exp_day');    
+                $d1         = new DateTime($from_date); 
+                $d2         = new DateTime($to_date);                                  
+                $Months     = $d2->diff($d1); 
+                
+                $totalExp   = $Months->y.' Years '.$Months->m.' Months and '.$Months->d.' Days';
+                $data = array(
+                        'exp_emp_id'            => $this->input->post('employee_id'),  
+                        'exp_emp_department'    => $this->input->post('Department'),  
+                        'exp_emp_remarks'       => $this->input->post('exp_remarks'),  
+                        'exp_emp_job_title'     => $this->input->post('jb_title'),  
+                        'exp_from'              => $from_date,  
+                        'exp_to'                => $to_date,  
+                        'exp_total'             => $totalExp,  
+                        'exp_create_by'         => $this->UserInfo->user_id,  
+                        'exp_create_datetime'   => date('Y-m-d H:i:s'),
+                      );
+                   $this->CRUDModel->insert('hr_emp_experience',$data);
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record saved successfully.'
+                      ); 
+                endif;
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('updateExperience') =='updateExperience'):
+                $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                
+                $employee_id                = $this->input->post('employee_id');
+                $degree_id                  = $this->input->post('degree_id');
+                $board_university_id        = $this->input->post('board_university_id');
+                
+                 $this->form_validation->set_rules('Department', 'Department', 'required', array('required'=>'1'));
+                $this->form_validation->set_rules('jb_title', 'Department', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('from_exp_day', 'from_exp_day', 'required', array('required'=>'3'));
+                $this->form_validation->set_rules('from_exp_month', 'from_exp_month', 'required', array('required'=>'3'));
+                $this->form_validation->set_rules('from_exp_year', 'from_exp_year', 'required', array('required'=>'3'));
+                
+                $this->form_validation->set_rules('to_exp_day', 'from_exp_day', 'required', array('required'=>'4'));
+                $this->form_validation->set_rules('to_exp_month', 'from_exp_month', 'required', array('required'=>'4'));
+                $this->form_validation->set_rules('to_exp_year', 'from_exp_year', 'required', array('required'=>'4'));
+//                $this->form_validation->set_rules('remarks', 'remarks', 'required', array('required'=>'4'));
+                        
+                if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Department is required.'; break;
+                        case 2: $return_json['e_text'] = 'Job title is required.'; break;
+                        case 3: $return_json['e_text'] = 'Experince From is required'; break;
+                        case 4: $return_json['e_text'] = 'Experince To is required'; break;
+                    endswitch;
+            else:
+                $from_date =  $this->input->post('from_exp_year').'-'.$this->input->post('from_exp_month').'-'.$this->input->post('from_exp_day');    
+                $to_date    = $this->input->post('to_exp_year').'-'.$this->input->post('to_exp_month').'-'.$this->input->post('to_exp_day');    
+                $d1         = new DateTime($from_date); 
+                $d2         = new DateTime($to_date);                                  
+                $Months     = $d2->diff($d1); 
+                
+                $totalExp   = $Months->y.' Years '.$Months->m.' Months and '.$Months->d.' Days';
+                $data = array(
+                        'exp_emp_department'    => $this->input->post('Department'),  
+                        'exp_emp_remarks'       => $this->input->post('exp_remarks'),
+                        'exp_emp_job_title'     => $this->input->post('jb_title'),
+                        'exp_from'              => $from_date,  
+                        'exp_to'                => $to_date,  
+                        'exp_total'             => $totalExp,  
+                      );
+                    $this->CRUDModel->update('hr_emp_experience',$data,array('exp_id'=>$this->input->post('experience_id')));
+                    $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record update successfully.'
+                      ); 
+                endif;
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('saveDesignation') =='saveDesignation'):
+               $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                        
+                
+                $this->form_validation->set_rules('category_id', 'Category', 'required', array('required'=>'1'));
+//                $this->form_validation->set_rules('category_type_id', 'Category Type', 'required', array('required'=>'2'));
+//                $this->form_validation->set_rules('designation_id', 'Designation', 'required', array('required'=>'3'));
+                $this->form_validation->set_rules('department_id', 'Department', 'required', array('required'=>'4'));
+                        
+                if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Category is required.'; break;
+//                        case 2: $return_json['e_text'] = 'Category Type is required'; break;
+//                        case 3: $return_json['e_text'] = 'Designation is required'; break;
+                        case 4: $return_json['e_text'] = 'Department is required'; break;
+                    endswitch;
+            else:
+                        
+                
+                        
+                $data = array(
+                        'emp_staff_emp_id'           => $this->input->post('employee_id'),  
+//                        'emp_staff_designation_id'  => $this->input->post('designation_id'),
+                        'emp_staff_category_id' => $this->input->post('category_id'),  
+//                        'emp_staff_category_type_id' => $this->input->post('category_type_id'),  
+                    
+                        'emp_staff_department_id'    => $this->input->post('department_id'),  
+                        
+                        'emp_staff_remarks'          => $this->input->post('dep_remarks'),  
+                        'emp_staff_create_by'        => $this->UserInfo->user_id,  
+                        'emp_staff_create_datetime' => date('Y-m-d H:i:s'),
+                      );
+                   $this->CRUDModel->insert('hr_emp_staff_designation',$data);
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record saved successfully.'
+                      );          
+             endif;           
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('updateDesignation') =='updateDesignation'):
+               $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                        
+                
+                $this->form_validation->set_rules('category_id', 'Category', 'required', array('required'=>'1'));
+//                $this->form_validation->set_rules('category_type_id', 'Category Type', 'required', array('required'=>'2'));
+//                $this->form_validation->set_rules('designation_id', 'Designation', 'required', array('required'=>'3'));
+                $this->form_validation->set_rules('department_id', 'Department', 'required', array('required'=>'4'));
+                        
+                if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Category is required.'; break;
+//                        case 2: $return_json['e_text'] = 'Category Type is required'; break;
+//                        case 3: $return_json['e_text'] = 'Designation is required'; break;
+                        case 4: $return_json['e_text'] = 'Department is required'; break;
+                    endswitch;
+            else:
+                $data = array( 
+                        'emp_staff_department_id'   => $this->input->post('department_id'),
+                        'emp_staff_category_id'     => $this->input->post('category_id'),  
+//                        'emp_staff_category_type_id'=> $this->input->post('category_type_id'),
+                        'emp_staff_remarks'         => $this->input->post('dep_remarks'));
+                        
+                   $this->CRUDModel->update('hr_emp_staff_designation',$data,array('emp_staff_design_id'=>$this->input->post('emp_staff_design_id')));
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record saved successfully.'
+                      );          
+             endif;           
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('saveFund') =='saveFund'):
+               $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                $this->form_validation->set_rules('fund', 'Fund', 'required', array('required'=>'1'));
+                $this->form_validation->set_rules('fund_day', 'Fund Day', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('fund_month', 'Fund Month', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('fund_year', 'Fund Year', 'required', array('required'=>'2'));
+               
+                    if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Fund is required.'; break;
+                        case 2: $return_json['e_text'] = 'Fund date is required.'; break;
+                    endswitch;
+            else:
+                $data = array(
+                        'emf_emp_id'        => $this->input->post('employee_id'),  
+                        'emf_date'          => $from_date =  $this->input->post('fund_year').'-'.$this->input->post('fund_month').'-'.$this->input->post('fund_day'),  
+                        'emf_emp_fund_id'   => $this->input->post('fund'),  
+                        'emf_remarks'   => $this->input->post('fund_remarks'),  
+                        'emf_create_by'     => $this->UserInfo->user_id,  
+                        'emf_date_time'     => date('Y-m-d H:i:s'),
+                      );
+                   $this->CRUDModel->insert('hr_emp_staff_fund_status',$data);
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record saved successfully.'
+                      );          
+             endif;           
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('updateFund') =='updateFund'):
+               $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                $this->form_validation->set_rules('fund', 'Fund', 'required', array('required'=>'1'));
+                $this->form_validation->set_rules('fund_day', 'Fund Day', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('fund_month', 'Fund Month', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('fund_year', 'Fund Year', 'required', array('required'=>'2'));
+               
+                    if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Fund is required.'; break;
+                        case 2: $return_json['e_text'] = 'Fund date is required.'; break;
+                    endswitch;
+            else:
+                $data = array(
+                        'emf_date'          => $from_date =  $this->input->post('fund_year').'-'.$this->input->post('fund_month').'-'.$this->input->post('fund_day'),  
+                        'emf_emp_fund_id'   => $this->input->post('fund'),
+                        'emf_remarks'       => $this->input->post('fund_remarks'),  
+                      );
+                   $this->CRUDModel->update('hr_emp_staff_fund_status',$data,array('emf_id'=>$this->input->post('fund_pk_id')));
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record update successfully.'
+                      );          
+             endif;           
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('saveShift') =='saveShift'):
+               $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                $this->form_validation->set_rules('shift', 'Shift', 'required', array('required'=>'1'));
+                $this->form_validation->set_rules('shift_day', 'Shift Day', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('shift_month', 'Shift Month', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('shift_year', 'Shift Year', 'required', array('required'=>'2'));
+               
+                    if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Shift is required.'; break;
+                        case 2: $return_json['e_text'] = 'Shift date is required.'; break;
+                    endswitch;
+            else:
+                $data = array(
+                        'ess_emp_id'        => $this->input->post('employee_id'),  
+                        'ess_date'          => $from_date =  $this->input->post('shift_year').'-'.$this->input->post('shift_month').'-'.$this->input->post('shift_day'),  
+                        'ess_shift_id'      => $this->input->post('shift'), 
+                        'ess_remarks'       => $this->input->post('shif_remarks'),
+                        'ess_create_by'     => $this->UserInfo->user_id,  
+                        'ess_date_time'     => date('Y-m-d H:i:s'),
+                      );
+                   $this->CRUDModel->insert('hr_emp_staff_shift',$data);
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record saved successfully.'
+                      );          
+             endif;           
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('updateShift') =='updateShift'):
+               $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                $this->form_validation->set_rules('shift', 'Shift', 'required', array('required'=>'1'));
+//                $this->form_validation->set_rules('shift_day', 'Shift Day', 'required', array('required'=>'2'));
+//                $this->form_validation->set_rules('shift_month', 'Shift Month', 'required', array('required'=>'2'));
+//                $this->form_validation->set_rules('shift_year', 'Shift Year', 'required', array('required'=>'2'));
+               
+                    if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Fund is required.'; break;
+//                        case 2: $return_json['e_text'] = 'Fund date is required.'; break;
+                    endswitch;
+            else:
+                $data = array(
+                        'ess_date'       => $from_date =  $this->input->post('shift_year').'-'.$this->input->post('shift_month').'-'.$this->input->post('shift_day'),  
+                        'ess_shift_id'   => $this->input->post('shift'),
+                        'ess_remarks'       => $this->input->post('shif_remarks'),
+                        
+                      );
+                   $this->CRUDModel->update('hr_emp_staff_shift',$data,array('ess_id'=>$this->input->post('shift_pk_id')));
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record update successfully.'
+                      );          
+             endif;           
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('saveBank') =='saveBank'):
+               $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                $this->form_validation->set_rules('bank', 'bank', 'required', array('required'=>'1'));
+                $this->form_validation->set_rules('branch', 'branch', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('account_no', '', 'required', array('required'=>'3'));
+                
+                if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Bank is required.'; break;
+                        case 2: $return_json['e_text'] = 'Branch is required.'; break;
+                        case 2: $return_json['e_text'] = 'Account # is required.'; break;
+                    endswitch;
+            else:
+                $where_chk = array(
+                    'heb_bank_id'           => $this->input->post('bank'), 
+                    'heb_account_no'        => $this->input->post('account_no'),  
+                );
+                
+                $query_chk = $this->CRUDModel->get_where_row('hr_emp_bank',$where_chk);
+                if(empty($query_chk)):
+                    
+                     if($this->input->post('default_acct') == '1'):
+                         $this->CRUDModel->update('hr_emp_bank',array('heb_default_account'=>2),array('heb_emp_id'=> $this->input->post('employee_id')));
+                    endif;
+                    
+                    
+                    $data = array(
+                        'heb_emp_id'            => $this->input->post('employee_id'),  
+//                        'ess_date'          => $from_date =  $this->input->post('shift_year').'-'.$this->input->post('shift_month').'-'.$this->input->post('shift_day'),  
+                        'heb_bank_id'           => $this->input->post('bank'), 
+                        'heb_branch_id'         => $this->input->post('branch'),
+                        'heb_account_no'        => $this->input->post('account_no'),
+                        'heb_default_account'   => $this->input->post('default_acct'),
+                        'heb_remarks'           => $this->input->post('bank_remarks'),
+                        'heb_create_by'         => $this->UserInfo->user_id,  
+                        'heb_datetime'         => date('Y-m-d H:i:s'),
+                      );
+                   $this->CRUDModel->insert('hr_emp_bank',$data);
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record saved successfully.'
+                      );
+                else:
+                    $return_json = array(
+                          'e_status'  => false,
+                          'e_icon'    => '<i class="fa fa-exclamation-triangle"></i>',
+                          'e_type'    => 'WARNING',
+                          'e_text'    => 'Account # already exist'
+                      );
+                endif;
+                          
+             endif;           
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('updateBank') =='updateBank'):
+               $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                $this->form_validation->set_rules('bank', 'bank', 'required', array('required'=>'1'));
+                $this->form_validation->set_rules('branch', 'branch', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('account_no', '', 'required', array('required'=>'3'));
+               
+                    if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Bank is required.'; break;
+                        case 2: $return_json['e_text'] = 'Branch is required.'; break;
+                        case 2: $return_json['e_text'] = 'Account # is required.'; break;
+                    endswitch;
+            else:
+                
+                 $where_chk = array(
+                    'heb_bank_id'           => $this->input->post('bank'), 
+                    'heb_account_no'        => $this->input->post('account_no'),
+                    'heb_id !='             => $this->input->post('bank_emp_id')
+                );
+                
+                $query_chk = $this->CRUDModel->get_where_row('hr_emp_bank',$where_chk);
+                
+                if(empty($query_chk)):
+                    
+                     if($this->input->post('default_acct') == '1'):
+                         $this->CRUDModel->update('hr_emp_bank',array('heb_default_account'=>2),array('heb_emp_id'=> $this->input->post('employee_id')));
+                    endif;
+                    
+                    
+                    $data = array(
+                        'heb_bank_id'           => $this->input->post('bank'), 
+                        'heb_branch_id'         => $this->input->post('branch'),
+                        'heb_account_no'        => $this->input->post('account_no'),
+                        'heb_default_account'   => $this->input->post('default_acct'),
+                        'heb_remarks'           => $this->input->post('bank_remarks'),
+                        
+                      );
+                   $this->CRUDModel->update('hr_emp_bank',$data,array('heb_id'=>$this->input->post('bank_emp_id')));
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record update successfully.'
+                      ); 
+                    else:
+                     $return_json = array(
+                          'e_status'  => false,
+                          'e_icon'    => '<i class="fa fa-exclamation-triangle"></i>',
+                          'e_type'    => 'WARNING',
+                          'e_text'    => 'Account # already exist'
+                      );
+                endif;
+                         
+             endif;           
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('saveAllowance') =='saveAllowance'):
+               $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+               
+                $this->form_validation->set_rules('allowance', 'allowance', 'required', array('required'=>'1'));
+//                $this->form_validation->set_rules('allowance_day', 'branch', 'required', array('required'=>'2'));
+//                $this->form_validation->set_rules('allowance_month', 'branch', 'required', array('required'=>'2'));
+//                $this->form_validation->set_rules('allowance_year', 'branch', 'required', array('required'=>'2'));
+                
+                
+                if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Allowance is required.'; break;
+//                        case 2: $return_json['e_text'] = 'Allowance date is required.'; break;
+                        
+                    endswitch;
+            else:
+                $where_chk = array(
+                    'hsa_emp_id'           => $this->input->post('employee_id'), 
+                    'hsa_allowanc_id'      => $this->input->post('allowance'), 
+                    
+                );
+                $query_chk = $this->CRUDModel->get_where_row(' hr_staff_allowance',$where_chk);
+                if(empty($query_chk)):
+                     $data = array(
+                        'hsa_emp_id'            => $this->input->post('employee_id'), 
+                        'hsa_allowanc_id'       => $this->input->post('allowance'),  
+                        'hsa_date'              => $this->input->post('allowance_year').'-'.$this->input->post('allowance_month').'-'.$this->input->post('allowance_day'),  
+                        'hsa_remarks'           => $this->input->post('allowance_remarks'),
+                        'hsa_default_allowanc'  => $this->input->post('default_allowance'),
+                        'hsa_create_by'         => $this->UserInfo->user_id,  
+                        'hsa_datetime'          => date('Y-m-d H:i:s'),
+                      );
+                   $this->CRUDModel->insert('hr_staff_allowance',$data);
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record saved successfully.'
+                      );
+                else:
+                    $return_json = array(
+                          'e_status'  => false,
+                          'e_icon'    => '<i class="fa fa-exclamation-triangle"></i>',
+                          'e_type'    => 'WARNING',
+                          'e_text'    => 'Allowance already exist'
+                      );
+                endif;
+                          
+             endif;           
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('updateAllownance') =='updateAllownance'):
+               $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                
+                $this->form_validation->set_rules('allowance', 'allowance', 'required', array('required'=>'1'));
+//                $this->form_validation->set_rules('allowance_day', 'branch', 'required', array('required'=>'2'));
+//                $this->form_validation->set_rules('allowance_month', 'branch', 'required', array('required'=>'2'));
+//                $this->form_validation->set_rules('allowance_year', 'branch', 'required', array('required'=>'2'));
+               
+                    if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Allowance is required.'; break;
+//                        case 2: $return_json['e_text'] = 'Allowance date is required.'; break;
+                    endswitch;
+            else:
+                
+                 $where_chk = array(
+                    'hsa_emp_id'           => $this->input->post('employee_id'), 
+                    'hsa_allowanc_id'      => $this->input->post('allowance'),
+                    'hsa_id !='           => $this->input->post('allowance_id'));
+                $query_chk = $this->CRUDModel->get_where_row('hr_staff_allowance',$where_chk);
+                
+                if(empty($query_chk)):
+                    $data = array(
+                        'hsa_allowanc_id'       => $this->input->post('allowance'),  
+                        'hsa_date'              => $this->input->post('allowance_year').'-'.$this->input->post('allowance_month').'-'.$this->input->post('allowance_day'),  
+                        'hsa_remarks'           => $this->input->post('allowance_remarks'),
+                        'hsa_default_allowanc'  => $this->input->post('default_allowance'));
+                   $this->CRUDModel->update('hr_staff_allowance',$data,array('hsa_id'=>$this->input->post('allowance_id')));
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record update successfully.'
+                      ); 
+                    else:
+                     $return_json = array(
+                          'e_status'  => false,
+                          'e_icon'    => '<i class="fa fa-exclamation-triangle"></i>',
+                          'e_type'    => 'WARNING',
+                          'e_text'    => 'Account # already exist'
+                      );
+                endif;
+                         
+             endif;           
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('saveResponsibility') =='saveResponsibility'):
+               $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+               
+                $this->form_validation->set_rules('responsibility', '', 'required', array('required'=>'1'));
+                
+                $this->form_validation->set_rules('Resp_from_day', '', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('Resp_from_month', '', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('Resp_from_year', '', 'required', array('required'=>'2'));
+                
+                $this->form_validation->set_rules('Resp_to_day', '', 'required', array('required'=>'3'));
+                $this->form_validation->set_rules('Resp_to_month', '', 'required', array('required'=>'3'));
+                $this->form_validation->set_rules('Resp_to_year', '', 'required', array('required'=>'3'));
+                
+                
+                
+                if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Responsibility is required.'; break;
+                        case 2: $return_json['e_text'] = 'Responsibility from date is required.'; break;
+                        case 3: $return_json['e_text'] = 'Responsibility to date is required.'; break;
+                        
+                    endswitch;
+            else:
+                
+                     $data = array(
+                        'resp_emp_id'           => $this->input->post('employee_id'), 
+                        'resp_details'          => $this->input->post('responsibility'),  
+                        'resp_from_date'        => $this->input->post('Resp_from_year').'-'.$this->input->post('Resp_from_month').'-'.$this->input->post('Resp_from_day'),  
+                        'resp_to_date'          => $this->input->post('Resp_to_year').'-'.$this->input->post('Resp_to_month').'-'.$this->input->post('Resp_to_day'),  
+                        'resp_remarks'          => $this->input->post('Resp_remarks'),
+                        'resp_status'           => $this->input->post('Resp_status'),
+                        'resp_create_by'        => $this->UserInfo->user_id,  
+                        'resp_date_time'        => date('Y-m-d H:i:s'),
+                      );
+                   $this->CRUDModel->insert('hr_emp_responsibility',$data);
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record saved successfully.'
+                      );
+                        
+                          
+             endif;           
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('updateResponsibility') =='updateResponsibility'):
+                $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+                
+                $this->form_validation->set_rules('responsibility', '', 'required', array('required'=>'1'));
+                
+                $this->form_validation->set_rules('Resp_from_day', '', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('Resp_from_month', '', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('Resp_from_year', '', 'required', array('required'=>'2'));
+                
+                $this->form_validation->set_rules('Resp_to_day', '', 'required', array('required'=>'3'));
+                $this->form_validation->set_rules('Resp_to_month', '', 'required', array('required'=>'3'));
+                $this->form_validation->set_rules('Resp_to_year', '', 'required', array('required'=>'3'));
+               
+                    if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('', '');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+                        case 1: $return_json['e_text'] = 'Responsibility is required.'; break;
+                        case 2: $return_json['e_text'] = 'Responsibility from date is required.'; break;
+                        case 3: $return_json['e_text'] = 'Responsibility to date is required.'; break;
+                    endswitch;
+            else:
+                
+                        
+                    $data = array(
+                        'resp_details'          => $this->input->post('responsibility'),  
+                        'resp_from_date'        => $this->input->post('Resp_from_year').'-'.$this->input->post('Resp_from_month').'-'.$this->input->post('Resp_from_day'),  
+                        'resp_to_date'          => $this->input->post('Resp_to_year').'-'.$this->input->post('Resp_to_month').'-'.$this->input->post('Resp_to_day'),  
+                        'resp_remarks'          => $this->input->post('Resp_remarks'),
+                        'resp_status'           => $this->input->post('Resp_status')
+                    );
+                   $this->CRUDModel->update('hr_emp_responsibility',$data,array('resp_id'=>$this->input->post('Resp_id')));
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record update successfully.'
+                      ); 
+                        
+                         
+             endif;           
+            echo json_encode($return_json); 
+        endif;
+        if($this->input->post('saveLetter') =='saveLetter'):
+               $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+               
+//                 $this->form_validation->set_rules('c_renwal_letter_no', '', 'required', array('required'=>'1'));
+                
+                $this->form_validation->set_rules('letter_day', '', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('letter_month', '', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('letter_year', '', 'required', array('required'=>'2'));
+//                
+//                $this->form_validation->set_rules('c_f_day', '', 'required', array('required'=>'3'));
+//                $this->form_validation->set_rules('c_f_month', '', 'required', array('required'=>'3'));
+//                $this->form_validation->set_rules('c_f_year', '', 'required', array('required'=>'3'));
+//                
+//                $this->form_validation->set_rules('c_t_day', '', 'required', array('required'=>'4'));
+//                $this->form_validation->set_rules('c_t_month', '', 'required', array('required'=>'4'));
+//                $this->form_validation->set_rules('c_t_year', '', 'required', array('required'=>'4'));
+                
+                $this->form_validation->set_rules('ltr_category_id', '', 'required', array('required'=>'5'));
+                $this->form_validation->set_rules('ltr_category_type_id', '', 'required', array('required'=>'6'));
+                $this->form_validation->set_rules('ltr_designation_id', '', 'required', array('required'=>'7'));
+                $this->form_validation->set_rules('scale_id', '', 'required', array('required'=>'8'));
+                $this->form_validation->set_rules('contract_status', '', 'required', array('required'=>'9'));
+                
+                
+                
+                if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('','');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+//                        case 1: $return_json['e_text'] = 'Letter No is required.'; break;
+                        case 2: $return_json['e_text'] = 'Letter date is required.'; break;
+//                        case 3: $return_json['e_text'] = 'Contrate from date is required.'; break;
+//                        case 4: $return_json['e_text'] = 'Contrate to date is required.'; break;
+                        case 5: $return_json['e_text'] = 'Category is required.'; break;
+                        case 6: $return_json['e_text'] = 'Category type is required.'; break;
+                        case 7: $return_json['e_text'] = 'Designation is required.'; break;
+                        case 8: $return_json['e_text'] = 'Scale is required.'; break;
+                        case 9: $return_json['e_text'] = 'Contract status is required.'; break;
+                        
+                    endswitch;
+            else:
+                
+                    $emp_info = $this->CRUDModel->get_where_row('hr_emp_record',array('emp_id'=>$this->input->post('employee_id')));
+                    $file_name          = '';
+                    if(!empty($_FILES['file']['name'])):
+                       $image       = $this->CRUDModel->uploadDirectory('file','assets/images/employee/contract_files');
+                        $file_name  = $image['file_name'];
+                    endif;
+            
+            
+                     $data = array(
+                        'c_renwal_emp_id'           => $this->input->post('employee_id'), 
+                        'c_renwal_letter_no'        => $this->input->post('c_renwal_letter_no'),  
+                        'c_renwal_contract_date'    => $this->input->post('letter_year').'-'.$this->input->post('letter_month').'-'.$this->input->post('letter_day'),  
+                        'c_renwal_from_date'        => $this->input->post('c_f_year').'-'.$this->input->post('c_f_month').'-'.$this->input->post('c_f_day'),  
+                        'c_renwal_to_date'          => $this->input->post('c_t_year').'-'.$this->input->post('c_t_month').'-'.$this->input->post('c_t_day'),  
+                        'c_renwal_category_id'      => $this->input->post('ltr_category_id'),
+                        'c_renwal_category_type_id' => $this->input->post('ltr_category_type_id'),
+                        'c_renewal_designation_id'  => $this->input->post('ltr_designation_id'),
+                        'c_renwal_scale'            => $this->input->post('scale_id'),
+                        'c_renwal_emp_status'       => $emp_info->emp_status_id,
+                        'c_renewal_contract_status_id'  => $this->input->post('contract_status'),
+                        'c_renwal_image'            => $file_name,
+                        'c_renwal_details'          => $this->input->post('renewal_details'),
+                        'c_renwal_remarks'          => $this->input->post('renewal_remarks'),
+                        'c_renwal_create_by'        => $this->UserInfo->user_id,  
+                        'c_renwal_create_datetime'  => date('Y-m-d H:i:s'),
+                      );
+                   $this->CRUDModel->insert('hr_contract_reneval',$data);
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record saved successfully.'
+                      );
+                        
+                          
+             endif;           
+            echo json_encode($return_json); 
+        endif;                
+        if($this->input->post('updateLetter') =='updateLetter'):
+               $return_json['e_status']    = false;
+                $return_json['e_icon']      = '<i class="fa fa-exclamation-triangle"></i>';
+                $return_json['e_type']      = 'WARNING';
+               
+//                 $this->form_validation->set_rules('c_renwal_letter_no', '', 'required', array('required'=>'1'));
+                
+                $this->form_validation->set_rules('letter_day', '', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('letter_month', '', 'required', array('required'=>'2'));
+                $this->form_validation->set_rules('letter_year', '', 'required', array('required'=>'2'));
+                
+//                $this->form_validation->set_rules('c_f_day', '', 'required', array('required'=>'3'));
+//                $this->form_validation->set_rules('c_f_month', '', 'required', array('required'=>'3'));
+//                $this->form_validation->set_rules('c_f_year', '', 'required', array('required'=>'3'));
+//                
+//                $this->form_validation->set_rules('c_t_day', '', 'required', array('required'=>'4'));
+//                $this->form_validation->set_rules('c_t_month', '', 'required', array('required'=>'4'));
+//                $this->form_validation->set_rules('c_t_year', '', 'required', array('required'=>'4'));
+                
+                $this->form_validation->set_rules('ltr_category_id', '', 'required', array('required'=>'5'));
+                $this->form_validation->set_rules('ltr_category_type_id', '', 'required', array('required'=>'6'));
+                $this->form_validation->set_rules('ltr_designation_id', '', 'required', array('required'=>'7'));
+                $this->form_validation->set_rules('scale_id', '', 'required', array('required'=>'8'));
+                $this->form_validation->set_rules('contract_status', '', 'required', array('required'=>'9'));
+                
+                
+                
+                if ($this->form_validation->run() == FALSE):
+                    $this->form_validation->set_error_delimiters('','');
+                    $fve =  validation_errors();
+                        
+                    switch ($fve):
+//                        case 1: $return_json['e_text'] = 'Letter No is required.'; break;
+                        case 2: $return_json['e_text'] = 'Letter date is required.'; break;
+//                        case 3: $return_json['e_text'] = 'Contrate from date is required.'; break;
+//                        case 4: $return_json['e_text'] = 'Contrate to date is required.'; break;
+                        case 5: $return_json['e_text'] = 'Category is required.'; break;
+                        case 6: $return_json['e_text'] = 'Category type is required.'; break;
+                        case 7: $return_json['e_text'] = 'Designation is required.'; break;
+                        case 8: $return_json['e_text'] = 'Scale is required.'; break;
+                        case 9: $return_json['e_text'] = 'Contract status is required.'; break;
+                        
+                    endswitch;
+            else:
+                
+                    $emp_info = $this->CRUDModel->get_where_row('hr_emp_record',array('emp_id'=>$this->input->post('employee_id')));
+                    $file_name          = '';
+                    if(!empty($_FILES['file']['name'])):
+                       $image      = $this->CRUDModel->uploadDirectory('file','assets/images/employee/contract_files');
+                        $file_name  = $image['file_name'];
+                        $path = 'assets/images/employee/contract_files/'.$this->input->post('old_image');
+                        @unlink($path);
+                    else:
+                         $file_name  = $this->input->post('old_image');   
+                    endif;
+            
+            
+                     $data = array(
+                        'c_renwal_letter_no'        => $this->input->post('c_renwal_letter_no'),  
+                        'c_renwal_contract_date'    => $this->input->post('letter_year').'-'.$this->input->post('letter_month').'-'.$this->input->post('letter_day'),  
+                        'c_renwal_from_date'        => $this->input->post('c_f_year').'-'.$this->input->post('c_f_month').'-'.$this->input->post('c_f_day'),  
+                        'c_renwal_to_date'          => $this->input->post('c_t_year').'-'.$this->input->post('c_t_month').'-'.$this->input->post('c_t_day'),  
+                        'c_renwal_category_id'      => $this->input->post('ltr_category_id'),
+                        'c_renwal_category_type_id' => $this->input->post('ltr_category_type_id'),
+                        'c_renewal_designation_id'  => $this->input->post('ltr_designation_id'),
+                        'c_renwal_scale'            => $this->input->post('scale_id'),
+                        'c_renwal_emp_status'       => $emp_info->emp_status_id,
+                        'c_renewal_contract_status_id'  => $this->input->post('contract_status'),
+                        'c_renwal_image'            => $file_name,
+                        'c_renwal_details'          => $this->input->post('renewal_details'),
+                        'c_renwal_remarks'          => $this->input->post('renewal_remarks'),
+                        
+                      );
+                   $this->CRUDModel->update('hr_contract_reneval',$data,array('contract_id'=>$this->input->post('Letter_id')));
+                   $return_json = array(
+                          'e_status'  => true,
+                          'e_icon'    => '<i class="fa fa-check-circle"></i>',
+                          'e_type'    => 'SUCCESS',
+                          'e_text'    => 'Record update successfully.'
+                      );
+                        
+                          
+             endif;           
+            echo json_encode($return_json); 
+        endif;                
         }
     
-    public function add_employee_pic()
-    {
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $image = $this->CRUDModel->do_resize('file','assets/images/employee');
-            $file_name = $image['file_name'];
-            $data = array('picture'=>$file_name);
-            $where = array('emp_id'=>$id); 
-            $this->CRUDModel->update('hr_emp_record',$data,$where);
-            redirect('HrController/add_employee_picture'); 
+    public function check_tab(){
+        
+            if($this->input->post('request')== 'academic'):
+                if(empty($this->CRUDModel->get_where_row('hr_emp_education',array('edu_emp_id'=>$this->input->post('employee_id'))))):
+                    echo  1;
+                else:
+                    echo  0;
+                endif;
+            endif;
+            if($this->input->post('request')== 'experience'):
+                if(empty($this->CRUDModel->get_where_row('hr_emp_experience',array('exp_emp_id'=>$this->input->post('employee_id'))))):
+                    echo  1;
+                else:
+                    echo  0;
+                endif;
+            endif;
+            if($this->input->post('request')== 'department'):
+                if(empty($this->CRUDModel->get_where_row('hr_emp_staff_designation',array('emp_staff_emp_id'=>$this->input->post('employee_id'))))):
+                    echo  1;
+                else:
+                    echo  0;
+                endif;
+            endif;
+            if($this->input->post('request')== 'fund'):
+                if(empty($this->CRUDModel->get_where_row('hr_emp_staff_fund_status',array('emf_emp_id'=>$this->input->post('employee_id'))))):
+                    echo  1;
+                else:
+                    echo  0;
+                endif;
+            endif;
+            if($this->input->post('request')== 'shift'):
+                if(empty($this->CRUDModel->get_where_row('hr_emp_staff_shift',array('ess_emp_id'=>$this->input->post('employee_id'))))):
+                    echo  1;
+                else:
+                    echo  0;
+                endif;
+            endif;
+            if($this->input->post('request')== 'bank'):
+                if(empty($this->CRUDModel->get_where_row('hr_emp_bank',array('heb_emp_id'=>$this->input->post('employee_id'))))):
+                    echo  1;
+                else:
+                    echo  0;
+                endif;
+            endif;
+            if($this->input->post('request')== 'allowance'):
+                if(empty($this->CRUDModel->get_where_row('hr_staff_allowance',array('hsa_emp_id'=>$this->input->post('employee_id'))))):
+                    echo  1;
+                else:
+                    echo  0;
+                endif;
+            endif;
+            if($this->input->post('request')== 'responsibility'):
+                if(empty($this->CRUDModel->get_where_row('hr_emp_responsibility',array('resp_emp_id'=>$this->input->post('employee_id'))))):
+                    echo  1;
+                else:
+                    echo  0;
+                endif;
+            endif;
+            if($this->input->post('request')== 'letter'):
+                if(empty($this->CRUDModel->get_where_row('hr_contract_reneval',array('c_renwal_emp_id'=>$this->input->post('employee_id'))))):
+                    echo  1;
+                else:
+                    echo  0;
+                endif;
+            endif;
+                        
+    }
+    public function employee_information_details(){
+        if($this->input->post('request') == 'wedget_PersonalInfo'):
+            $this->data['result'] = $this->HrModel->get_employee_details(array('emp_id'=>$this->input->post('employee_id')));
+            $this->load->view('HR/hr_wedgets/employee_details_v',$this->data);
         endif;
-        if($id):
-            $where = array('emp_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_emp_record',$where);
-
-            $this->data['page_title']        = 'Upload Employee Picture | ECP';
-            $this->data['page']        =  'hr/add_employee_pic';
-            $this->load->view('common/common',$this->data);
+        if($this->input->post('request') == 'basic_Info'):
+                echo json_encode($this->HrModel->employee_basic_info(array('emp_id'=>$this->input->post('employee_id'))));
         endif;
-    }
-	
-	
-	public function explanation_letter()
-    {       
-        $this->data['result']       = $this->HrModel->getemp_rec();
-        $this->data['page_title']   = 'Explanation Letter | ECMS';
-        $this->data['page']         = 'hr/explanation_letter';
-        $this->load->view('common/common',$this->data);
-    }
-    
-    public function show_cause()
-    {       
-        $this->data['result']       = $this->HrModel->getemp_show_cause();
-        $this->data['page_title']   = 'Show Cause| ECMS';
-        $this->data['page']         = 'hr/show_cause';
-        $this->load->view('common/common',$this->data);
-    }
-    
-    public function promotion()
-    {       
-        $this->data['result']       = $this->HrModel->getemp_promotion();
-        $this->data['page_title']   = 'Promotion | ECMS';
-        $this->data['page']         = 'hr/promotion';
-        $this->load->view('common/common',$this->data);
-    }
-    
-    public function demotion()
-    {       
-        $this->data['result']       = $this->HrModel->getemp_demotion();
-        $this->data['page_title']   = 'Demotion | ECMS';
-        $this->data['page']         = 'hr/demotion';
-        $this->load->view('common/common',$this->data);
-    }
-    
-    public function contract_reneval()
-    {       
-        $this->data['result']       = $this->HrModel->emp_contract_reneval();
-        $this->data['page_title']   = 'Contract Reneval | ECMS';
-        $this->data['page']         = 'hr/contract_reneval';
-        $this->load->view('common/common',$this->data);
-    }
-	
-	public function update_demotion()
-    {		
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $dem_id         = $this->input->post('dem_id');
-            $emp_id         = $this->input->post('emp_id');
-            $from_scale_id  = $this->input->post('from_scale_id');
-            $to_scale_id    = $this->input->post('to_scale_id');
-            $from_desg_id   = $this->input->post('from_desg_id');
-            $to_desg_id     = $this->input->post('to_desg_id');
-            $date           = $this->input->post('date');
-            $letter_no      = $this->input->post('letter_no');
-            $from_p         = $this->input->post('from_p');
-            $remarks        = $this->input->post('remarks');
-            $date_1 = date('Y-m-d', strtotime($date));
-            $data       = array(
-                'emp_id' =>$emp_id,
-                'letter_no' =>$letter_no,
-                'from_scale_id' =>$from_scale_id,
-                'to_scale_id' =>$to_scale_id,
-                'from_desg_id' =>$from_desg_id,
-                'to_desg_id' =>$to_desg_id,
-                'from_p' =>$from_p,
-                'dem_date' =>$date_1,
-                'remarks' =>$remarks
+        if($this->input->post('request') == 'academic_grid'):
+            $this->data['result'] = $this->HrModel->get_employee_academics(array('hr_emp_record.emp_id'=>$this->input->post('employee_id')));
+                        
+            if(!empty($this->data['result'])):
+                $this->load->view('HR/Forms/jquery_results/academic_grid_v',$this->data);
+            endif;
+        endif;
+        if($this->input->post('request') == 'academic_delete'):
+            $where      = array('emp_edu_id'=>$this->input->post('academic_id'));
+            $this->CRUDModel->deleteid('hr_emp_education',$where);
+        endif;
+        if($this->input->post('request') == 'academic_update'):
+            echo json_encode($this->HrModel->get_employee_academic(array('emp_edu_id'=>$this->input->post('academic_id'))));
+        endif;
+        if($this->input->post('request') == 'experience_grid'):
+            $this->data['result'] = $this->CRUDModel->get_where_result('hr_emp_experience',array('exp_emp_id'=>$this->input->post('employee_id')));
+            if(!empty($this->data['result'])):
+                $this->load->view('HR/Forms/jquery_results/experience_grid_v',$this->data);
+            endif;
+        endif;
+        if($this->input->post('request') == 'experienc_update'):
+            echo json_encode($this->CRUDModel->get_where_row('hr_emp_experience',array('exp_id'=>$this->input->post('experienc_id'))));
+        endif;
+        if($this->input->post('request') == 'experienc_delete'):
+            $where      = array('exp_id'=>$this->input->post('experienc_id'));
+            $this->CRUDModel->deleteid('hr_emp_experience',$where);
+        endif;
+        if($this->input->post('request') == 'designation_grid'):
+            $this->data['result'] = $this->HrModel->get_employee_designations(array('emp_staff_emp_id'=>$this->input->post('employee_id')));
+//            echo '<pre>';print_r($this->data['result']);
+            if(!empty($this->data['result'])):
+                $this->load->view('HR/Forms/jquery_results/employee_designation_grid_v',$this->data);
+            endif;
+        endif;
+        if($this->input->post('request') == 'designation_update'):
+            echo json_encode($this->HrModel->get_employee_designation(array('emp_staff_design_id'=>$this->input->post('designation_id'))));
+        endif;
+        if($this->input->post('request') == 'designation_delete'):
+            $where      = array('emp_staff_design_id'=>$this->input->post('designation_id'));
+            $this->CRUDModel->deleteid('hr_emp_staff_designation',$where);
+        endif;
+        if($this->input->post('request') == 'fund_grid'):
+            $this->data['result'] = $this->HrModel->get_employee_fund(array('emf_emp_id'=>$this->input->post('employee_id')));
+            if(!empty($this->data['result'])):
+                $this->load->view('HR/Forms/jquery_results/fund_grid_v',$this->data);
+            endif;
+        endif;
+         if($this->input->post('request') == 'fund_delete'):
+            $where      = array('emf_id'=>$this->input->post('fund_id'));
+            $this->CRUDModel->deleteid('hr_emp_staff_fund_status',$where);
+        endif;
+        if($this->input->post('request') == 'fund_update'):
+            echo json_encode($this->CRUDModel->get_where_row('hr_emp_staff_fund_status',array('emf_id'=>$this->input->post('fund_id'))));
+        endif;
+        if($this->input->post('request') == 'shift_grid'):
+            $this->data['result'] = $this->HrModel->get_employee_shifts(array('ess_emp_id'=>$this->input->post('employee_id')));
+            if(!empty($this->data['result'])):
+                $this->load->view('HR/Forms/jquery_results/shift_grid_v',$this->data);
+            endif;
+        endif;
+        if($this->input->post('request') == 'shift_update'):
+            echo json_encode($this->HrModel->get_employee_shift(array('ess_id'=>$this->input->post('fund_id'))));
+        endif;
+          if($this->input->post('request') == 'shift_delete'):
+            $where      = array('ess_id'=>$this->input->post('shift_id'));
+            $this->CRUDModel->deleteid('hr_emp_staff_shift',$where);
+        endif;
+        if($this->input->post('request') == 'bank_grid'):
+            $this->data['result'] = $this->HrModel->get_employee_banks(array('heb_emp_id'=>$this->input->post('employee_id')));
+            if(!empty($this->data['result'])):
+                $this->load->view('HR/Forms/jquery_results/bank_grid_v',$this->data);
+            endif;
+        endif;
+        if($this->input->post('request') == 'bank_update'):
+            echo json_encode($this->HrModel->get_employee_bank(array('heb_id'=>$this->input->post('bank_id'))));
+        endif;
+         if($this->input->post('request') == 'bank_delete'):
+            $where      = array('heb_id'=>$this->input->post('bank_id'));
+            $this->CRUDModel->deleteid('hr_emp_bank',$where);
+        endif;
+       if($this->input->post('request') == 'allowance_grid'):
+            $this->data['result'] = $this->HrModel->get_employee_allowances(array('hsa_emp_id'=>$this->input->post('employee_id')));
+            if(!empty($this->data['result'])):
+                $this->load->view('HR/Forms/jquery_results/allowamce_grid_v',$this->data);
+            endif;
+        endif;
+        if($this->input->post('request') == 'allowance_update'):
+            echo json_encode($this->CRUDModel->get_where_row('hr_staff_allowance',array('hsa_id'=>$this->input->post('allowance_id'))));
+        endif;
+        if($this->input->post('request') == 'allowance_delete'):
+            $where      = array('hsa_id'=>$this->input->post('allowance_id'));
+            $this->CRUDModel->deleteid('hr_staff_allowance',$where);
+        endif;
+        if($this->input->post('request') == 'responsibility_grid'):
+            $this->data['result'] = $this->HrModel->get_employee_responsibilities(array('resp_emp_id'=>$this->input->post('employee_id')));
+            if(!empty($this->data['result'])):
+                $this->load->view('HR/Forms/jquery_results/responsibility_grid_v',$this->data);
+            endif;
+        endif;
+        if($this->input->post('request') == 'respon_update'):
+            echo json_encode($this->CRUDModel->get_where_row('hr_emp_responsibility',array('resp_id'=>$this->input->post('respon_id'))));
+        endif;
+        if($this->input->post('request') == 'respon_delete'):
+            $where      = array('resp_id'=>$this->input->post('respon_id'));
+            $this->CRUDModel->deleteid('hr_emp_responsibility',$where);
+        endif;
+        if($this->input->post('request') == 'letter_grid'):
+            $this->data['result'] = $this->HrModel->get_employee_letters(array('c_renwal_emp_id'=>$this->input->post('employee_id')));
+            if(!empty($this->data['result'])):
+                $this->load->view('HR/Forms/jquery_results/letter_grid_v',$this->data);
+            endif;
+        endif;
+        if($this->input->post('request') == 'letter_update'):
+            echo json_encode($this->CRUDModel->get_where_row('hr_contract_reneval',array('contract_id'=>$this->input->post('letter_id'))));
+        endif;
+         if($this->input->post('request') == 'letter_delete'):
+            $where      = array('contract_id'=>$this->input->post('letter_id'));
+            $this->CRUDModel->deleteid('hr_contract_reneval',$where);
+        endif;
+         if($this->input->post('request') == 'letter_file_delete'):
+            $data = array(
+              'c_renwal_image' =>''  
             );
-              $where = array('dem_id'=>$dem_id); 
-              $this->CRUDModel->update('hr_emp_demotion',$data,$where);
-              redirect('HrController/demotion'); 
-           endif;
-        if($id):
-            $where = array('dem_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_emp_demotion',$where);
-
-            $this->data['page_title']  = 'Update Demotion | ECMS';
-            $this->data['page']        =  'hr/update_demotion';
-            $this->load->view('common/common',$this->data);
-        endif;
-    }
-    
-    public function update_contract_reneval()
-    {		
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $contract_id         = $this->input->post('contract_id');
-            $emp_id      = $this->input->post('emp_id');
-            $from_date      = $this->input->post('fromdate');
-            $to_date      = $this->input->post('todate');
-            $date      = $this->input->post('date');
-            $letter_no      = $this->input->post('letter_no');
-            $details      = $this->input->post('details');
-            $from_p      = $this->input->post('from_p');
-            $remarks      = $this->input->post('remarks');
-            $date_f = date('Y-m-d', strtotime($from_date));
-            $date_t = date('Y-m-d', strtotime($to_date));
-            $date_1 = date('Y-m-d', strtotime($date));
-            $data       = array(
-                'emp_id' =>$emp_id,
-                'letter_no' =>$letter_no,
-                'from_date' =>$date_f,
-                'to_date' =>$date_t,
-                'from_p' =>$from_p,
-                'contract_date' =>$date_1,
-                'details' =>$details,
-                'image' =>$file_name,
-                'remarks' =>$remarks
-            );
-              $where = array('contract_id'=>$contract_id); 
-              $this->CRUDModel->update('hr_contract_reneval',$data,$where);
-              redirect('HrController/contract_reneval'); 
-           endif;
-        if($id):
-            $where = array('contract_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_contract_reneval',$where);
-
-            $this->data['page_title']  = 'Update Contract Reneval | ECMS';
-            $this->data['page']        =  'hr/update_contract_reneval';
-            $this->load->view('common/common',$this->data);
-        endif;
-    }
-    
-    public function update_promotion()
-    {		
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $pro_id         = $this->input->post('pro_id');
-            $emp_id         = $this->input->post('emp_id');
-            $from_scale_id  = $this->input->post('from_scale_id');
-            $to_scale_id    = $this->input->post('to_scale_id');
-            $from_desg_id   = $this->input->post('from_desg_id');
-            $to_desg_id     = $this->input->post('to_desg_id');
-            $date           = $this->input->post('date');
-            $letter_no      = $this->input->post('letter_no');
-            $from_p         = $this->input->post('from_p');
-            $remarks        = $this->input->post('remarks');
-            $date_1 = date('Y-m-d', strtotime($date));
-            $data       = array(
-                'emp_id' =>$emp_id,
-                'letter_no' =>$letter_no,
-                'from_scale_id' =>$from_scale_id,
-                'to_scale_id' =>$to_scale_id,
-                'from_desg_id' =>$from_desg_id,
-                'to_desg_id' =>$to_desg_id,
-                'from_p' =>$from_p,
-                'pro_date' =>$date_1,
-                'remarks' =>$remarks
-            );
-              $where = array('pro_id'=>$pro_id); 
-              $this->CRUDModel->update('hr_emp_promotion',$data,$where);
-              redirect('HrController/promotion'); 
-           endif;
-        if($id):
-            $where = array('pro_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_emp_promotion',$where);
-
-            $this->data['page_title']  = 'Update Promotion | ECMS';
-            $this->data['page']        =  'hr/update_promotion';
-            $this->load->view('common/common',$this->data);
-        endif;
-    }
-    
-    public function update_explanation()
-    {		
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $file_name = $image['file_name'];
-            $exp_id      = $this->input->post('exp_id');
-            $emp_id      = $this->input->post('emp_id');
-            $date      = $this->input->post('date');
-            $letter_no      = $this->input->post('letter_no');
-            $from_p      = $this->input->post('from_p');
-            $details      = $this->input->post('details');
-            $remarks      = $this->input->post('remarks');
-            $comment      = $this->input->post('comment');
-            $date_1 = date('Y-m-d', strtotime($date));
-            $data       = array(
-                'emp_id' =>$emp_id,
-                'date' =>$date_1,
-                'letter_no' =>$letter_no,
-                'from_p' =>$from_p,
-                'details' =>$details,
-                'remarks' =>$remarks
-            );
-              $where = array('exp_id'=>$exp_id); 
-              $this->CRUDModel->update('hr_explanation_letter',$data,$where);
-              redirect('HrController/explanation_letter'); 
-           endif;
-        if($id):
-            $where = array('exp_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_explanation_letter',$where);
-
-            $this->data['page_title']  = 'Update Explanation Letter | ECMS';
-            $this->data['page']        =  'hr/update_explanation';
-            $this->load->view('common/common',$this->data);
+            $this->CRUDModel->update('hr_contract_reneval',$data,array('contract_id'=>$this->input->post('Letter_id')));
+            $path = 'assets/images/employee/contract_files/'.$this->input->post('old_image');
+            @unlink($path);
         endif;
     }
-    
-    public function update_show_cause()
-    {		
-        $id = $this->uri->segment(3);
-        if($this->input->post()):
-            $file_name = $image['file_name'];
-            $sc_id      = $this->input->post('sc_id');
-            $emp_id      = $this->input->post('emp_id');
-            $date      = $this->input->post('date');
-            $letter_no      = $this->input->post('letter_no');
-            $from_p      = $this->input->post('from_p');
-            $details      = $this->input->post('details');
-            $remarks      = $this->input->post('remarks');
-            $comment      = $this->input->post('comment');
-            $date_1 = date('Y-m-d', strtotime($date));
-            $data       = array(
-                'emp_id' =>$emp_id,
-                'date' =>$date_1,
-                'letter_no' =>$letter_no,
-                'from_p' =>$from_p,
-                'details' =>$details,
-                'remarks' =>$remarks
-            );
-              $where = array('sc_id'=>$exp_id); 
-              $this->CRUDModel->update('hr_show_cause',$data,$where);
-              redirect('HrController/show_cause'); 
-           endif;
-        if($id):
-            $where = array('sc_id'=>$id);
-            $this->data['result'] = $this->CRUDModel->get_where_row('hr_show_cause',$where);
-
-            $this->data['page_title']  = 'Update Explanation Letter | ECMS';
-            $this->data['page']        =  'hr/update_show_cause';
-            $this->load->view('common/common',$this->data);
+    public function update_employee(){
+              //Employee Registration
+        $this->data['gender']       = $this->CRUDModel->dropDown('gender', 'Gender', 'gender_id', 'title');
+        $this->data['network']      = $this->CRUDModel->dropDown('mobile_network', 'Select', 'net_id', 'network',array('net_id !='=>'0'));
+        $this->data['religion']     = $this->CRUDModel->dropDown('religion', 'Select', 'religion_id', 'title');
+        $this->data['m_status']     = $this->CRUDModel->dropDown('marital_status', 'Select', 'marital_status_id', 'title');
+        $this->data['status']       = $this->CRUDModel->dropDown('hr_emp_status', '', 'emp_status_id', 'emp_status_name',array('emp_status_id'=>1));
+         //Adacdemics
+        $this->data['division']             = $this->CRUDModel->dropDown('hr_emp_division', 'Select Division', 'devision_id', 'division_name');
+        //Staff Department
+         $this->data['Category']    = $this->CRUDModel->DropDown_Code('hr_emp_category', 'CATEGORY', 'category_id', 'category_name','category_code');
+        $this->data['CategoryType'] = $this->CRUDModel->DropDown_Code('hr_emp_category_type', 'CATEGORY TYPE', 'category_type_id', 'ctgy_type_name','ctgy_type_code');
+        $this->data['Designation']  = $this->CRUDModel->DropDown_Code('hr_emp_designation', 'DESIGNATION', 'emp_desg_id', 'emp_desg_name','emp_desg_code');
+        $this->data['department']     = $this->CRUDModel->dropDown('hr_emp_departments', 'DEPARTMENT', 'emp_deprt_id', 'emp_deprt_name','',array('column'=>'emp_deprt_name','order'=>'asc'));
+        //Staff Funds
+        $this->data['funds']        = $this->CRUDModel->dropDown('hr_emp_fund_status', 'Select Fund', 'fund_status_id', 'fund_status_name','',array('column'=>'fund_status_name','order'=>'asc'));
+        //Staff Shift 
+        $this->data['Shift']        = $this->CRUDModel->dropDown('shift', 'Shift', 'shift_id', 'shift_name','',array('column'=>'shift_name','order'=>'asc'));
+            
+        //Staff Bank 
+        $this->data['bank']         = $this->CRUDModel->dropDown('bank', 'SELECT BANK', 'bank_id', 'bank_name','',array('column'=>'bank_name','order'=>'asc'));
+        $this->data['branch']       = $this->CRUDModel->dropDown('hr_bank_branch', 'SELECT BRANCH', 'branch_id', 'branch_name','',array('column'=>'branch_name','order'=>'asc'));
+        $this->data['commonStatus'] = $this->CRUDModel->dropDown('yesno', '', 'yn_id', 'yn_value','',array('column'=>'yn_id','order'=>'asc'));
+        //Staff Allowance    
+        $this->data['allowance']    = $this->CRUDModel->dropDown('hr_allowance', 'SELECT ALLOWANCE', 'ha_id', 'ha_name','',array('column'=>'ha_id','order'=>'asc'));
+        // Responsibility     
+        $this->data['RespStatus']   = $this->CRUDModel->dropDown('common_status', '', 'cs_id', 'cs_title','',array('column'=>'cs_status_order','order'=>'asc'));    
+        //Add Letter
+        $this->data['scale']            = $this->CRUDModel->dropDown('hr_emp_scale', 'Scale', 'emp_scale_id', 'scale_name','',array('column'=>'scale_order','order'=>'asc')); 
+        $this->data['contract_status']  = $this->CRUDModel->dropDown('hr_contract_status','Select', 'contract_status_id', 'contract_status_title');
+            $this->data['breadcrumbs']  = 'Employee Information';
+            $this->data['employee_id']  = $this->uri->segment(2);
+            $this->data['page_title']   = 'Employee Information | ECP';
+            $this->data['page']         = 'HR/Forms/employee_update_v';
+            $this->load->view('common/common',$this->data);             
+	}
+    public function education_degree_check(){
+        $datawhr = array(
+            'edu_emp_id'    => $this->input->post('employee_id'),
+            'emp_edu_id !=' => $this->input->post('emp_academic_id'),
+            'edu_degree_id' => $this->input->post('degree_id'),
+        );
+        $query = $this->CRUDModel->get_where_result('hr_emp_education',$datawhr);       
+        if(empty($query)):
+            return true;
+        else:
+            return false;
         endif;
-    }
-    
-    public function add_contract_reneval()
-    {	  	
-        if($this->input->post()):
-            $image = $this->CRUDModel->do_resize_letter('file','assets/images/contract_reneval');
-            $file_name = $image['file_name'];
-            $emp_id      = $this->input->post('emp_id');
-            $from_date      = $this->input->post('fromdate');
-            $to_date      = $this->input->post('todate');
-            $date      = $this->input->post('date');
-            $letter_no      = $this->input->post('letter_no');
-            $details      = $this->input->post('details');
-            $from_p      = $this->input->post('from_p');
-            $remarks      = $this->input->post('remarks');
-            $date_f = date('Y-m-d', strtotime($date));
-            $date_t = date('Y-m-d', strtotime($date));
-            $date_1 = date('Y-m-d');
-            $data       = array(
-                'emp_id' =>$emp_id,
-                'letter_no' =>$letter_no,
-                'from_date' =>$date_f,
-                'to_date' =>$date_t,
-                'from_p' =>$from_p,
-                'contract_date' =>$date_1,
-                'details' =>$details,
-                'image' =>$file_name,
-                'remarks' =>$remarks
-            );
-            $this->CRUDModel->insert('hr_contract_reneval',$data);
-            redirect('HrController/contract_reneval');
-           endif;	 
-            $this->data['page_title']   = 'Add Contract Reneval | ECMS';
-            $this->data['page']         = 'hr/add_contract_reneval';
-            $this->load->view('common/common',$this->data);
-	}
-    
-    public function add_demotion()
-    {	  	
-        if($this->input->post()):
-            $image = $this->CRUDModel->do_resize_letter('file','assets/images/demotion');
-            $file_name = $image['file_name'];
-            $emp_id      = $this->input->post('emp_id');
-            $from_scale_id      = $this->input->post('from_scale_id');
-            $to_scale_id      = $this->input->post('to_scale_id');
-            $from_desg_id      = $this->input->post('from_desg_id');
-            $to_desg_id      = $this->input->post('to_desg_id');
-            $date      = $this->input->post('date');
-            $letter_no      = $this->input->post('letter_no');
-            $from_p      = $this->input->post('from_p');
-            $remarks      = $this->input->post('remarks');
-            $date_1 = date('Y-m-d', strtotime($date));
-            $data       = array(
-                'emp_id' =>$emp_id,
-                'letter_no' =>$letter_no,
-                'from_scale_id' =>$from_scale_id,
-                'to_scale_id' =>$to_scale_id,
-                'from_desg_id' =>$from_desg_id,
-                'to_desg_id' =>$to_desg_id,
-                'from_p' =>$from_p,
-                'dem_date' =>$date_1,
-                'image' =>$file_name,
-                'remarks' =>$remarks
-            );
-            $this->CRUDModel->insert('hr_emp_demotion',$data);
-            redirect('HrController/demotion');
-           endif;	 
-            $this->data['page_title']   = 'Add Demotion | ECMS';
-            $this->data['page']         = 'hr/add_demotion';
-            $this->load->view('common/common',$this->data);
-	}
-    
-    public function add_promotion()
-    {	  	
-        if($this->input->post()):
-            $image = $this->CRUDModel->do_resize_letter('file','assets/images/promotion');
-            $file_name = $image['file_name'];
-            $emp_id      = $this->input->post('emp_id');
-            $from_scale_id      = $this->input->post('from_scale_id');
-            $to_scale_id      = $this->input->post('to_scale_id');
-            $from_desg_id      = $this->input->post('from_desg_id');
-            $to_desg_id      = $this->input->post('to_desg_id');
-            $date      = $this->input->post('date');
-            $letter_no      = $this->input->post('letter_no');
-            $from_p      = $this->input->post('from_p');
-            $remarks      = $this->input->post('remarks');
-            $date_1 = date('Y-m-d', strtotime($date));
-            $data       = array(
-                'emp_id' =>$emp_id,
-                'letter_no' =>$letter_no,
-                'from_scale_id' =>$from_scale_id,
-                'to_scale_id' =>$to_scale_id,
-                'from_desg_id' =>$from_desg_id,
-                'to_desg_id' =>$to_desg_id,
-                'from_p' =>$from_p,
-                'pro_date' =>$date_1,
-                'image' =>$file_name,
-                'remarks' =>$remarks
-            );
-            $this->CRUDModel->insert('hr_emp_promotion',$data);
-            redirect('HrController/promotion');
-        endif;	 
-            $this->data['page_title']   = 'Add Promotion | ECMS';
-            $this->data['page']         = 'hr/add_promotion';
-            $this->load->view('common/common',$this->data);
-	}
-    
-    public function add_explanation()
-    {	  	
-        if($this->input->post()):
-            $image = $this->CRUDModel->do_resize_letter('file','assets/images/explanation_letters');
-            $file_name = $image['file_name'];
-            $emp_id      = $this->input->post('emp_id');
-            $date      = $this->input->post('date');
-            $letter_no      = $this->input->post('letter_no');
-            $from_p      = $this->input->post('from_p');
-            $details      = $this->input->post('details');
-            $remarks      = $this->input->post('remarks');
-            $comment      = $this->input->post('comment');
-            $date_1 = date('Y-m-d', strtotime($date));
-            $data       = array(
-                'emp_id' =>$emp_id,
-                'date' =>$date_1,
-                'letter_no' =>$letter_no,
-                'from_p' =>$from_p,
-                'details' =>$details,
-                'image' =>$file_name,
-                'remarks' =>$remarks
-            );
-            $this->CRUDModel->insert('hr_explanation_letter',$data);
-            redirect('HrController/explanation_letter');
-        endif;	 
-            $this->data['page_title']   = 'Add Explanation | ECMS';
-            $this->data['page']         = 'hr/add_explanation_letter';
-            $this->load->view('common/common',$this->data);
-	}
-    
-    public function add_show_cause()
-    {	  	
-        if($this->input->post()):
-            $image = $this->CRUDModel->do_resize_letter('file','assets/images/show_cause');
-            $file_name = $image['file_name'];
-            $emp_id      = $this->input->post('emp_id');
-            $date      = $this->input->post('date');
-            $letter_no      = $this->input->post('letter_no');
-            $from_p      = $this->input->post('from_p');
-            $details      = $this->input->post('details');
-            $remarks      = $this->input->post('remarks');
-            $comment      = $this->input->post('comment');
-            $date_1 = date('Y-m-d', strtotime($date));
-            $data       = array(
-                'emp_id' =>$emp_id,
-                'date' =>$date_1,
-                'letter_no' =>$letter_no,
-                'from_p' =>$from_p,
-                'details' =>$details,
-                'image' =>$file_name,
-                'remarks' =>$remarks
-            );
-            $this->CRUDModel->insert('hr_show_cause',$data);
-            redirect('HrController/show_cause');
-        endif;	 
-            $this->data['page_title']   = 'Add Show Cause | ECMS';
-            $this->data['page']         = 'hr/add_show_cause';
-            $this->load->view('common/common',$this->data);
-	}
-	
-	public function delete_acr()
-    {	    
-        $id         = $this->uri->segment(3);
-        $where      = array('acr_id'=>$id);
-        $this->CRUDModel->deleteid('hr_emp_acr',$where);
-        redirect('HrController/acr');
-	}
-	
-	public function acr()
-    {       
-        $this->data['result']       = $this->HrModel->emp_acr();
-        $this->data['page_title']   = 'ACR | ECMS';
-        $this->data['page']         = 'hr/acr';
-        $this->load->view('common/common',$this->data);
-    }
-	
-public function add_acr(){	  	
-        if($this->input->post()):
-            $image1 = $this->CRUDModel->do_resize_letter('file_1','assets/images/acr');
-            $image2 = $this->CRUDModel->do_resize_letter('file_2','assets/images/acr');
-            $image3 = $this->CRUDModel->do_resize_letter('file_3','assets/images/acr');
-            $image4 = $this->CRUDModel->do_resize_letter('file_4','assets/images/acr');
-            $image5 = $this->CRUDModel->do_resize_letter('file_5','assets/images/acr');
-            $file_name1 = $image1['file_name'];
-            $file_name2 = $image2['file_name'];
-            $file_name3 = $image3['file_name'];
-            $file_name4 = $image4['file_name'];
-            $file_name5 = $image5['file_name'];
-            $emp_id      = $this->input->post('emp_id');
-            $date      = $this->input->post('submitted_date');
-            $date = date('Y-m-d', strtotime($date));
-            $data       = array(
-                'emp_id' =>$emp_id,
-                'submitted_date' =>$date,
-                'image_1' =>$file_name1,
-                'image_2' =>$file_name2,
-                'image_3' =>$file_name3,
-                'image_4' =>$file_name4,
-                'image_5' =>$file_name5
-            );
-            $this->CRUDModel->insert('hr_emp_acr',$data);
-            redirect('HrController/acr');
-           endif;	 
-            $this->data['page_title']   = 'Add New ACR | ECMS';
-            $this->data['page']         = 'hr/add_acr';
-            $this->load->view('common/common',$this->data);
-	}
+    }    
+                    
     public function all_employee_reocrd(){
         
+            $this->data['emp_name']         = '';
+            $this->data['father_name']      = '';
             $this->data['gender_id']        = '';
             $this->data['department_id']    = '';
             $this->data['designation_id']   = '';
             $this->data['scale_id']         = '';
             $this->data['category_id']      = '';
-            $this->data['contract_tp_id']      = '';
-            $this->data['status_id']      = '';
+            $this->data['contract_id']      = '';
+            $this->data['status_id']        = '';
+            $this->data['payroll_code']     = '';
+            
+               //Dropdowns 
+            $this->data['gender']       = $this->CRUDModel->dropDown('gender', 'Gender', 'gender_id', 'title');
+            $this->data['department']   = $this->CRUDModel->dropDown('hr_emp_departments', 'Department', 'emp_deprt_id', 'emp_deprt_name','',array('column'=>'emp_deprt_name','order'=>'asc'));
+            $this->data['designation']  = $this->CRUDModel->dropDown('hr_emp_designation', 'Designation', 'emp_desg_id', 'emp_desg_name','',array('column'=>'emp_desg_name','order'=>'asc'));
+            $this->data['scale']        = $this->CRUDModel->dropDown('hr_emp_scale', 'Scale', 'emp_scale_id', 'scale_name','',array('column'=>'scale_order','order'=>'asc'));
+            $this->data['category']     = $this->CRUDModel->dropDown('hr_emp_category', 'Category', 'category_id', 'category_name');
+            $this->data['contract_tp']  = $this->CRUDModel->dropDown('hr_emp_category_type', 'Contract Type', 'category_type_id', 'ctgy_type_name');
+            $this->data['status']       = $this->CRUDModel->dropDown('hr_emp_status', 'Status', 'emp_status_id', 'emp_status_name');
         
             
-            if($this->input->post()):
-               
+        if($this->input->post()):
+                $emp_name               =  $this->input->post('emp_name');
+                $father_name            =  $this->input->post('father_name');
+                $gender_id              =  $this->input->post('gender_id');
+                $department_id          =  $this->input->post('department_id');
+                $current_designation    =  $this->input->post('current_designation');
+                $c_emp_scale_id         =  $this->input->post('c_emp_scale_id');
+                $category               =  $this->input->post('hr_category');
+                $contract               =  $this->input->post('hr_contract');
+                $emp_status_id          =  $this->input->post('status');
+                $payroll_code           =  $this->input->post('payroll_code');
                 
                 
-                $emp_name       =  $this->input->post('emp_name');
-                $father_name        =  $this->input->post('father_name');
-                $gender_id             =  $this->input->post('gender_id');
-                $department_id            =  $this->input->post('department_id');
-                $current_designation        =  $this->input->post('current_designation');
-                $c_emp_scale_id      =  $this->input->post('c_emp_scale_id');
-                $emp_status_id      =  $this->input->post('emp_status_id');
-                $cat_id      =  $this->input->post('cat_id');
-                $subject_id      =  $this->input->post('subject_id');
-                $contract_type_id      =  $this->input->post('contract_type_id');
-                $limit              =  $this->input->post('limit');  
+                
                 //like Array
-                $like = '';
-                $where = '';
-                $this->data['emp_name'] = '';
-                $this->data['father_name']  = '';
-                $this->data['gender_id']  = '';
-                $this->data['department_id']  = '';
-                $this->data['current_designation']  = '';
-                $this->data['c_emp_scale_id']  = '';
-                $this->data['emp_status_id']  = '';
-                $this->data['cat_id']  = '';
-                $this->data['subject_id']  = '';
-                $this->data['contract_type_id']  = '';
-                $this->data['limitId']  = ''; 
-
+                $like   = array();
+                $where  = array();
+                    if(!empty($payroll_code)):
+                        $like['emp_personal_no']    = $payroll_code;
+                        $this->data['payroll_code'] = $payroll_code;
+                    endif;
                     if(!empty($emp_name)):
                         $like['emp_name'] = $emp_name;
                         $this->data['emp_name'] =$emp_name;
@@ -2371,119 +1527,455 @@ public function add_acr(){
                     //where array 
                     if(!empty($gender_id)):
                         $where['gender.gender_id'] = $gender_id;
-                        $this->data['gender_id']  = $gender_id;
+                        $this->data['gender_id']   = $gender_id;
                     endif;
                     if(!empty($department_id)):
-                        $where['department.department_id'] = $department_id;
-                        $this->data['department_id']  = $department_id;
+                        $where['department.department_id']  = $department_id;
+                        $this->data['department_id']        = $department_id;
                     endif;
                     if(!empty($current_designation)):
                         $where['hr_emp_designation.emp_desg_id'] = $current_designation;
-                        $this->data['current_designation']  = $current_designation;
-                    endif;
-                    if(!empty($emp_status_id)):
-                        $where['hr_emp_record.emp_status_id'] = $emp_status_id;
-                        $this->data['emp_status_id']  = $emp_status_id;
+                        $this->data['designation_id']  = $current_designation;
                     endif;
                     if(!empty($c_emp_scale_id)):
                         $where['hr_emp_scale.emp_scale_id'] = $c_emp_scale_id;
-                        $this->data['c_emp_scale_id']  = $c_emp_scale_id;
+                        $this->data['scale_id']  = $c_emp_scale_id;
                     endif;
-                if(!empty($cat_id)):
-                        $where['hr_emp_category.cat_id'] = $cat_id;
-                        $this->data['cat_id']  = $cat_id;
+                    if(!empty($category)):
+                        $where['hr_emp_category.cat_id']    = $category;
+                        $this->data['category_id']               = $category;
                     endif;
-                    if(!empty($contract_type_id)):
-                        $where['hr_emp_contract_type.contract_type_id'] = $contract_type_id;
-                        $this->data['contract_type_id']  = $contract_type_id;
+                    if(!empty($contract)):
+                        $where['hr_emp_contract_type.contract_type_id'] = $contract;
+                        $this->data['contract_id']                 = $contract;
                     endif;
-                if(!empty($subject_id)):
-                        $where['subject.subject_id'] = $subject_id;
-                        $this->data['subject_id']  = $subject_id;
+                    if(!empty($emp_status_id)):
+                        $where['hr_emp_record.emp_status_id'] = $emp_status_id;
+                        $this->data['status_id']  = $emp_status_id;
                     endif;
-                        $limitVale = $this->CRUDModel->get_where_row('show_limit',array('limitId'=>$limit));
-
-                        if($limitVale):
-                            $limitD = $limitVale->limit_value;
-                        else:
-                            $limitD = 50;
-                        endif;
-                        $custom['limit']        = $limitD;
-                        $custom['start']        = 0;
-                        $custom['column']       = '';
-                        $custom['order']        = 'desc';
-                        $this->data['limitId']  = $limit;
-                        $this->data['result']   = $this->HrModel->get_empData('hr_emp_record',$where,$like,NULL);
-//                        $this->data['page']     = "hr/employee_record_list";
-//                        $this->data['title']    = 'Employee List 2016 | ECP';
-//                        $this->load->view('common/common',$this->data); 
-                
-                else:
-                
+                     
+                    $this->data['result']   = $this->HrModel->get_employee_detail_record($where,$like,NULL);
+//                    echo '<pre>';print_r( $this->data['result']);die;
             
-            
-            //Dropdowns 
-            $this->data['gender']       = $this->CRUDModel->dropDown('gender', 'Gender', 'gender_id', 'title');
-            $this->data['department']   = $this->CRUDModel->dropDown('department', 'Department', 'department_id', 'title');
-            $this->data['designation']  = $this->CRUDModel->dropDown('hr_emp_designation', 'Designation', 'emp_desg_id', 'title');
-            $this->data['scale']        = $this->CRUDModel->dropDown('hr_emp_scale', 'Scale', 'emp_scale_id', 'title','',array('column'=>'hr_scl_order','order'=>'asc'));
-            $this->data['category']     = $this->CRUDModel->dropDown('hr_emp_category', 'Category', 'cat_id', 'title');
-            $this->data['contract_tp']  = $this->CRUDModel->dropDown('hr_emp_contract_type', 'Contract Type', 'contract_type_id', 'title');
-            $this->data['status']       = $this->CRUDModel->dropDown('hr_emp_status', 'Status', 'emp_status_id', 'title');
-            //pagination start
-            
-            $config['base_url']         = base_url('GreenFileStudent');
-            $config['total_rows']       = count($this->HrModel->getEmployee());  //echo $config['total_rows']; exit;
-            $config['per_page']         = 50;
-            $config["num_links"]        = 6;
-            $config['uri_segment']      = 2;
-            
-            //Encapsulate whole pagination 
-            $config['full_tag_open']    = "<ul class='pagination'>";
-            $config['full_tag_close']   = "</ul>";
-            
-            
-            //First link of pagination
-            $config['first_link']       = "<i class='fa fa-angle-double-left'></i>";
-            $config['first_tag_open']   = "<li>";
-            $config['first_tag_close']  = "</li>";
-            
-            //Customizing the ?Digit?? Link
-            $config['num_tag_open']     = '<li>';
-            $config['num_tag_close']    = '</li>';
-            
-            //For PREVIOUS PAGE Setup
-            $config['prev_link']        = "<i class='fa fa-angle-left'></i>";
-            $config['prev_tag_open']    = "<li>";
-            $config['prev_tag_close']   = "</li>";
-                        
-            //For NEXT PAGE Setup
-            $config['next_link']        = "<i class='fa fa-angle-right'></i>";
-            $config['next_tag_open']    = "<li>";
-            $config['next_tag_close']   = "</li>";
-            
-            //For LAST PAGE Setup
-            $config['last_link']        = "<i class='fa fa-angle-double-right'></i>";
-            $config['last_tag_open']    = "<li>";
-            $config['last_tag_close']   = "</li>";
-            
-            //For CURRENT page on which you are
-            $config['cur_tag_open']     = "<li class='disabled'><li class='active'><a href='javascript:vodid(0)'>";
-            $config['cur_tag_close']    = "</a></li>";
-            
-            
-            
-            $this->pagination->initialize($config);
-            $page                           = is_numeric($this->uri->segment(2)) ? $this->uri->segment(2) :  0;
-            $this->data['pagination_links'] = $this->pagination->create_links();
-            //pagination start 
-            $this->data['result']       = $this->HrModel->getEmployeePg($config['per_page'], $page,null,array('column'=>'emp_id','order'=>'desc')); //get user data from db
-            
-            endif;
+        endif;
             
             $this->data['page_heading'] = 'All Employees Record';
             $this->data['page_title']   = 'All Employees Record | ECMS';
-            $this->data['page']         = 'hr/Forms/all_employee_record_v';
+            $this->data['page']         = 'HR/Forms/all_employee_record_v';
             $this->load->view('common/common',$this->data);  
     }
+    public function contract_popup_details(){
+
+        $this->data['contract_info'] = $this->HrModel->get_employee_letter(array('contract_id'=>$this->input->post('contract_id')));
+       $this->load->view('HR/Forms/jquery_results/contract_details_popup_v',$this->data);
+        
+    }
+//    public function employee_profile(){
+//        $id = $this->uri->segment(2);
+//        $this->data['emp_id'] = $id;
+//        $where = array('hr_emp_record.emp_id'=>$id);
+//        $this->data['result']       = $this->HrModel->profileEmployee($where);
+//        $this->data['bank_dtl']         = $this->HrModel->employee_bank_details(array('heb_emp_id'=>$id));
+//        $this->data['page_title']   = 'Employees Profile  | ECP';
+//        $this->data['page']         = 'HR/Report/employee_profile_v';
+//        $this->load->view('common/common',$this->data);
+//    }
+//    public function update_employee_x(){		
+//            $id = $this->uri->segment(3);
+//            $this->data['result']       = $this->CRUDModel->get_where_row('hr_emp_record',array('hr_emp_record.emp_id'=>$id));
+//            $this->data['gender']       = $this->CRUDModel->dropDown('gender', 'Gender', 'gender_id', 'title');
+//            $this->data['department']   = $this->CRUDModel->dropDown('department', 'Department', 'department_id', 'title','',array('column'=>'title','order'=>'asc'));
+//            $this->data['designation']  = $this->CRUDModel->dropDown('hr_emp_designation', 'Designation', 'emp_desg_id', 'title','',array('column'=>'title','order'=>'asc'));
+//            $this->data['scale']        = $this->CRUDModel->dropDown('hr_emp_scale', 'Scale', 'emp_scale_id', 'title','',array('column'=>'hr_scl_order','order'=>'asc'));
+//            $this->data['category']     = $this->CRUDModel->dropDown('hr_emp_category', 'Category', 'cat_id', 'title');
+//            $this->data['status']       = $this->CRUDModel->dropDown('hr_emp_status', 'Status', 'emp_status_id', 'title');
+//            $this->data['district']     = $this->CRUDModel->dropDown('district', 'Select', 'district_id', 'name');
+//            $this->data['country']      = $this->CRUDModel->dropDown('country', 'Select', 'country_id', 'name');
+//            $this->data['network']      = $this->CRUDModel->dropDown('mobile_network', 'Select', 'net_id', 'network',array('net_id !='=>'0'));
+//            $this->data['religion']     = $this->CRUDModel->dropDown('religion', 'Select', 'religion_id', 'title');
+//            $this->data['m_status']     = $this->CRUDModel->dropDown('marital_status', 'Select', 'marital_status_id', 'title');
+//            $this->data['shift']        = $this->CRUDModel->dropDown('shift', 'Shift', 'shift_id', 'name');
+////            $this->data['bank']         = $this->CRUDModel->dropDown('bank', 'Selecrt Bank', 'bank_id', 'name');
+//            $this->data['contract_tp']  = $this->CRUDModel->dropDown('hr_emp_contract_type', 'Contract Type', 'contract_type_id', 'title',array('hr_category_fk'=> $this->data['result']->cat_id));
+//        
+//        if($this->input->post()):
+//                        
+////            $ret_date = '';
+////            if(empty($this->CRUDModel->date_convert($this->input->post('retirement_date'),'Y-m-d'))):
+//                $dob_Y       = $this->input->post('dob_year');
+//                $dob_M       = $this->input->post('dob_month');
+//                $dob_D       = $this->input->post('dob_day');
+//                $retur_year  = $dob_Y+'60';
+//                $ret_date = $retur_year.'-'.$dob_M.'-'.$dob_D;
+////            else:
+////                $ret_date = $this->CRUDModel->date_convert($this->input->post('retirement_date'),'Y-m-d');
+////            endif;
+//            
+//            $data       = array(
+//                'emp_name'          => strtoupper($this->input->post('emp_name')),
+//                'father_name'       => strtoupper($this->input->post('father_name')),
+//                'emp_husband_name'  => strtoupper($this->input->post('emp_husband_name')),
+//                'gender_id'         => $this->input->post('gender_id'),
+//                'dob'               => $this->input->post('dob_year').'-'.$this->input->post('dob_month').'-'.$this->input->post('dob_day'),
+//                'nic'               => $this->input->post('nic'),
+//                'postal_address'    => $this->input->post('postal_address'),
+//                'permanent_address' => $this->input->post('permanent_address'),
+//                'district_id'       => $this->input->post('district_id'),
+//                'post_office'       => $this->input->post('post_office'),
+//                'country_id'        => $this->input->post('country_id'),
+//                'ptcl_number'       => $this->input->post('ptcl_number'),
+//                'contact1'          => $this->input->post('contact1'),
+//                'net_id'            => $this->input->post('net_id'),
+//                'contact2'          => $this->input->post('contact2'),
+//                'religion_id'       => $this->input->post('religion_id'),
+//                'marital_status_id' => $this->input->post('marital_status_id'),
+//                'emp_personal_no'   => $this->input->post('emp_personal_no'),
+//                'email'             => $this->input->post('email'),
+//                'j_emp_scale_id'    => $this->input->post('j_emp_scale_id'),
+//                'retirement_date'   => $ret_date,
+//                'cat_id'            => $this->input->post('cat_id'),
+//                'c_emp_scale_id'    => $this->input->post('c_emp_scale_id'),
+//                'department_id'     => $this->input->post('department_id'),
+//                'shift_id'          => $this->input->post('shift_id'),
+//                'emp_status_id'     => $this->input->post('emp_status_id'),
+//                'comment'           => $this->input->post('comment'),
+//                'joining_designation'       => $this->input->post('joining_designation'),
+//                'current_designation'       => $this->input->post('current_designation'),
+//            );
+//              $where = array('emp_id'=>$id);
+//              $this->CRUDModel->update('hr_emp_record',$data,$where);
+//              redirect('EmployeeRecords'); 
+//           endif;
+//        if($id):
+//            
+//            $this->data['employee_records']     = $this->HrModel->hr_edu_record(array('hr_emp_record.emp_id'=>$id));
+//            $this->data['page_title']           = 'Update Employee Record | ECMS';
+//            $this->data['page']                 = 'HR/Forms/employee_update_v';
+//            $this->load->view('common/common',$this->data);
+//        endif;
+//    } 
+//    public function update_emp_edu(){
+//       $id      = $this->uri->segment(3);
+//       $emp_id = $this->uri->segment(4);
+//        if($this->input->post()):
+//             
+//            $data       = array(
+////                'emp_id'        => $this->input->post('emp_id'),
+//                'degree_id'     => $this->input->post('degree_id'),
+//                'bu_id'         => $this->input->post('bu_id'),
+//                'passing_year'  => $this->input->post('passing_year'),
+//                'cgpa'          => $this->input->post('cgpa'),
+//                'div_id'        => $this->input->post('div_id'),
+//                'hec_verified'  => $this->input->post('hec_verified')    
+//            );
+//            $this->CRUDModel->update('hr_emp_education',$data,array('emp_edu_id'=>$id));
+//            redirect('HrController/update_employee/'.$this->uri->segment(4)); 
+//           endif;
+//        if($id):
+//            
+//            $this->data['result']       = $this->CRUDModel->get_where_row('hr_emp_education',array('emp_edu_id'=>$id));
+//            $this->data['page_title']   = 'Update Employee Qualification | ECP';
+//            $this->data['page']         =  'HR/Forms/employee_update_academic_v';
+//            $this->load->view('common/common',$this->data);
+//        else:
+//        redirect('/');
+//        endif; 
+//    }
+//    public function delete_emp_edu(){	    
+//        $id         = $this->uri->segment(3);
+//        $emp_id     = $this->uri->segment(4);
+//        $where      = array('emp_edu_id'=>$id);
+//        $this->CRUDModel->deleteid('hr_emp_education',$where);
+//        redirect('HrController/update_employee/'.$emp_id);
+//	} 
+//    public function employee_academic_record(){		
+//       
+//        $this->data['emp_id'] = $this->uri->segment(3);
+//        if($this->input->post()):
+//                $data = array(
+//                    'emp_id'        => $this->input->post('emp_id'),
+//                    'degree_id'     => $this->input->post('degree_id'),
+//                    'bu_id'         => $this->input->post('bu_id'),
+//                    'cgpa'          => $this->input->post('cgpa'),
+//                    'div_id'        => $this->input->post('div_id'),
+//                    'hec_verified'  =>$this->input->post('hec_verified'),
+//                    'passing_year'  => $this->input->post('passing_year'),
+//                );
+//            $this->CRUDModel->insert('hr_emp_education',$data);
+//            redirect('HrController/employee_academic_record/'.$this->input->post('emp_id'));
+//        endif;
+//            $this->data['degree']               = $this->CRUDModel->dropDown('degree', ' Select degree', 'degree_id', 'title');
+//            $this->data['board_university']     = $this->CRUDModel->dropDown('board_university', 'Select Board', 'bu_id', 'title');
+//            $this->data['division']             = $this->CRUDModel->dropDown('hr_emp_division', 'Select Division', 'devision_id', 'name');
+//        
+//            $where = array('hr_emp_education.emp_id'=>$this->uri->segment(3));
+//            $this->data['employee_records'] =$this->HrModel->hr_edu_record($where);
+//            $this->data['page_title']   = 'Employee Academic Record | ECP';
+//            $this->data['page']         = 'HR/Forms/employee_add_academic_v';
+//            $this->load->view('common/common',$this->data); 
+//	}
+//    public function upload_employee_picture(){
+//        $id = $this->uri->segment(2);
+//        if($this->input->post()):
+//            $image      = $this->CRUDModel->do_resize('file','assets/images/employee');
+//            $file_name  = $image['file_name'];
+//            $data       = array('picture'=>$file_name);
+//            $where      = array('emp_id'=>$id); 
+//            $this->CRUDModel->update('hr_emp_record',$data,$where);
+//            
+//            if($this->input->post('old_image')):
+//                unlink('assets/images/employee/'.$this->input->post('old_image'));
+//            endif;
+//            
+//            redirect('EmployeeRecords'); 
+//        endif;
+//       
+//        if($id):
+//            
+//            $this->data['result']   = $this->HrModel->get_employee_details(array('emp_id'=>$id));
+//            $this->data['breadcrumbs']       = 'Upload & Update  Employee Picture';
+//            $this->data['page_title']        = 'Update & Upload Employee Picture | ECP';
+//            $this->data['page']        =  'HR/Forms/employee_picture_v';
+//            $this->load->view('common/common',$this->data);
+//        else:
+//        redirect('EmployeeRecords');
+//        endif;
+//    }
+//    public function contract_details(){
+//        
+//        $id = $this->uri->segment(2);
+//        
+//        $this->data['emp_info']     = $this->CRUDModel->get_where_row('hr_emp_record',array('emp_id'=>$id));
+//        $this->data['category']     = $this->CRUDModel->dropDown('hr_emp_category','','cat_id', 'title',array('cat_id'=>$this->data['emp_info']->cat_id));
+//        $this->data['designation']  = $this->CRUDModel->dropDown('hr_emp_designation','Select Designation', 'emp_desg_id', 'title','',array('column'=>'title','order'=>'asc'));
+//        $this->data['scale']        = $this->CRUDModel->dropDown('hr_emp_scale','','emp_scale_id', 'title','',array('column'=>'hr_scl_order','order'=>'asc'));
+//        $this->data['contract_tp']  = $this->CRUDModel->dropDown('hr_emp_contract_type','', 'contract_type_id', 'title',array('hr_category_fk'=>$this->data['emp_info']->cat_id));
+//        $this->data['contract_status']  = $this->CRUDModel->dropDown('hr_contract_status','Select', 'contract_status_id', 'contract_status_title');
+//        
+//        if($this->input->post()):
+//           
+//            $letter_no          = strtoupper($this->input->post('c_renwal_letter_no'));
+//            $renewal_date       = $this->input->post('letter_day').'-'.$this->input->post('letter_month').'-'.$this->input->post('letter_year');
+//            $emp_id             = $this->input->post('emp_id');
+//            $contract_from_date = $this->input->post('c_f_day').'-'.$this->input->post('c_f_month').'-'.$this->input->post('c_f_year');
+//            $contract_to_date   = $this->input->post('c_t_day').'-'.$this->input->post('c_t_month').'-'.$this->input->post('c_t_year');
+//            $designation        = $this->input->post('designation');
+//            $scale_id           = $this->input->post('scale_id');
+//            $contract_type      = $this->input->post('contract_type_id');
+//            $renewal_details    = $this->input->post('renewal_details');
+//            $renewal_remarks    = $this->input->post('renewal_remarks');
+//            $emp_status_id      = $this->input->post('emp_status_id');
+//            $contract_status    = $this->input->post('contract_status');
+//            $file_name          = '';
+//            if(!empty($_FILES['file']['name'])):
+//               $image      = $this->CRUDModel->uploadDirectory('file','assets/images/employee/contract_files');
+//                $file_name  = $image['file_name'];
+//            endif;
+//            
+//            $check_rcd = $this->CRUDModel->get_where_row('hr_contract_reneval',array('c_renwal_emp_id'=>$emp_id));
+//            
+//            if(empty($check_rcd)):
+//                $set = array(
+//                    'joining_date'          => $this->CRUDModel->date_convert($renewal_date,'Y-m-d'),
+//                    'joining_designation'   => $designation, 
+//                    'j_emp_scale_id'        => $scale_id, 
+//                );
+//                $where = array('emp_id'=>$emp_id);
+//                $this->CRUDModel->update('hr_emp_record',$set,$where);
+//            endif;
+//                        
+//            $data   = array(
+//                'c_renwal_emp_id'               =>  $emp_id,
+//                'c_renwal_letter_no'            =>  $letter_no,
+//                'c_renwal_from_date'            =>  $this->CRUDModel->date_convert($contract_from_date,'Y-m-d'),
+//                'c_renwal_to_date'              =>  $this->CRUDModel->date_convert($contract_to_date,'Y-m-d'),
+//                'c_renwal_current_contract_type'=>  $contract_type,
+//                'c_renwal_contract_date'        =>  $this->CRUDModel->date_convert($renewal_date,'Y-m-d'),
+//                'c_renwal_current_scale'        =>  $scale_id,
+//                'c_renewal_designation'         =>  $designation,
+//                'c_renwal_current_emp_status'   =>   $emp_status_id,
+//                'c_renwal_details'              =>  $renewal_details,
+//                'c_renwal_remarks'              =>  $renewal_remarks,
+//                'c_renewal_contract_status_id'  =>  $contract_status,
+//                'c_renwal_image'                =>  $file_name,
+//                'c_renwal_create_by'            =>  $this->UserInfo->user_id,
+//                'c_renwal_create_datetime'      =>  date('Y-m-d H:i:s'),
+//                
+//                    );
+//                       
+//            $this->CRUDModel->insert('hr_contract_reneval',$data);
+//                        
+//              $set_c = array(
+//                    'current_designation'   => $designation, 
+//                    'c_emp_scale_id'        => $scale_id,
+//                    'contract_type_id'      => $contract_type,
+//                );
+//            $this->CRUDModel->update('hr_emp_record',$set_c,array('emp_id'=>$emp_id));
+//            redirect('ContractDetails/'.$emp_id);
+//        endif;
+//       
+//        if($id):
+//            $this->data['breadcrumbs']       = 'Contract Renewal Details';
+//            $this->data['page_title']        = 'Contract Renewal Details | ECP';
+//            $this->data['page']              =  'HR/Forms/employee_contract_details_v';
+//            $this->load->view('common/common',$this->data);
+//        else:
+//        redirect('EmployeeRecords');
+//        endif;
+//    }
+//    public function delete_contract_file(){
+//        if($this->input->post('request') == 'DeleteFile'):
+//           $path    = 'assets/images/employee/contract_files/'.$this->input->post('image_name');
+//           unlink($path);
+//           $this->CRUDModel->update('hr_contract_reneval',array('c_renwal_image'=>''),array('contract_id'=>$this->input->post('cont_id')));
+//        endif;
+//    }
+
+//    public function edit_contract(){
+//        
+//        if($this->input->post('request') == 'fethRcd'):
+//            
+//                                        $this->db->select('hr_emp_record.cat_id,hr_contract_reneval.*,hr_emp_contract_type.title as c_title,hr_emp_status.title as emp_status,hr_emp_scale.title as current_scale,hr_emp_designation.title as des_title');    
+//                                        $this->db->join('hr_emp_contract_type','hr_emp_contract_type.contract_type_id=hr_contract_reneval.c_renwal_current_contract_type');    
+//                                        $this->db->join('hr_emp_status','hr_emp_status.emp_status_id=hr_contract_reneval.c_renwal_current_emp_status');    
+//                                        $this->db->join('hr_emp_scale','hr_emp_scale.emp_scale_id=hr_contract_reneval.c_renwal_current_scale');    
+//                                        $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_contract_reneval.c_renewal_designation');
+//                                        $this->db->join('hr_emp_record','hr_emp_record.emp_id=hr_contract_reneval.c_renwal_emp_id');
+//                                        $this->db->order_by('contract_id','asc');
+//          $this->data['contract_info'] = $this->db->get_where('hr_contract_reneval',array('contract_id'=>$this->input->post('contract_id')))->row();
+//        
+////        $this->data['category']     = $this->CRUDModel->dropDown('hr_emp_category','','cat_id', 'title',array('cat_id'=>$this->data['emp_info']->cat_id));
+//        $this->data['designation']  = $this->CRUDModel->dropDown('hr_emp_designation','', 'emp_desg_id', 'title','',array('column'=>'title','order'=>'asc'));
+//        $this->data['scale']        = $this->CRUDModel->dropDown('hr_emp_scale','','emp_scale_id', 'title','',array('column'=>'hr_scl_order','order'=>'asc'));
+//        $this->data['contract_tp']  = $this->CRUDModel->dropDown('hr_emp_contract_type','', 'contract_type_id', 'title',array('hr_category_fk'=>$this->data['contract_info']->cat_id));
+//        $this->data['contract_status']  = $this->CRUDModel->dropDown('hr_contract_status','Select', 'contract_status_id', 'contract_status_title');
+//        $this->load->view('HR/Forms/jquery_results/edit_contract_v',$this->data);
+//        endif;
+//        if($this->input->post('request') == 'update'):
+//           
+//            $letter_no          = strtoupper($this->input->post('c_renwal_letter_no'));
+//            $renewal_date       = $this->input->post('renewal_date');
+//            $emp_id             = $this->input->post('emp_id');
+//            $contract_from_date = $this->input->post('contract_from_date');
+//            $contract_to_date   = $this->input->post('contract_to_date');
+//            $designation        = $this->input->post('designation');
+//            $scale_id           = $this->input->post('scale_id');
+//            $contract_type      = $this->input->post('contract_type_id');
+//            $renewal_details    = $this->input->post('renewal_details');
+//            $renewal_remarks    = $this->input->post('renewal_remarks');
+//            $emp_status_id      = $this->input->post('emp_status_id');
+//            $contract_status      = $this->input->post('contract_status');
+//            $contract_old_image      = $this->input->post('contract_old_image');
+//            
+//            
+//            $file_name          = '';
+//            if(!empty($_FILES['file']['name'])):
+//               $image      = $this->CRUDModel->uploadDirectory('file','assets/images/employee/contract_files');
+//                $file_name  = $image['file_name'];
+//                $path = 'assets/images/employee/contract_files/'.$contract_old_image;
+//                @unlink($path);
+//                else:
+//                    
+//                $file_name =$contract_old_image;
+//            endif;
+//            $data   = array(
+//                'c_renwal_emp_id'               =>  $emp_id,
+//                'c_renwal_letter_no'            =>  $letter_no,
+//                'c_renwal_from_date'            =>  date('Y-m-d',strtotime($contract_from_date)),
+//                'c_renwal_to_date'              =>  date('Y-m-d',strtotime($contract_to_date)),
+//                'c_renwal_current_contract_type'=>  $contract_type,
+//                'c_renwal_contract_date'        =>  date('Y-m-d',strtotime($renewal_date)),
+//                'c_renwal_current_scale'        =>  $scale_id,
+//                'c_renewal_designation'         =>  $designation,
+//                'c_renwal_current_emp_status'   =>   $emp_status_id,
+//                'c_renwal_details'              =>  $renewal_details,
+//                'c_renwal_remarks'              =>  $renewal_remarks,
+//                'c_renwal_image'                =>  $file_name,
+//                'c_renewal_contract_status_id'  =>  $contract_status,
+//                'c_renwal_create_by'            =>  $this->UserInfo->user_id,
+//                'c_renwal_create_datetime'      =>  date('Y-m-d H:i:s'),
+//                
+//                    );
+//            
+//            $this->CRUDModel->update('hr_contract_reneval',$data,array('contract_id'=>$this->input->post('cont_id')));
+//            redirect('EmployeeRecords','refresh');
+//        endif;
+//     
+//        
+//        
+//    }
+//    public function employee_bank_info(){
+//        if($this->input->post('request') == 'getRecord'):
+//             $this->data['emp_id']       = $this->input->post('emp_id');
+//             $this->data['bank']         = $this->CRUDModel->dropDown('bank', 'Selecrt Bank', 'bank_id', 'bank_name',array('bank_status'=>1),array('order'=>'asc','column'=>'bank_name'));
+//             $this->data['status']       = $this->CRUDModel->dropDown('common_status', 'Select Default Account', 'cs_id', 'cs_title',array('cs_status'=>1),array('order'=>'asc','column'=>'cs_title'));
+//             $this->load->view('HR/Forms/jquery_results/employee_bank_details_v',$this->data);
+//        endif;
+//        if($this->input->post('request') == 'EditBankRecord'):
+//            $query =   $this->db->get_where('hr_emp_bank',array('heb_id'=>$this->input->post('emp_bank_id')))->row();     
+//             echo  json_encode($query);
+//        endif;
+//        if($this->input->post('request') == 'DataGride'):
+//            $this->data['result']         = $this->HrModel->employee_bank_details(array('heb_emp_id'=>$this->input->post('emp_id')));
+//            $this->load->view('HR/Forms/jquery_results/employee_bank_result_v',$this->data);
+//        endif;
+//       
+//        if($this->input->post('request') == 'saveRecord'):
+//           $emp_id          = $this->input->post('emp_id');
+//           $bank            = $this->input->post('bank');
+////           $branch_code     = $this->input->post('branch_code');
+//           $account_no      = $this->input->post('account_no');
+//           $branch          = $this->input->post('branch');
+//           $Remarks         = $this->input->post('Remarks');
+//           $status          = $this->input->post('status');
+//           if($status == '1'):
+//               $this->CRUDModel->update('hr_emp_bank',array('heb_status'=>'0'),array('heb_emp_id'=>$emp_id));
+//           endif;
+//           
+//           $data = array(
+//             'heb_emp_id'       => $emp_id,  
+//             'heb_bank_id'      => $bank,  
+////             'heb_branch_code'  => $branch_code,  
+//             'heb_account_no'   => $account_no,  
+//             'heb_bank_branch'  => $branch,  
+//             'heb_remarks'      => $Remarks,  
+//             'heb_status'       => $status,  
+//             'heb_date'         => date('Y-m-d'),
+//             'heb_create_by'    => $this->UserInfo->user_id,  
+//             'heb_create_datetime'  => date('Y-m-d H:i:s'),  
+//           );
+//           $this->CRUDModel->insert('hr_emp_bank',$data);
+//        endif;
+//        if($this->input->post('request') == 'upateRecord'):
+//           
+//           $emp_id          = $this->input->post('emp_id');
+//           $emp_bank_id     = $this->input->post('emp_bank_id');
+//           $bank            = $this->input->post('bank');
+//           $account_no      = $this->input->post('account_no');
+//           $branch          = $this->input->post('branch');
+//           $Remarks         = $this->input->post('Remarks');
+//           $status          = $this->input->post('status');
+//           
+//           if($status == '1'):
+//               $this->CRUDModel->update('hr_emp_bank',array('heb_status'=>'0'),array('heb_emp_id'=>$emp_id));
+//           endif;
+//           
+//           $data = array(
+//               
+//             'heb_bank_id'      => $bank,  
+//             'heb_account_no'   => $account_no,  
+//             'heb_bank_branch'  => $branch,  
+//             'heb_remarks'      => $Remarks,
+//             'heb_status'       => $status,  
+//             'heb_update_by'    => $this->UserInfo->user_id,  
+//             'hed_update_datetime'  => date('Y-m-d H:i:s'),  
+//           );
+//           $this->CRUDModel->update('hr_emp_bank',$data,array('heb_id'=>$emp_bank_id));
+//        endif;
+//    }
+                        
+  
+                        
+                        
 }
+ 
