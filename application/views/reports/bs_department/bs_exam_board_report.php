@@ -36,6 +36,7 @@
                     <div class="col-md-2 col-sm-5">
                         <label for="name" style=" visibility: hidden">Subjectsqwqwqw</label>
                         <input type="button" id="Search" name="submit" value="Search" class="btn btn-theme">
+                        <button type="button" class="btn btn-theme" style="float: right" id="print_bs_list"><i class="fa fa-print"></i> Print </button>
                     </div>
                </div>
                 
@@ -55,8 +56,10 @@
                     </section>
           
                     </div>
-               <div id="BsProgramResult">
-                   
+               <div id="div_print">
+                <div id="BsProgramResult">
+
+                </div>
                </div>
         
             </div><!--//cols-wrapper-->
@@ -153,6 +156,17 @@
                 });
 
             });
+            
+            $('#print_bs_list').on('click', function(){
+                var TeacherId = jQuery('#EmpBsProgram_id').val();
+                var SectionId = jQuery('#SecBsProgram_id').val();
+                var SubjId    = jQuery('#SubjBsProgram_id').val();
+                if(TeacherId == ''){ TeacherId = 0; }
+                if(SectionId == ''){ SectionId = 0; }
+                if(SubjId == ''){ SubjId = 0; }
+                window.open('ReportsController/bs_exame_result_print/'+TeacherId+'/'+SectionId+'/'+SubjId, '_blank');
             });
+            
+        });
         
         </script>

@@ -17,6 +17,7 @@ class ReportsModel extends CI_Model
 //                ');
         $this->db->query('SET SQL_BIG_SELECTS=1;');
 //        $this->db->query('SET OPTION SQL_BIG_SELECTS = 1;');
+        $this->load->model('CRUDModel');
     }
     
     public function get_by_id($table,$id){
@@ -37,7 +38,7 @@ public function grand_finance_report($where=NULL,$like=NULL,$date=NULL){
                         student_record.comment,
                         student_record.rseats_id1,
                         student_record.rseats_id2,
-                        student_status.name as student_statusName,
+                        student_status.name as student_status,
                         student_record.father_name,
                         programes_info.programe_name,
                         sub_programes.name as subprogram,
@@ -48,6 +49,7 @@ public function grand_finance_report($where=NULL,$like=NULL,$date=NULL){
                         applicant_edu_detail.total_marks,
                         applicant_edu_detail.obtained_marks,
                         applicant_edu_detail.percentage,
+                        DATE_FORMAT(student_record.admission_date,"%d-%m-%Y") as admission_date,
                     ');    
                 $this->db->join('student_group_allotment','student_group_allotment.student_id=student_record.student_id','left outer');
                 $this->db->join('sections','sections.sec_id=student_group_allotment.section_id','left outer');
@@ -69,13 +71,62 @@ public function grand_finance_report($where=NULL,$like=NULL,$date=NULL){
                     else:
                      $this->db->where('student_record.admission_date BETWEEN "'.date('Y-m-d', strtotime($date['fromDate'])).'" AND "'.date('Y-m-d', strtotime($date['toDate'])).'"');   
             endif;
-            $this->db->where('student_record.s_status_id !=','1');
+            $this->db->where_not_in('student_record.s_status_id',array(1,11,15,17,18));
             $this->db->group_by('student_record.student_id');
             $this->db->order_by('student_record.college_no','asc');
             $this->db->order_by('student_record.form_no','asc');
             $query =  $this->db->get('student_record');
             if($query):
                 return $query->result();
+            endif;
+    }
+public function grand_finance_report_excel($where=NULL,$like=NULL,$date=NULL){
+               
+                $this->db->select('
+                        student_record.form_no,
+                        student_record.college_no,
+                        student_record.student_name,
+                        student_record.father_name,
+                        gender.title as genderName,
+                        shift.name as shiftName,
+                        prospectus_batch.batch_name,
+                        sub_programes.name as subprogram,
+                        sections.name as sectionName,
+                        applicant_edu_detail.obtained_marks,
+                        applicant_edu_detail.total_marks,
+                        applicant_edu_detail.percentage,
+                        DATE_FORMAT(student_record.admission_date,"%d-%m-%Y") as admission_date,
+                        student_status.name as student_status,
+                    '); 
+//                DATE_FORMAT(student_record.admission_date,"%d-%m-%Y") as admission_date,
+                $this->db->join('student_group_allotment','student_group_allotment.student_id=student_record.student_id','left outer');
+                $this->db->join('sections','sections.sec_id=student_group_allotment.section_id','left outer');
+                $this->db->join('programes_info','programes_info.programe_id=student_record.programe_id','left outer');
+                $this->db->join('sub_programes','sub_programes.sub_pro_id=student_record.sub_pro_id','left outer');
+                $this->db->join('prospectus_batch','prospectus_batch.batch_id=student_record.batch_id','left outer');
+                $this->db->join('student_status','student_status.s_status_id=student_record.s_status_id','left outer');
+                $this->db->join('applicant_edu_detail','applicant_edu_detail.student_id=student_record.student_id','left outer');
+                 $this->db->join('gender','gender.gender_id=student_record.gender_id','left outer');
+                 $this->db->join('shift','shift.shift_id=student_record.shift_id','left outer') ;  
+            if($like):
+                $this->db->like($like);
+            endif;
+            if($where):
+                $this->db->where($where);
+            endif;
+            if(empty($date['fromDate'])):
+                   $this->db->where('student_record.admission_date <=',date('Y-m-d', strtotime($date['toDate'])));
+                    else:
+                     $this->db->where('student_record.admission_date BETWEEN "'.date('Y-m-d', strtotime($date['fromDate'])).'" AND "'.date('Y-m-d', strtotime($date['toDate'])).'"');   
+            endif;
+//            $this->db->where('student_record.s_status_id !=','1');
+            $this->db->where_not_in('student_record.s_status_id',array(1,11,15,17,18));
+            $this->db->group_by('student_record.student_id');
+            $this->db->order_by('student_record.college_no','asc');
+            $this->db->order_by('student_record.form_no','asc');
+            $query =  $this->db->get('student_record');
+            if($query):
+                return $query->result_array();
             endif;
     }
     
@@ -541,7 +592,7 @@ public function grand_finance_report($where=NULL,$like=NULL,$date=NULL){
                 endif;
                 $this->db->order_by($custom['column'],$custom['order']);
                 $this->db->order_by('form_no','asc');
-                $this->db->where_in('student_record.s_status_id', array(5,6,7,8,9,12,13,14));
+                $this->db->where_in('student_record.s_status_id', array(5,6,7,8,9,12,13,14,19,20,21,22));
                 $this->db->group_by('student_record.student_id');
             
             if($where):
@@ -1617,6 +1668,8 @@ public function get_student_pracattendance_row($where=NULL){
                 student_record.admission_date,
                 student_record.migrated_remarks,
                 student_record.applicant_image,
+                student_record.programe_id,
+                student_record.sub_pro_id,
               
                 sections.name as sectionsName,
                 sections.sec_id,
@@ -1665,6 +1718,8 @@ public function get_student_pracattendance_row($where=NULL){
                 student_record.admission_date,
                 student_record.migrated_remarks,
                 student_record.applicant_image,
+                student_record.programe_id,
+                student_record.sub_pro_id,
               
                 sections.name as sectionsName,
                 occupation.title as occupationTitle,
@@ -1779,6 +1834,7 @@ public function get_student_pracattendance_row($where=NULL){
              $this->db->from('class_alloted');
               $this->db->join('student_attendance','student_attendance.class_id=class_alloted.class_id');
               $this->db->join('student_attendance_details','student_attendance_details.attend_id=student_attendance.attend_id');
+              
             if($where):
                $this->db->where($where);
             endif;
@@ -1817,13 +1873,12 @@ public function get_student_pracattendance_row($where=NULL){
             $this->db->from('class_alloted');
             $this->db->join('student_attendance','student_attendance.class_id=class_alloted.class_id');
             $this->db->join('student_attendance_details','student_attendance_details.attend_id=student_attendance.attend_id');
-////         $this->db->join('hr_emp_record','hr_emp_record.emp_id=class_alloted.emp_id');
-         if($where):
+        if($where):
                $this->db->where($where);
-         endif;
-         if($date):
+        endif;
+        if($date):
               $this->db->where('attendance_date BETWEEN "'.$date['start'].'"and "'.$date['end'].'"');
-         endif;
+        endif;
         
          return $this->db->get()->result();
          }
@@ -2965,19 +3020,25 @@ public function practical_white_card_group($where)
                 student_record.father_name,
                 student_record.form_no,
                 student_record.college_no,
+                student_record.applicant_mob_no1,
                 student_record.timestamp,
                 student_record.student_id,
                 sub_programes.name as sub_pro_name,
+                sections.name as section_name,
                 hr_emp_record.emp_name as user_name');
         $this->db->from('student_record');
         $this->db->join('sub_programes','sub_programes.sub_pro_id=student_record.sub_pro_id', 'left outer');
         $this->db->join('users','users.id=student_record.user_id', 'left outer');
         $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId', 'left outer');
+        $this->db->join('student_group_allotment','student_group_allotment.student_id=student_record.student_id', 'left outer');
+        $this->db->join('sections','sections.sec_id=student_group_allotment.section_id', 'left outer');
         if($like):
             $this->db->like($like);   
         endif;
 //        $this->db->where_in('student_record.sub_pro_id',array(4,5));
         $this->db->where($where);
+        $this->db->order_by('sections.name', 'acs');
+        $this->db->order_by('student_record.college_no', 'acs');
         return $this->db->get()->result();
         }
         
@@ -3881,6 +3942,7 @@ public function practical_white_card_group($where)
                     student_record.college_no,
                     student_record.student_name,
                     student_record.father_name,
+                    student_record.mobile_no,
                     student_record.form_no,
                     programes_info.programe_name,
                     sub_programes.name as subprogram,
@@ -3945,15 +4007,26 @@ public function practical_white_card_group($where)
                     
                 $att_details  = $this->db->get_where('student_attendance_details',array('student_id'=>$row->student_id))->row();
                     if(!empty($att_details)):
-                        $marks      = $this->CRUDModel->get_student_montly_marks_details($row->student_id,$row->sec_id);
+                        $marks      = $this->CRUDModel->get_student_montly_marks_details(
+                            $row->student_id,
+                            $row->sec_id);
+                            $std_marks_per = '0';
+                        if(isset($marks) && !empty($marks)):
+                            $std_marks_per = $marks->Percentage;
+                        endif;
                         
                         $return_array[] = array(
                         'college_no'    => $row->college_no,
                         'student_name'  => $row->student_name,
                         'father_name'   => $row->father_name,
+                        'mobile_no'     => $row->mobile_no,
                         'status'        => $row->status,
-                        'marks'         => $marks->Percentage,
+                        'marks'         =>$std_marks_per ,
+                        'sectionName'   => $row->sectionName,
                         'Total_Classes' => $att_details->Absent.' + '.$att_details->Present.' = '.$att_details->Total_Classes,
+                        'Absent'        => $att_details->Absent,
+                        'Present'       => $att_details->Present,
+                        'Total'         => $att_details->Total_Classes,
                         'Percentage'    => $att_details->Percentage,
                     );  
                     endif;
@@ -3967,6 +4040,36 @@ public function practical_white_card_group($where)
             
             endif;
            
+    }
+      
+    public function bs_program_exam_prev($where=NULL){
+        
+       $this->db->select('
+        exams_bs.*,
+        subject.title as subject,
+        subject.subject_id as subject_id,
+        sub_programes.name,
+        hr_emp_record.emp_name as employee,
+        hr_emp_record.emp_id,
+        sections.name as section,
+        sections.sec_id as sec_id,
+       '); 
+        $this->db->join('hr_emp_record','hr_emp_record.emp_id=exams_bs.exb_employ_id', 'left outer');
+        $this->db->join('subject','subject.subject_id=exams_bs.exb_subject_id', 'left outer');
+        $this->db->join('sub_programes','sub_programes.sub_pro_id=subject.sub_pro_id', 'left outer');
+        $this->db->join('programes_info','programes_info.programe_id=sub_programes.programe_id', 'left outer');
+        $this->db->join('sections','sections.sec_id=exams_bs.exb_section_id', 'left outer');
+//        $this->db->join('class_alloted_merge_groups','class_alloted_merge_groups.camg_id=class_alloted.ca_merge_id', 'left outer');
+         if($where):
+            $this->db->where($where);
+        endif;
+        $this->db->order_by('sections.name', 'asc');
+        $this->db->group_by('exb_class_id');
+        $query =  $this->db->get('exams_bs');
+        if($query):
+            return $query->result();
+        endif;
+        
     }
      
     public function bs_program_exame($where=NULL){
@@ -3989,6 +4092,7 @@ public function practical_white_card_group($where)
         $this->db->join('programes_info','programes_info.programe_id=sub_programes.programe_id', 'left outer');
         $this->db->join('sections','sections.sec_id=class_alloted.sec_id', 'left outer');
         $this->db->join('class_alloted_merge_groups','class_alloted_merge_groups.camg_id=class_alloted.ca_merge_id', 'left outer');
+        $this->db->order_by('sub_programes.name', 'asc');
          if($where):
             $this->db->where($where);
         endif;
@@ -4017,6 +4121,35 @@ public function practical_white_card_group($where)
         $this->db->join('sub_programes','sub_programes.sub_pro_id=subject.sub_pro_id', 'left outer');
         $this->db->join('programes_info','programes_info.programe_id=sub_programes.programe_id', 'left outer');
         $this->db->join('sections','sections.sec_id=class_alloted.sec_id', 'left outer');
+        $this->db->join('prospectus_batch','prospectus_batch.batch_id=sections.batch_id', 'left outer');
+        if($where):
+            $this->db->where($where);
+        endif;
+        $query =  $this->db->get('exams_bs');
+        if($query):
+            return $query->row();
+        endif;
+        
+    }
+    
+    public function get_test_info_prev($where=NULL){
+        
+        $this->db->select('
+            exams_bs.*,
+            sections.name as section_name,
+            subject.title as subject_name,
+            hr_emp_record.emp_name as employee_name,
+            sub_programes.sp_title as sub_pro_name,
+            prospectus_batch.batch_name,
+            exam_types.xt_title
+       '); 
+        $this->db->join('exam_types','exam_types.xt_id=exams_bs.exb_test_type', 'left outer');
+//        $this->db->join('class_alloted','class_alloted.class_id=exams_bs.exb_class_id', 'left outer');
+        $this->db->join('hr_emp_record','hr_emp_record.emp_id=exams_bs.exb_employ_id', 'left outer');
+        $this->db->join('subject','subject.subject_id=exams_bs.exb_subject_id', 'left outer');
+        $this->db->join('sub_programes','sub_programes.sub_pro_id=subject.sub_pro_id', 'left outer');
+        $this->db->join('programes_info','programes_info.programe_id=sub_programes.programe_id', 'left outer');
+        $this->db->join('sections','sections.sec_id=exams_bs.exb_section_id', 'left outer');
         $this->db->join('prospectus_batch','prospectus_batch.batch_id=sections.batch_id', 'left outer');
         if($where):
             $this->db->where($where);
@@ -4072,6 +4205,30 @@ public function practical_white_card_group($where)
         
     }
     
+    public function get_test_students_prev($where=NULL){
+        
+        $this->db->select('
+            exams_bs_details.*,
+            exams_bs.*,
+            student_record.college_no,
+            student_record.student_name,
+            student_record.bs_enrollment_no,
+            student_record.student_id,
+       '); 
+        $this->db->join('exams_bs','exams_bs.exb_test_id=exams_bs_details.exbd_test_id', 'left outer');
+        $this->db->join('sections','sections.sec_id=exams_bs.exb_section_id', 'left outer');
+        $this->db->join('student_record','student_record.student_id=exams_bs_details.exbd_student_id', 'left outer');
+        if($where):
+            $this->db->where($where);
+        endif;
+        $this->db->group_by('exbd_student_id');
+        $query =  $this->db->get('exams_bs_details');
+        if($query):
+            return $query->result();
+        endif;
+        
+    }
+    
     public function get_midterm_students($where=NULL, $type){
         
         $this->db->select('
@@ -4090,6 +4247,26 @@ public function practical_white_card_group($where)
         endif;
         
     }
+    
+    public function get_midterm_students_prev($where=NULL, $type){
+        
+        $this->db->select('
+            exams_bs_details.*,
+            exams_bs.*,
+       '); 
+        $this->db->join('exams_bs','exams_bs.exb_test_id=exams_bs_details.exbd_test_id', 'left outer');
+        $this->db->join('exam_types','exam_types.xt_id=exams_bs.exb_test_type', 'left outer');
+//        $this->db->join('class_alloted','class_alloted.class_id=exams_bs.exb_class_id', 'left outer');
+        if($where):
+            $this->db->where($where);
+        endif;
+        $query =  $this->db->get('exams_bs_details');
+        if($query):
+            return $query->$type();
+        endif;
+        
+    }
+    
     public function student_shit_wise_report_search($where=NULL){
                 
         
@@ -4187,17 +4364,39 @@ public function practical_white_card_group($where)
             
     }
  
- public function get_teacher_attendance_date_wise($where=NULL,$date){
+// public function get_teacher_attendance_date_wise($where=NULL,$date){
+//       
+//            $this->db->select('
+//                hr_emp_record.emp_name as employeename,
+//                hr_emp_record.emp_id as employeeId,
+//                student_attendance.attendance_date,
+//                '
+//                 );
+//         
+//            $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id','left outer');
+//            $this->db->join('hr_emp_record','hr_emp_record.emp_id=class_alloted.emp_id','left outer');
+//            if($where):
+//                $this->db->where($where);
+//            endif;
+//            $this->db->where('student_attendance.attendance_date BETWEEN "'.$date['from'].'" and "'.$date['to'].'"');
+//            $this->db->group_by('student_attendance.attendance_date');
+//            $this->db->order_by('student_attendance.attendance_date','asc');
+//         return $this->db->get('student_attendance')->result();
+//         
+//   } 
+ public function get_teacher_attendance_date_wise_enter_by($where=NULL,$date){
        
             $this->db->select('
-                hr_emp_record.emp_name as employeename,
-                hr_emp_record.emp_id as employeeId,
-                student_attendance.attendance_date,
+                    hr_emp_record.emp_name as employeename,
+                    hr_emp_record.emp_id as employeeId,
+                    student_attendance.attendance_date,
                 '
                  );
          
-            $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id','left outer');
-            $this->db->join('hr_emp_record','hr_emp_record.emp_id=class_alloted.emp_id','left outer');
+//            $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id','left outer');
+//            $this->db->join('hr_emp_record','hr_emp_record.emp_id=student_attendance.user_id','left outer');
+            $this->db->join('users','users.id=student_attendance.user_id');
+             $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId');
             if($where):
                 $this->db->where($where);
             endif;
@@ -4227,5 +4426,453 @@ public function practical_white_card_group($where)
         return $this->db->get('proctorial_fine')->result();
        
    }
+
+      public function position_report_excel($field,$table,$where=NULL,$like=NULL,$custom=NULL){
+  
+                $this->db->select($field);    
+                $this->db->from($table);
+                
+                $this->db->join('applicant_edu_detail','applicant_edu_detail.student_id=student_record.student_id','left outer');
+                $this->db->join('student_group_allotment','student_group_allotment.student_id=student_record.student_id','left outer');
+                $this->db->join('sections','sections.sec_id=student_group_allotment.section_id','left outer');
+                $this->db->join('programes_info','programes_info.programe_id=student_record.programe_id','left outer');
+                $this->db->join('sub_programes','sub_programes.sub_pro_id=student_record.sub_pro_id','left outer');
+                $this->db->join('prospectus_batch','prospectus_batch.batch_id=student_record.batch_id','left outer');
+                $this->db->join('student_status','student_status.s_status_id=student_record.s_status_id','left outer');
+                if($like):
+                     $this->db->like($like);
+                endif;
+                $this->db->order_by($custom['column'],$custom['order']);
+                $this->db->order_by('form_no','asc');
+                $this->db->group_by('student_record.college_no');
+            if($where):
+                $this->db->where($where);
+            endif;
+            
+            $result =  $this->db->get()->result();
+            
+            $startDate  =  date("Y-m", strtotime($this->input->post('fromDate')));
+            $endDate    =  date("Y-m", strtotime($this->input->post('toDate')));
+             if($result):
+                    $this->db->truncate('student_position');
+                    $sn = 1;
+                    foreach($result as $resRow):
+                        $CheckStd = $this->CRUDModel->get_where_row('class_alloted',array('sec_id'=>$resRow->sec_id));
+                        if(@$CheckStd->flag ==1):
+                            $classSubjects = $this->ReportsModel->get_classSubjects_rep(array('sec_id'=>$resRow->sec_id));
+                        endif;
+                        if(@$CheckStd->flag == 2):
+                            $classSubjects = $this->ReportsModel->get_subject_list_report('student_subject_alloted',array('student_id'=>$resRow->student_id));
+                        endif;
+
+                        $month      = date("m", strtotime($startDate));
+                        $year       = date("Y", strtotime($startDate));
+                        $fmp     = 0;
+                        $fma     = 0;
+                        $fmtotal = 0;
+
+                        $tdp=0;
+                        $tda=0;
+                        $total=0;
+                        foreach($classSubjects as $CS):
+                            $where = array(
+                                'subject_id'                => $CS->subject_id,
+                                'sec_id'                    => $CS->section_id,
+                                'student_id'                => $resRow->student_id,
+                                'month(attendance_date)'    => $month,
+                                'year(attendance_date)'     => $year,
+                            );
+                            $from_Month_record = $this->ReportsModel->get_student_att($where);
+
+                            foreach($from_Month_record as $stdAtt):
+                                if($stdAtt->status == 1):
+                                    if($stdAtt->ca_classcount ==2):
+                                            $fmp++;
+                                            $fmp++;
+                                        else:
+                                            $fmp++;
+                                        endif;
+                                    else:
+                                       if($stdAtt->ca_classcount ==2):
+                                            $fma++;
+                                            $fma++;
+                                        else:
+                                            $fma++;
+                                        endif;
+                                    endif;
+                                    $fmtotal = $fma+$fmp;
+                            endforeach;
+                            $wheretotal = array(
+                                'sec_id'                    => $CS->section_id,
+                                'class_alloted.subject_id'      => $CS->subject_id,
+                                'student_id'                    => $resRow->student_id,
+                            );
+
+                            $data['start']  = date("Y", strtotime($startDate)).'-'.date("m", strtotime($startDate)).'-01';
+                            $data['end']    = date("Y", strtotime($endDate)).'-'.date("m", strtotime($endDate)).'-31';
+                            $to_date = $this->ReportsModel->get_student_attendance_date($wheretotal,$data);
+                            foreach($to_date as $tstdAtt):
+                               if($tstdAtt->status == 1):
+                                   if($tstdAtt->ca_classcount ==2):
+                                           $tdp++;
+                                           $tdp++;
+                                       else:
+                                           $tdp++;
+                                   endif;
+                                   else:
+                                      if($tstdAtt->ca_classcount ==2):
+                                           $tda++;
+                                           $tda++;
+                                       else:
+                                           $tda++;
+                                   endif;
+                               endif;
+                            endforeach;
+                        endforeach; 
+                        $perstage  = '';
+                        $total_classes = $tdp+$tda;
+                        if($total_classes):
+                            $perstage = $tdp/$total_classes *100;
+                        endif;
+                        $data = array(
+                            'college_no'            => $resRow->college_no,
+                            'student_id'            => $resRow->student_id,
+                            'std_name'              => $resRow->student_name,
+                            'father_name'           => $resRow->father_name,
+                            'from_month_present'    => $fmp,
+                            'from_month_absent'     => $fma,
+                            'total_month_present'   => $tdp,
+                            'total_month_absent'    => $tda,
+                            'total_classes'         => $total_classes,
+                            'sectionName'           => $resRow->sectionName,
+                            'perstage'              => round($perstage,2),
+                            'user_id'               => $this->userInfo->user_id
+                        );
+                        $this->CRUDModel->insert('student_position',$data);
+                        $sn++;
+                    endforeach;
+                endif;
+                                $this->db->order_by('perstage','desc');
+                $posion1     =   $this->db->get_where('student_position',array('user_id'=>$this->userInfo->user_id,'perstage '=>'100'))->result();
+                                $this->db->order_by('perstage','desc');
+                $posion2     =   $this->db->get_where('student_position',array('user_id'=>$this->userInfo->user_id,'perstage !='=>'100'))->result();
+            $sn = 1;
+          $defaulter = '';
+          $gDifference = '';
+          $return_array = array();
+           foreach(array_merge($posion1,$posion2) as $stRow):
+                        $this->db->select('sum(total_classess) as total_leaves');
+                        $this->db->where('leave_date BETWEEN "'.date("Y", strtotime($startDate)).'-'.date("m", strtotime($startDate)).'-01'.'"and "'.date("Y", strtotime($endDate)).'-'.date("m", strtotime($endDate)).'-31'.'"');
+                        $this->db->group_by('student_id');    
+              $leaeve = $this->db->get_where('student_fine',array('student_id'=>$stRow->student_id))->row();
+              $gLeave = '';
+              if($leaeve):
+                  $gLeave =$leaeve->total_leaves;
+                   
+              endif;
+              
+              $return_array[] = array(
+                  'sn'              =>$sn,
+                  'college_no'      => $stRow->college_no,
+                  'std_name'        => strtoupper($stRow->std_name),
+                  'father_name'     => strtoupper($stRow->father_name),
+                  'sectionName'     => $stRow->sectionName,
+                  'total_classes'   => $stRow->total_classes,
+                  'tmp'             => $stRow->total_month_present,
+                  'month_absent'    => $stRow->total_month_absent,
+                  'perstage'        => $stRow->perstage,
+                  'ap-leave'        => $gLeave,
+              );
+               
+              $sn++;
+          endforeach;
+                
+                
+                
+          return $return_array;
+            
+            
+    } 
+      public function attendance_group_percentage_subject_report($where=NULL,$like=NULL,$date=NULL,$att_between=NULL){
+  
+                $this->db->select('
+                    student_record.student_id,
+                    student_record.college_no,
+                    student_record.student_name,
+                    student_record.father_name,
+                    student_record.form_no,
+                    student_record.mobile_no,
+                    programes_info.programe_name,
+                    sub_programes.name as subprogram,
+                    prospectus_batch.batch_name,
+                    applicant_edu_detail.total_marks,
+                    applicant_edu_detail.obtained_marks,
+                    applicant_edu_detail.percentage,
+                    sections.sec_id,
+                    sections.name as sectionName,
+                    admission_date,
+                    college_no,
+                    student_status.name as status,
+                    ');    
+                
+                
+                $this->db->join('applicant_edu_detail','applicant_edu_detail.student_id=student_record.student_id','left outer');
+                $this->db->join('student_group_allotment','student_group_allotment.student_id=student_record.student_id','left outer');
+                $this->db->join('sections','sections.sec_id=student_group_allotment.section_id','left outer');
+                $this->db->join('student_subject_alloted','student_subject_alloted.student_id=student_record.student_id');
+                 
+                
+                $this->db->join('programes_info','programes_info.programe_id=student_record.programe_id','left outer');
+                $this->db->join('sub_programes','sub_programes.sub_pro_id=student_record.sub_pro_id','left outer');
+
+                $this->db->join('prospectus_batch','prospectus_batch.batch_id=student_record.batch_id','left outer');
+                $this->db->join('student_status','student_status.s_status_id=student_record.s_status_id','left outer');
+                
+                if($like):
+                     $this->db->like($like);
+                endif;
+                $this->db->group_by('student_record.student_id');
+                $this->db->order_by('form_no','asc');
+            
+            if($where):
+                $this->db->where($where);
+            endif;
+            $result =  $this->db->get('student_record')->result();
+            if(!empty($result)):
+                $return_array = array();
+                foreach($result as $row):
+                                $this->db->select("
+                                      count(*) as Total_Classes,
+                                      count(if(status = '0', 1, NULL)) AS Absent,
+                                      (count(*) - count(if(status = '0', 1, NULL))) as Present,
+                                        ROUND(((count(*) - count(if(status = '0', 1, NULL)))/ count(*))*100,2) as Percentage
+                                  ");
+                                  
+                                  if(empty($att_between['per_from'])):
+                                    $this->db->having('Percentage <=',$att_between['per_to']);
+                                else:
+                                    $this->db->having('Percentage BETWEEN "'.$att_between['per_from'].'" AND "'.$att_between['per_to'].'"');   
+                                endif;
+                                 
+                                if(empty($date['fromDate'])):
+                                    $this->db->where('student_attendance.attendance_date <=',date('Y-m-d', strtotime($date['toDate'])));
+                                else:
+                                    $this->db->where('student_attendance.attendance_date BETWEEN "'.date('Y-m-d', strtotime($date['fromDate'])).'" AND "'.date('Y-m-d', strtotime($date['toDate'])).'"');   
+                                endif;
+                                $this->db->join('student_attendance','student_attendance.attend_id=student_attendance_details.attend_id'); 
+                    
+                $att_details  = $this->db->get_where('student_attendance_details',array('student_id'=>$row->student_id))->row();
+                    if(!empty($att_details)):
+                        $marks      = $this->CRUDModel->get_student_montly_marks_details($row->student_id,$row->sec_id);
+                        
+                        $return_array[] = array(
+                        'college_no'    => $row->college_no,
+                        'student_name'  => $row->student_name,
+                        'father_name'   => $row->father_name,
+                        'status'        => $row->status,
+                        'sectionName'   => $row->sectionName,
+                        'mobile_no'     => $row->mobile_no,
+                        'marks'         => $marks->Percentage,
+                        'Total_Classes' => $att_details->Absent.' + '.$att_details->Present.' = '.$att_details->Total_Classes,
+                        'Absent'        =>$att_details->Absent,
+                        'Present'       =>$att_details->Present,
+                        'Total'         =>$att_details->Total_Classes,
+                        'Percentage'    => $att_details->Percentage,
+                    );  
+                    endif;
+                   
+                endforeach;
+                
+                        $keys   = array_column($return_array, 'Percentage');
+                        array_multisort($keys, SORT_DESC, $return_array);
+                return  json_decode(json_encode($return_array), FALSE); 
+           
+            
+            endif;
+           
+    }
+   
+
+    public function student_white_card($studentId){
+        
+        $group_allotment = $this->db->get_where('student_group_allotment',array('student_id'=>$studentId))->row();
+        $error = '';
+        if(!empty($group_allotment) && !empty($group_allotment)):        
+            $sectionId       = $group_allotment->section_id;
+
+            $CheckStd = $this->CRUDModel->get_where_row('class_alloted',array('sec_id'=>$sectionId));
+            if(isset($CheckStd) && !empty($CheckStd)):
+                //flag == 1 group_allot
+                //flag == 2 subject allot
+                if($CheckStd->flag==1):
+                        $result           = $this->ReportsModel->get_whiteCard_subject(array('student_group_allotment.student_id'=>$studentId,'student_group_allotment.section_id'=>$sectionId)); 
+                else:
+                        $result           = $this->ReportsModel->get_whiteCard_section(array('student_subject_alloted.student_id'=>$studentId,'student_subject_alloted.section_id'=>$sectionId)); 
+                endif;
+                $return_array = array(); // final return array
+                if(isset($result) && !empty($result)):
+                    $fy_id          = $this->db->get_where('whitecard_financial_year',array('status'=>1))->row();
+            // Create Array for Months $month_array
+                    $montts_array   = array();
+                    $time           = strtotime($fy_id->year_start);
+                        $montts_array[] = 'Subject';
+                            for($i=1;$i<=12;$i++):
+                                $monthi = '+'.$i.'month';
+                                $month  = date("M-y", strtotime($monthi, $time));
+                                $montts_array[] = $month;
+                            endfor;
+                        $montts_array[] = 'Total';    
+                        $return_array[] = $montts_array;    
+
+            // Get student subjects 
+                    if($CheckStd->flag ==1):
+                        $classSubjects = $this->ReportsModel->get_classSubjects(array('sec_id'=>$result->sec_id)); //Class wise ( Medical , Engi CS , all BS)
+                    endif;
+                    if($CheckStd->flag == 2):
+                        $classSubjects = $this->ReportsModel->get_subject_list('student_subject_alloted',array('student_id'=>$result->student_id)); // Subject Wise (Arts ,A-level)
+                    endif;
+                    if(isset($classSubjects) && !empty($classSubjects)):
+                        $netPresent = '';
+                        $netTotal   = '';// Create Subject Array $subject_array  with attendance
+                        foreach($classSubjects as $rowCS):
+                            $GrandTotal = 0;
+                            $granPresent = 0;
+                            $subject_array = array();
+                            $subject_array[] = substr($rowCS->title,0,20); // Subject Name.
+                            for($i=1;$i<=12;$i++):
+                                $monthi     = '+'.$i.'month';
+                                $month      = date("m", strtotime($monthi, $time));
+                                $year       = date("Y", strtotime($monthi, $time));
+                                $where      = array(
+                                    'subject_id'                => $rowCS->subject_id,
+                                    'student_id'                =>$result->student_id,
+                                    'month(attendance_date)'    =>$month,
+                                    'year(attendance_date)'     =>$year,
+                                );
+                                $stdAtts = $this->ReportsModel->get_student_att($where);
+                                $p=0;
+                                $a=0;
+                            // Each Subject Attendance count, Absent and Present
+                                foreach($stdAtts as $stdAtt):
+                                    if($stdAtt->status == 1):
+                                        if($stdAtt->ca_classcount ==2):
+                                            $p++; $p++;
+                                        else:
+                                            $p++;
+                                        endif;
+                                    else:
+                                        if($stdAtt->ca_classcount ==2):
+                                            $a++; $a++;
+                                        else:
+                                            $a++;
+                                        endif;
+                                    endif;
+                                endforeach;
+                                $total = $a+$p;
+                                if($total):
+                                    $subject_array[]    = $p.'/'.$total;
+                                    $granPresent        += $p; 
+                                    $GrandTotal         += $total;
+                                else:
+                                    $subject_array[]   = '';
+                                endif;
+                                
+                                $per             = 0; 
+                                 if(isset($GrandTotal) && !empty($GrandTotal)):
+                                  $per = ($granPresent/$GrandTotal)*100;
+                                 endif;
+ 
+                            endfor;
+                            $netPresent += $granPresent;
+                            $netTotal   += $GrandTotal;
+ 
+                            $subject_array[]    = $granPresent.'/'.$GrandTotal.'='.round($per,1)  ;
+                            $return_array[]     = $subject_array;
+                        endforeach;
+            
+                        
+                    endif;
+            // Create Final Array for Each Month and Grand Total 
+
+                    $total_array[]     = '% age';
+                    $final_total       = 0;
+                    $final_total_a     = 0;
+                    $final_total_p     = 0;
+
+                    for($ti=1;$ti<=12;$ti++):
+                        $monthti     = '+'.$ti.'month';
+                        $month      = date("m", strtotime($monthti, $time));
+                        $year       = date("Y", strtotime($monthti, $time));
+                        $gfoter_total  = 0 ; 
+                        if(isset($classSubjects) && !empty($classSubjects)):
+                            $foter_p = 0;
+                            $foter_a = 0;
+                            $foter_total = 0;
+                            foreach($classSubjects as $ta_row):
+                                $where_ta= array(
+                                    'subject_id'                => $ta_row->subject_id,
+                                    'student_id'                =>$result->student_id,
+                                    'month(attendance_date)'    =>$month,
+                                    'year(attendance_date)'     =>$year,
+                                );
+                                
+                                $QueryTotal = $this->ReportsModel->get_student_att($where_ta);
+                                
+                                if(isset($QueryTotal) && !empty($QueryTotal)):
+                                    $tp=0;
+                                    $ta=0;
+                                    
+                                    foreach($QueryTotal as $TTRow):
+                                        if($TTRow->status == 1):
+                                            if($TTRow->ca_classcount ==2):
+                                                $tp++;
+                                                $tp++;
+                                            else:
+                                                $tp++;
+                                            endif;
+                                        else:
+                                            if($TTRow->ca_classcount ==2):
+                                                $ta++;
+                                                $ta++;
+                                            else:
+                                                $ta++;
+                                            endif;
+                                        endif;
+                                    endforeach;
+                                    $foter_p += $tp;
+                                    $foter_a += $ta;
+                                endif;
+                            endforeach;
+                            $foter_total = $foter_a+$foter_p;                           //Each Month Total
+                            if(isset($foter_total) && !empty($foter_total)):            
+                                $gfoter_total = round(($foter_p/$foter_total)*100,1).' %';   //Each Month Per%
+                            else:
+                                $gfoter_total = '';
+                            endif;
+                            $final_total_a     += $foter_a;
+                            $final_total_p     += $foter_p;
+                        endif;  
+                        $total_array[]     = $gfoter_total;
+                    endfor;
+                    $final_total = $final_total_a+$final_total_p;                       //Final Total 
+                    if(isset($final_total) && !empty($final_total)):
+                        $total_array[]     = $final_total_p.'/'.$final_total.' = '.round(($final_total_p/$final_total)*100,1).' %'; // Final Total Result
+                    else:
+                        $total_array[]     = ''; 
+                    endif;
+                    $return_array[] = $total_array;
+                endif;
+            endif;
+        else:
+            $error = 'Student Section not alloted';
+        endif;
+        return array(
+            'result'        => @$result,
+            'Attendance'    => @$return_array,
+            'classSubjects' => @$classSubjects,
+            'error'         => @$error,
+        );
+    }
    
 }
+//

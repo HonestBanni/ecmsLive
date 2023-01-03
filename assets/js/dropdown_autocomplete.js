@@ -333,6 +333,83 @@ jQuery("#hmamount").autocomplete({
         jQuery("#college_no").val(ui.item.college_no);
         }
         }).focus(function() {  jQuery(this).autocomplete("search", "");  });
-        
+ 
+ 
+      //Employee Autocomplete
+      
+//          $( "#ServingTeachersX" ).autocomplete({
+//                minLength   : 0,
+//                source: function( request, response ) {
+//                  // Fetch data
+//                  $.ajax({
+//                    url: "DropdownController/auto_serving_teacher",
+//                    type: 'post',
+//                    dataType: "json",
+//                    data: {
+//                      term: request.term
+//                    },
+//                    success: function( data ) {
+//                      response( data );
+//                    }
+//                  });
+//                },
+//                select: function (event, ui) {
+//                  // Set selection
+//                  $('#ServingTeachers').val(ui.item.label); // display the selected text
+//                  $('#ServingTeachersID').val(ui.item.value); // save selected id to input
+//                  return false;
+//                }
+//              });
+//
+//             
+//      
+//      
+//      
+        jQuery("#ServingTeachers").autocomplete({  
+            source      :function( request, response ) {
+                jQuery.ajax({
+                url         : "AutoComplete/Employee/Teacher/Serving",
+                type        : 'post',
+                dataType    : "json",
+                data        : { 
+                                employee_name        : request.term,
+                                ActiveSectionsID     :jQuery('#ActiveSectionsID').val()
+                              },
+                success     : function( data ) {response( data );}
+                });
+            },
+            minLength   : 0,
+            autoFocus   : true,
+            scroll      : true,
+            select      : function(event, ui){
+            jQuery("#ServingTeacher").val(ui.item.contactPerson);
+            jQuery("#ServingTeacherID").val(ui.item.emp_id);
+            }
+        }).focus(function() {  jQuery(this).autocomplete("search", "");  });
+    
+    jQuery("#ActiveSections").autocomplete({  
+       
+        source      :function( request, response ) {
+                jQuery.ajax({
+                url         : "AutoComplete/Sections",
+                type        : 'post',
+                dataType    : "json",
+                data        : { 
+                                sections        : request.term,
+                              },
+                success     : function( data ) {response( data );}
+                });
+            },
+        minLength: 0,
+        autoFocus: true,
+        scroll: true,
+        dataType: 'jsonp',
+        select: function(event, ui){
+        jQuery("#ActiveSections").val(ui.item.contactPerson);
+        jQuery("#ActiveSectionsID").val(ui.item.sec_id);
+        }
+        }).focus(function() {  jQuery(this).autocomplete("search", "");  });
+    
+    
 });
  

@@ -3965,6 +3965,268 @@ $this->excel->getActiveSheet()->getStyle(chr($col))->getAlignment()->setHorizont
         endif;
     }
     
+    public function political_student_record()
+    {
+        $whereSub_pro = array('programe_id'=>17);
+        $this->data['gender']    = $this->CRUDModel->dropDown('gender', ' Gender ', 'gender_id', 'title');
+        $this->data['sub_program']    = $this->CRUDModel->dropDown('sub_programes', 'Sub Program ', 'sub_pro_id', 'name',$whereSub_pro);
+		$this->data['reserved_seat']    = $this->CRUDModel->dropDown('reserved_seat', ' Reserved Seats ', 'rseat_id', 'name');  
+		$this->data['status']    = $this->CRUDModel->dropDown('student_status', ' Admission Status ', 's_status_id', 'name');
+		$this->data['batch']   = $this->CRUDModel->dropDown('prospectus_batch', 'Select Batch', 'batch_id', 'batch_name',$whereSub_pro);
+        
+        $like = '';
+            $where = '';
+			$this->data['batchId']          = '';
+            $this->data['college_no'] = '';
+            $this->data['form_no'] = '';
+            $this->data['student_name'] = '';
+            $this->data['father_name']  = '';
+            $this->data['gender_id']  = '';
+            $this->data['sub_pro_id']  = '';
+            $this->data['rseats_id']  = '';
+            $this->data['s_status_id']  = '';
+        if($this->input->post('search')):
+            $college_no       =  $this->input->post('college_no');
+            $form_no       =  $this->input->post('form_no');
+            $student_name       =  $this->input->post('student_name');
+            $father_name        =  $this->input->post('father_name');
+            $gender_id             =  $this->input->post('gender_id');
+            $sub_pro_id            =  $this->input->post('sub_pro_id');
+            $rseats_id        =  $this->input->post('rseats_id');
+            $s_status_id        =  $this->input->post('s_status_id');
+			$batch               =  $this->input->post('batch');
+           
+            $where['student_record.programe_id'] = 17;
+            if(!empty($college_no)):
+                $where['student_record.college_no'] = $college_no;
+                $this->data['college_no'] = $college_no;
+            endif;
+			if(!empty($batch)):
+                 $where['student_record.batch_id'] = $batch;
+                $this->data['batchId'] = $batch;
+            endif;
+            if(!empty($form_no)):
+                $where['form_no'] = $form_no;
+                $this->data['form_no'] =$form_no;
+            endif;
+            if(!empty($student_name)):
+                $like['student_name'] = $student_name;
+                $this->data['student_name'] =$student_name;
+            endif;
+            if(!empty($father_name)):
+                $like['father_name'] = $father_name;
+            $this->data['father_name'] =$father_name;
+            endif;
+            if(!empty($gender_id)):
+                $where['gender.gender_id'] = $gender_id;
+                $this->data['gender_id']  = $gender_id;
+            endif;
+            if(!empty($rseats_id)):
+                $where['reserved_seat.rseat_id'] = $rseats_id;
+                $this->data['rseats_id']  = $rseats_id;
+            endif;
+            if(!empty($sub_pro_id)):
+                $where['sub_programes.sub_pro_id'] = $sub_pro_id;
+                $this->data['sub_pro_id']  = $sub_pro_id;
+            endif;
+            if(!empty($s_status_id)):
+                $where['student_status.s_status_id'] = $s_status_id;
+                $this->data['s_status_id']  = $s_status_id;
+            endif;
+           
+        $this->data['result'] = $this->get_model->get_stdData('student_record',$where,$like);
+        else:
+        $where = array('student_record.programe_id'=>17,'student_record.s_status_id'=>5);
+        $config['base_url']   = base_url('admin/economics_student_record');
+        $config['total_rows'] = count($this->CRUDModel->get_where_result('student_record',$where));  
+        $config['per_page']         = 50;
+        $config["num_links"]        = 2;
+        $config['uri_segment']      = 3;
+        $config['full_tag_open']    = "<ul class='pagination'>";
+        $config['full_tag_close']   = "</ul>";
+        $config['num_tag_open']     = '<li>';
+        $config['num_tag_close']    = '</li>';
+        $config['cur_tag_open']     = "<li class='disabled'><li class='active'><a href='javascript:vodid(0)'>";
+        $config['cur_tag_close']    = "</a></li>";
+        $config['next_tag_open']    = "<li>";
+        $config['next_tag_close']   = "</li>";
+        $config['prev_tag_open']    = "<li>";
+        $config['prev_tag_close']   = "</li>";
+        $config['first_tag_open']   = "<li>";
+        $config['first_tag_close']  = "</li>";
+        $config['last_tag_open']    = "<li>";
+        $config['last_tag_close']   = "</li>";
+        $config['first_link']       = "<i class='fa fa-angle-left'></i>";
+        $config['last_link']        = "<i class='fa fa-angle-right'></i>";
+
+        $this->pagination->initialize($config);
+        $page = is_numeric($this->uri->segment(3)) ? $this->uri->segment(3) :  0;
+        $this->data['pages']        = $this->pagination->create_links();          
+        $this->data['result']    = $this->get_model->stds_pagination($config['per_page'], $page,$where);
+        $this->data['count']     =$config['total_rows']; 
+        endif;
+        $this->data['page_title']   = 'Students Record (BS Economics) | ECMS';
+        $this->data['page']         = 'admission/economics/form/economics_student_record';
+        $this->load->view('common/common',$this->data);
+        if($this->input->post('export')):    
+            
+            $this->load->library('excel');
+            $this->excel->setActiveSheetIndex(0);
+            //name the worksheet
+            $this->excel->getActiveSheet()->setTitle('Students Record BS Economics');
+             $this->excel->getActiveSheet()->setCellValue('A1', 'Serial No');
+            $this->excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('B1', 'College No');
+            $this->excel->getActiveSheet()->getStyle('B1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('B1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('C1','Form No');
+            $this->excel->getActiveSheet()->getStyle('C1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('C1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('D1', 'Student Name');
+            $this->excel->getActiveSheet()->getStyle('D1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('D1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('E1','Father Name');
+            $this->excel->getActiveSheet()->getStyle('E1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('E1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('F1','Gender');
+            $this->excel->getActiveSheet()->getStyle('F1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('F1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('G1','Seat');
+            $this->excel->getActiveSheet()->getStyle('G1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('G1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('H1','Sub Program');
+            $this->excel->getActiveSheet()->getStyle('H1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('H1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('I1','T.Marks');
+            $this->excel->getActiveSheet()->getStyle('I1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('I1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('J1','O.Marks');
+            $this->excel->getActiveSheet()->getStyle('J1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('J1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('K1','%Age');
+            $this->excel->getActiveSheet()->getStyle('K1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('K1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('L1','Shift');
+            $this->excel->getActiveSheet()->getStyle('L1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('L1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('M1','Section');
+            $this->excel->getActiveSheet()->getStyle('M1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('M1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('N1','Student status');
+            $this->excel->getActiveSheet()->getStyle('N1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('N1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('O1','Mobile No#');
+            $this->excel->getActiveSheet()->getStyle('O1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('O1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('P1','Permanent Address');
+            $this->excel->getActiveSheet()->getStyle('P1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('P1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('Q1','Postal Address');
+            $this->excel->getActiveSheet()->getStyle('Q1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('Q1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('R1','Domicle');
+            $this->excel->getActiveSheet()->getStyle('R1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('R1')->getFont()->setSize(16);
+
+            $this->excel->getActiveSheet()->setCellValue('S1','Religion');
+            $this->excel->getActiveSheet()->getStyle('S1')->getFont()->setBold(true);
+            $this->excel->getActiveSheet()->getStyle('S1')->getFont()->setSize(16);
+    
+                
+       for($col = ord('A'); $col <= ord('T'); $col++){
+                //set column dimension
+                $this->excel->getActiveSheet()->getColumnDimension(chr($col))->setAutoSize(true);
+                 //change the font size
+                $this->excel->getActiveSheet()->getStyle(chr($col))->getFont()->setSize(12);
+                  
+                $this->excel->getActiveSheet()->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+        }
+        
+            $college_no         =  $this->input->post('college_no');
+            $form_no            =  $this->input->post('form_no');
+            $student_name       =  $this->input->post('student_name');
+            $father_name        =  $this->input->post('father_name');
+            $gender_id          =  $this->input->post('gender_id');
+            $sub_pro_id         =  $this->input->post('sub_pro_id');
+            $rseats_id          =  $this->input->post('rseats_id');
+            $s_status_id          =  $this->input->post('s_status_id');
+			$batch               =  $this->input->post('batch');
+            $limit              =  $this->input->post('limit');
+            $like = '';
+            $where = '';
+            $where['student_record.programe_id'] = 17;
+            if(!empty($college_no)):
+                $where['college_no'] = $college_no;
+                $this->data['college_no'] =$college_no;
+            endif;
+			if(!empty($batch)):
+                 $where['student_record.batch_id'] = $batch;
+                $this->data['batchId'] = $batch;
+            endif;
+            if(!empty($form_no)):
+                $where['form_no'] = $form_no;
+                $this->data['form_no'] =$form_no;
+            endif;
+            if(!empty($student_name)):
+                $like['student_name'] = $student_name;
+                $this->data['student_name'] =$student_name;
+            endif;
+            if(!empty($father_name)):
+                $like['father_name'] = $father_name;
+            $this->data['father_name'] =$father_name;
+            endif;
+            if(!empty($gender_id)):
+                $where['gender.gender_id'] = $gender_id;
+                $this->data['gender_id']  = $gender_id;
+            endif;
+            if(!empty($rseats_id)):
+                $where['reserved_seat.rseat_id'] = $rseats_id;
+                $this->data['rseats_id']  = $rseats_id;
+            endif;
+            if(!empty($sub_pro_id)):
+                $where['sub_programes.sub_pro_id'] = $sub_pro_id;
+                $this->data['sub_pro_id']  = $sub_pro_id;
+            endif;
+            if(!empty($s_status_id)):
+                $where['student_status.s_status_id'] = $s_status_id;
+                $this->data['s_status_id']  = $s_status_id;
+            endif;
+        $result = $this->get_model->get_Export('student_record',$where,$like);
+        
+        $exceldata="";
+        foreach ($result as $row)
+        {
+        $exceldata[] = $row;
+        }      
+
+        $this->excel->getActiveSheet()->fromArray($exceldata, null, 'A2');        
+        $filename='StudentsRecord_BSEconomics.xls'; 
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0'); 
+        $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel5');  
+        $objWriter->save('php://output');
+        endif;
+    }
+    
     public function eng_medical_students()
     {       
             $this->data['limit'] = $this->CRUDModel->dropDown('show_limit', ' Select Limit  ', 'limitId', 'limit_value');
@@ -8569,11 +8831,11 @@ public function update_seat_detail($id)
         $this->data['program']                  = $this->CRUDModel->dropDown('programes_info', 'Program ', 'programe_id', 'programe_name');
         $this->data['result'] = $this->get_model->studentData($uri);
        if($this->input->post()){
-            $student = ucwords(strtolower(ucwords($this->input->post('student_name'))));
-            $father = ucwords(strtolower(ucwords($this->input->post('father_name'))));
-            $guardian = ucwords(strtolower(ucwords($this->input->post('guardian_name'))));
-            $emargency_person = ucwords(strtolower(ucwords($this->input->post('emargency_person_name'))));
-            $current_datetime = date('Y-m-d H:i:s');
+            $student            = strtoupper($this->input->post('student_name'));
+            $father             = strtoupper($this->input->post('father_name'));
+            $guardian           = strtoupper($this->input->post('guardian_name'));
+            $emargency_person   = strtoupper($this->input->post('emargency_person_name'));
+            $current_datetime   = date('Y-m-d H:i:s');
             $dob = $_POST['dob']; 
             $admission_date = $_POST['admission_date']; 
             $date1 = date('Y-m-d', strtotime($dob));

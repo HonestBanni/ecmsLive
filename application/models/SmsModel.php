@@ -233,6 +233,7 @@ class SmsModel extends CI_Model
             
             return $this->db->get('hr_emp_record')->result();
    }
+   
      public function student_sms_report($where=Null,$like=NULL,$date=NULL){
             $this->db->select(
                     '   student_record.college_no,
@@ -280,6 +281,54 @@ class SmsModel extends CI_Model
                
       return $this->db->get('student_record')->result();
   }
+  
+    public function fee_sms_report($where=Null,$like=NULL,$date=NULL){
+        $this->db->select('
+            student_record.college_no,
+            student_record.student_id,
+            student_record.form_no,
+            student_record.student_name,
+            student_record.s_status_id,
+            student_record.father_name,
+            sections.name as sessionName, 
+            sub_programes.sub_pro_id,
+            prospectus_batch.batch_id,
+            student_status.name as student_status,
+            prospectus_batch.batch_name,
+            fee_message.fee_msg_text as message,
+            fee_message_details.fee_msgd_mob_no as sender_number,
+            fee_message_details.fee_msgd_response as message_status,
+            fee_message.fee_msg_date as send_date,
+            fee_defaulter_type.title as sms_type_title,
+        ');
+
+        $this->db->join('fee_message','fee_message.fee_msg_id=fee_message_details.fee_msgd_msg_id');
+        $this->db->join('student_record','student_record.student_id=fee_message_details.fee_msgd_std_id');
+        $this->db->join('fee_defaulter_type','fee_defaulter_type.id=fee_message.fee_msg_type_flag', 'left outer');
+        $this->db->join('student_group_allotment','student_group_allotment.student_id=student_record.student_id','left outer');
+        $this->db->join('sections','sections.sec_id=student_group_allotment.section_id','left outer');
+        $this->db->join('programes_info','programes_info.programe_id=student_record.programe_id');
+        $this->db->join('sub_programes','sub_programes.sub_pro_id=student_record.sub_pro_id');
+        $this->db->join('prospectus_batch','prospectus_batch.batch_id=student_record.batch_id');
+        $this->db->join("student_status","student_status.s_status_id=student_record.s_status_id");
+
+        if($date['from'] == ''):
+           $this->db->where('fee_message.fee_msg_date <=',date('Y-m-d', strtotime($date['to'])));
+            else:
+             $this->db->where('fee_message.fee_msg_date BETWEEN "'.date('Y-m-d', strtotime($date['from'])).'" AND "'.date('Y-m-d', strtotime($date['to'])).'"');   
+        endif;
+        if($where):
+            $this->db->where($where);
+        endif;
+        if($like):
+            $this->db->like($like);
+        endif;
+
+        $this->db->order_by('college_no','asc');
+               
+        return $this->db->get('fee_message_details')->result();
+    }
+  
       public function employee_sms_report($where=Null,$like=NULL,$date=NULL){
            $this->db->select('
             hr_emp_record.emp_id,

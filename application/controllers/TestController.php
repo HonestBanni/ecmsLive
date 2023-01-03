@@ -25,7 +25,22 @@ class TestController extends AdminController {
             
              $this->load->model('CRUDModel');
           }
-          
+          public function suspend(){
+                       $where = array(
+                        's_status_id'   => 12,
+                        'batch_id'      => 109,
+                       ) ;
+            $student = $this->db->get_where('student_record',$where)->result();
+            if(isset($student) && !empty(  $student)):
+                foreach($student as $row):
+                    $where  = array('student_id'=>$row->student_id);
+                    $set    = array('s_status_id'=>21);
+                    $this->CRUDModel->update('student_record',$set,$where);
+                endforeach;
+            endif;
+            echo '<pre>';print_r($student);die;
+
+          }
           public function shift_change(){
             $where_in_seX = array(
                 // 1st Year 
@@ -116,7 +131,7 @@ class TestController extends AdminController {
                             
                                 $set    = array('shift_id'=>2);
                                 $where  = array('student_id'=>$rowstd->student_id);
-                                $this->CRUDModel->update('student_record',$set,$where);
+                                // $this->CRUDModel->update('student_record',$set,$where);
                             // echo '<pre>';print_r($rowstd);
                             // die;
                         endforeach;
@@ -178,7 +193,7 @@ class TestController extends AdminController {
               $result =   $this->db->get_where('student_record',array('s_status_id'=>'9'))->result();
               echo '<pre>';print_r($result);die;
                   foreach($result as $row):
-                  $this->CRUDModel->deleteid('student_attendance_details',array('serial_no'=>$row->serial_no));
+                //   $this->CRUDModel->deleteid('student_attendance_details',array('serial_no'=>$row->serial_no));
               endforeach;
 //              foreach($result)
           }
@@ -345,7 +360,7 @@ class TestController extends AdminController {
                       'fc_challan_id'=>$lastChallan->fc_challan_id
                   );
                   
-                  $this->CRUDModel->update('fee_challan',$dueDate,$where);
+                //   $this->CRUDModel->update('fee_challan',$dueDate,$where);
 //                   die;
                   endif;
 //                    echo '<pre>';print_r($lastChallan); 
@@ -419,7 +434,7 @@ class TestController extends AdminController {
                             'id'=>$lastChallan->id
                         );
                   
-                  $this->CRUDModel->update('hostel_student_bill',$dueDate,$where); 
+                //   $this->CRUDModel->update('hostel_student_bill',$dueDate,$where); 
                       
                   endif;
 //                   
@@ -597,7 +612,7 @@ class TestController extends AdminController {
                         'exb_section_id' => $row->sec_id, 
                         'exb_subject_id' => $row->subject_id
                     );
-                    $this->CRUDModel->update('exams_bs', $upd, array('exb_class_id' => $row->class_id));
+                    // $this->CRUDModel->update('exams_bs', $upd, array('exb_class_id' => $row->class_id));
                 endif;
             endif;
         endforeach;
@@ -644,5 +659,18 @@ class TestController extends AdminController {
         
     }
     
+    
+    public function prac_group_students(){
+        $get = $this->CRUDModel->getResults('TABLE380');
+        
+        foreach($get as $row):
+            $arr = array(
+                'college_no' => $row->college_no,
+                'student_name' => $row->student_name,
+                'group_id' => $row->group_id,
+            );
+//        $this->CRUDModel->insert('student_prac_group_allottment', $arr);
+        endforeach;
+    }
 }
 ?>

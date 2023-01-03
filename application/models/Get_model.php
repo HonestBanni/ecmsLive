@@ -889,7 +889,7 @@ public function search_group_student($table,$where=NULL,$like=NULL,$custom=NULL)
                        'total_marks'    => $drow->total_marks,
                        'obtained_marks' => $drow->obtained_marks,
                        'percentage'     => $drow->percentage,
-                       'board_regno'   => $drow->board_regno,
+                       'board_regno'   => (int)$drow->board_regno,
                        'shift_name'     => $drow->shift_name,
                        'section'        => $drow->section,
                        'student_status' => $drow->student_status,

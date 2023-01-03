@@ -41,12 +41,48 @@ class MinuteSheetModel extends CI_Model
             min_sheet.msr_cost,
             min_sheet.msr_curr_status,
             min_sheet.msr_date,
+            min_sheet.msr_approve_date,
+            min_sheet.msr_approve_id,
             hr_emp_record.emp_name,
             department.title as deptt_name
         ');
         $this->db->FROM('min_sheet');
         $this->db->join('hr_emp_record','hr_emp_record.emp_id=min_sheet.msr_emp_id', 'left outer');
         $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
+        if($where):
+            $this->db->where($where);
+        endif;
+        if($like):
+            $this->db->like($like);
+        endif;
+        $this->db->order_by('msr_id', 'desc');
+        $query =  $this->db->get();
+        if($query):
+            return $query->result();
+        endif;
+    }
+    
+    public function get_ms_info_dfn($where=NULL, $like=NULL){
+        
+        $this->db->SELECT('
+            min_sheet.msr_id,
+            min_sheet.msr_diary_no,
+            min_sheet.msr_detail,
+            min_sheet.msr_cost,
+            min_sheet.msr_curr_status,
+            min_sheet.msr_date,
+            min_sheet.msr_approve_date,
+            min_sheet.msr_approve_id,
+            hr_emp_record.emp_name,
+            department.title as deptt_name,
+            fn_coa_master_sub_child.fn_coa_mc_title,
+            fn_coa_master_sub_child.fn_coa_mc_code
+        ');
+        $this->db->FROM('min_sheet');
+        $this->db->join('hr_emp_record','hr_emp_record.emp_id=min_sheet.msr_emp_id', 'left outer');
+        $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
+        $this->db->join('min_sheet_budget','min_sheet_budget.msbg_msr_id=min_sheet.msr_id', 'left outer');
+        $this->db->join('fn_coa_master_sub_child','fn_coa_master_sub_child.fn_coa_mc_id=min_sheet_budget.msbg_chart_of_account', 'left outer');
         if($where):
             $this->db->where($where);
         endif;
@@ -69,6 +105,8 @@ class MinuteSheetModel extends CI_Model
             min_sheet.msr_cost,
             min_sheet.msr_curr_status,
             min_sheet.msr_date,
+            min_sheet.msr_approve_date,
+            min_sheet.msr_approve_id,
             hr_emp_record.emp_name,
             department.title as deptt_name
         ');
@@ -98,6 +136,8 @@ class MinuteSheetModel extends CI_Model
             min_sheet.msr_cost,
             min_sheet.msr_curr_status,
             min_sheet.msr_date,
+            min_sheet.msr_approve_date,
+            min_sheet.msr_approve_id,
             hr_emp_record.emp_name,
             department.title as deptt_name
         ');
@@ -127,6 +167,8 @@ class MinuteSheetModel extends CI_Model
             min_sheet.msr_cost,
             min_sheet.msr_curr_status,
             min_sheet.msr_date,
+            min_sheet.msr_approve_date,
+            min_sheet.msr_approve_id,
             hr_emp_record.emp_name,
             department.title as deptt_name
         ');
@@ -148,11 +190,176 @@ class MinuteSheetModel extends CI_Model
         endif;
     }
     
+    public function get_ms_info_where_in_fno($where=NULL, $like=NULL, $column, $array){
+        
+        $this->db->SELECT('
+            min_sheet.msr_id,
+            min_sheet.msr_diary_no,
+            min_sheet.msr_detail,
+            min_sheet.msr_cost,
+            min_sheet.msr_curr_status,
+            min_sheet.msr_date,
+            min_sheet.msr_approve_date,
+            min_sheet.msr_approve_id,
+            min_sheet_budget.msbg_chart_of_account,
+            hr_emp_record.emp_name,
+            department.title as deptt_name,
+            fn_coa_master_sub_child.fn_coa_mc_title,
+            fn_coa_master_sub_child.fn_coa_mc_code
+        ');
+        $this->db->FROM('min_sheet');
+        $this->db->join('hr_emp_record','hr_emp_record.emp_id=min_sheet.msr_emp_id', 'left outer');
+        $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
+        $this->db->join('min_sheet_details','min_sheet_details.msd_msr_id=min_sheet.msr_id', 'left outer');
+        $this->db->join('min_sheet_budget','min_sheet_budget.msbg_msr_id=min_sheet.msr_id', 'left outer');
+        $this->db->join('fn_coa_master_sub_child','fn_coa_master_sub_child.fn_coa_mc_id=min_sheet_budget.msbg_chart_of_account', 'left outer');
+        if($where):
+            $this->db->where($where);
+        endif;
+        $this->db->where_in($column, $array);
+        if($like):
+            $this->db->like($like);
+        endif;
+        $this->db->order_by('msr_id', 'desc');
+        $this->db->group_by('msr_id');
+        $query =  $this->db->get();
+        if($query):
+            return $query->result();
+        endif;
+    }
+    
+    public function get_ms_info_where_in_fno_limit($where=NULL, $like=NULL, $column, $array){
+        
+        $this->db->SELECT('
+            min_sheet.msr_id,
+            min_sheet.msr_diary_no,
+            min_sheet.msr_detail,
+            min_sheet.msr_cost,
+            min_sheet.msr_curr_status,
+            min_sheet.msr_date,
+            min_sheet.msr_approve_date,
+            min_sheet.msr_approve_id,
+            hr_emp_record.emp_name,
+            department.title as deptt_name,
+            fn_coa_master_sub_child.fn_coa_mc_title,
+            fn_coa_master_sub_child.fn_coa_mc_code
+        ');
+        $this->db->FROM('min_sheet');
+        $this->db->join('hr_emp_record','hr_emp_record.emp_id=min_sheet.msr_emp_id', 'left outer');
+        $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
+        $this->db->join('min_sheet_details','min_sheet_details.msd_msr_id=min_sheet.msr_id', 'left outer');
+        $this->db->join('min_sheet_budget','min_sheet_budget.msbg_msr_id=min_sheet.msr_id', 'left outer');
+        $this->db->join('fn_coa_master_sub_child','fn_coa_master_sub_child.fn_coa_mc_id=min_sheet_budget.msbg_chart_of_account', 'left outer');
+        if($where):
+            $this->db->where($where);
+        endif;
+        $this->db->where_in($column, $array);
+        if($like):
+            $this->db->like($like);
+        endif;
+        $this->db->order_by('msr_id', 'desc');
+        $this->db->group_by('msr_id');
+        $this->db->limit(25, 0);
+        $query =  $this->db->get();
+        if($query):
+            return $query->result();
+        endif;
+    }
+    
+    public function get_ms_info_where_in_dfn($where=NULL, $like=NULL, $column, $array, $ms_init_start, $ms_init_end, $ms_appr_start, $ms_appr_end){
+        
+        $this->db->SELECT('
+            min_sheet.msr_id,
+            min_sheet.msr_diary_no,
+            min_sheet.msr_detail,
+            min_sheet.msr_cost,
+            min_sheet.msr_curr_status,
+            min_sheet.msr_date,
+            min_sheet.msr_approve_date,
+            min_sheet.msr_approve_id,
+            min_sheet_budget.msbg_chart_of_account,
+            hr_emp_record.emp_name,
+            department.title as deptt_name,
+            fn_coa_master_sub_child.fn_coa_mc_title,
+            fn_coa_master_sub_child.fn_coa_mc_code
+        ');
+        $this->db->FROM('min_sheet');
+        $this->db->join('hr_emp_record','hr_emp_record.emp_id=min_sheet.msr_emp_id', 'left outer');
+        $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
+        $this->db->join('min_sheet_details','min_sheet_details.msd_msr_id=min_sheet.msr_id', 'left outer');
+        $this->db->join('min_sheet_budget','min_sheet_budget.msbg_msr_id=min_sheet.msr_id', 'left outer');
+        $this->db->join('fn_coa_master_sub_child','fn_coa_master_sub_child.fn_coa_mc_id=min_sheet_budget.msbg_chart_of_account', 'left outer');
+        $this->db->where_in($column, $array);
+        if($like):
+            $this->db->like($like);
+        endif;
+        if($where):
+            $this->db->where($where);
+        endif;
+        if($ms_init_start && $ms_init_end):
+            $this->db->where('min_sheet.msr_date BETWEEN "'.date('Y-m-d', strtotime($ms_init_start)).'" AND "'.date('Y-m-d', strtotime($ms_init_end)).'"');
+        endif;
+        if($ms_appr_start && $ms_appr_end):
+            $this->db->where('min_sheet.msr_date BETWEEN "'.date('Y-m-d', strtotime($ms_appr_start)).'" AND "'.date('Y-m-d', strtotime($ms_appr_end)).'"');
+        endif;
+        $this->db->order_by('msr_id', 'desc');
+        $this->db->group_by('msr_id');
+        $query =  $this->db->get();
+        if($query):
+            return $query->result();
+        endif;
+    }
+    
+    public function get_ms_info_where_in_dfn_limit($where=NULL, $like=NULL, $column, $array, $ms_init_start, $ms_init_end, $ms_appr_start, $ms_appr_end){
+        
+        $this->db->SELECT('
+            min_sheet.msr_id,
+            min_sheet.msr_diary_no,
+            min_sheet.msr_detail,
+            min_sheet.msr_cost,
+            min_sheet.msr_curr_status,
+            min_sheet.msr_date,
+            min_sheet.msr_approve_date,
+            min_sheet.msr_approve_id,
+            hr_emp_record.emp_name,
+            department.title as deptt_name,
+            fn_coa_master_sub_child.fn_coa_mc_title,
+            fn_coa_master_sub_child.fn_coa_mc_code
+        ');
+        $this->db->FROM('min_sheet');
+        $this->db->join('hr_emp_record','hr_emp_record.emp_id=min_sheet.msr_emp_id', 'left outer');
+        $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
+        $this->db->join('min_sheet_details','min_sheet_details.msd_msr_id=min_sheet.msr_id', 'left outer');
+        $this->db->join('min_sheet_budget','min_sheet_budget.msbg_msr_id=min_sheet.msr_id', 'left outer');
+        $this->db->join('fn_coa_master_sub_child','fn_coa_master_sub_child.fn_coa_mc_id=min_sheet_budget.msbg_chart_of_account', 'left outer');
+        $this->db->where_in($column, $array);
+        if($like):
+            $this->db->like($like);
+        endif;
+        if($where):
+            $this->db->where($where);
+        endif;
+        if($ms_init_start && $ms_init_end):
+            $this->db->where('min_sheet.msr_date BETWEEN "'.date('Y-m-d', strtotime($ms_init_start)).'" AND "'.date('Y-m-d', strtotime($ms_init_end)).'"');
+        endif;
+        if($ms_appr_start && $ms_appr_end):
+            $this->db->where('min_sheet.msr_approve_date BETWEEN "'.date('Y-m-d', strtotime($ms_appr_start)).'" AND "'.date('Y-m-d', strtotime($ms_appr_end)).'"');
+        endif;
+        $this->db->order_by('msr_id', 'desc');
+        $this->db->group_by('msr_id');
+        $this->db->limit(25, 0);
+        $query =  $this->db->get();
+        if($query):
+            return $query->result();
+        endif;
+    }
+    
     public function get_ms_info_edit($where=NULL){
         
         $this->db->SELECT('
             min_sheet.*,
             hr_emp_record.emp_name,
+            hr_emp_record.hod_ms_signature,
             department.title as deptt_name,
         ');
         $this->db->FROM('min_sheet');
@@ -171,10 +378,13 @@ class MinuteSheetModel extends CI_Model
         
         $this->db->SELECT('
             hr_emp_record.department_id as deptt_id,
+            hr_emp_record.current_designation as design_id,
             department.title as deptt_name,
+            hr_emp_designation.title as designation,
         ');
         $this->db->FROM('hr_emp_record');
         $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
+        $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation', 'left outer');
         if($where):
             $this->db->where($where);
         endif;
@@ -193,6 +403,7 @@ class MinuteSheetModel extends CI_Model
             min_sheet.msr_cost,
             min_sheet.msr_curr_status,
             min_sheet.msr_date,
+            min_sheet.msr_user_id,
             hr_emp_record.emp_name,
             department.title as deptt_name
         ');
@@ -208,6 +419,7 @@ class MinuteSheetModel extends CI_Model
             $this->db->like($like);
         endif;
         $this->db->order_by('msr_id', 'desc');
+        $this->db->group_by('msr_id');
         $query =  $this->db->get();
         if($query):
             return $query->result();
@@ -275,17 +487,52 @@ class MinuteSheetModel extends CI_Model
     public function get_hod_remarks($where=NULL){
         
         $this->db->SELECT('
+            min_sheet_details.msd_id,
             min_sheet_details.msd_msr_id,
             min_sheet_details.msd_comments,
             min_sheet_details.msd_status,
+            min_sheet_details.msd_date,
+            min_sheet_details.msd_recommend,
+            min_sheet_details.msd_forwarded_for,
             hr_emp_record.emp_name,
             hr_emp_record.hod_ms_signature,
-            department.title as deptt_name
+            department.title as deptt_name,
+            hr_emp_designation.title as designation
         ');
         $this->db->FROM('min_sheet_details');
         $this->db->join('users','users.id=min_sheet_details.msd_user_id', 'left outer');
         $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId', 'left outer');
         $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
+        $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation', 'left outer');
+        if($where):
+            $this->db->where($where);
+        endif;
+        $query =  $this->db->get();
+        if($query):
+            return $query->row();
+        endif;
+    }
+    
+    public function get_hod_rec_remarks($where=NULL){
+        
+        $this->db->SELECT('
+            min_sheet_details.msd_id,
+            min_sheet_details.msd_msr_id,
+            min_sheet_details.msd_comments,
+            min_sheet_details.msd_status,
+            min_sheet_details.msd_date,
+            min_sheet_details.msd_recommend,
+            min_sheet_details.msd_forwarded_for,
+            hr_emp_record.emp_name,
+            hr_emp_record.hod_ms_signature,
+            department.title as deptt_name,
+            hr_emp_designation.title as designation
+        ');
+        $this->db->FROM('min_sheet_details');
+//        $this->db->join('users','users.id=min_sheet_details.msd_user_id', 'left outer');
+        $this->db->join('hr_emp_record','hr_emp_record.emp_id=min_sheet_details.msd_fwd_hod_id', 'left outer');
+        $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
+        $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation', 'left outer');
         if($where):
             $this->db->where($where);
         endif;
@@ -298,8 +545,10 @@ class MinuteSheetModel extends CI_Model
     public function get_fno_remarks($where=NULL){
         
         $this->db->SELECT('
+            min_sheet_budget.msbg_id,
             min_sheet_budget.msbg_comments,
             min_sheet_budget.msbg_budget,
+            min_sheet_budget.msbg_date,
             fn_coa_master_sub_child.fn_coa_mc_title,
             fn_coa_master_sub_child.fn_coa_mc_code,
             hr_emp_record.emp_name,
@@ -323,9 +572,12 @@ class MinuteSheetModel extends CI_Model
     public function get_vp_remarks($where=NULL){
         
         $this->db->SELECT('
+            min_sheet_details.msd_id,
             min_sheet_details.msd_msr_id,
             min_sheet_details.msd_comments,
             min_sheet_details.msd_status,
+            min_sheet_details.msd_date,
+            min_sheet_details.msd_recommend,
             min_sheet_purchase_type.mspt_type,
             hr_emp_record.emp_name,
             hr_emp_record.hod_ms_signature,
@@ -349,9 +601,12 @@ class MinuteSheetModel extends CI_Model
     public function get_dir_finance_remarks($where=NULL, $wi, $wi_arr){
         
         $this->db->SELECT('
+            min_sheet_details.msd_id,
             min_sheet_details.msd_msr_id,
             min_sheet_details.msd_comments,
             min_sheet_details.msd_status,
+            min_sheet_details.msd_date,
+            min_sheet_details.msd_recommend,
             min_sheet_status.mss_title,
             hr_emp_record.emp_name,
             hr_emp_record.hod_ms_signature,
@@ -377,9 +632,12 @@ class MinuteSheetModel extends CI_Model
     public function get_principal_remarks($where=NULL, $wi, $wi_arr){
         
         $this->db->SELECT('
+            min_sheet_details.msd_id,
             min_sheet_details.msd_msr_id,
             min_sheet_details.msd_comments,
             min_sheet_details.msd_status,
+            min_sheet_details.msd_date,
+            min_sheet_details.msd_recommend,
             min_sheet_status.mss_title,
             min_sheet_purchase_type.mspt_type,
             hr_emp_record.emp_name,
@@ -402,6 +660,93 @@ class MinuteSheetModel extends CI_Model
         $query =  $this->db->get();
         if($query):
             return $query->row();
+        endif;
+    }
+    
+    public function get_revert_detail($where){
+      
+        $this->db->SELECT('
+            min_sheet_details.*,
+            min_sheet_status.*,
+            hr_emp_record.emp_name
+        ');
+        $this->db->FROM('min_sheet_details');
+        $this->db->join('min_sheet_status','min_sheet_status.mss_id=min_sheet_details.msd_status', 'left outer');
+        $this->db->join('users','users.id=min_sheet_details.msd_user_id', 'left outer');
+        $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId', 'left outer');
+        if($where):
+            $this->db->where($where);
+        endif;
+        $query =  $this->db->get();
+        if($query):
+            return $query->row();
+        endif;  
+    }
+    
+    public function get_initiator_record($where, $like=NULL){
+      
+        $this->db->SELECT('
+            hr_emp_record.*,
+            hr_emp_designation.title as emp_design
+        ');
+        $this->db->FROM('hr_emp_record');
+        $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation', 'left outer');
+        $this->db->order_by('emp_name', 'asc');
+        if($where):
+            $this->db->where($where);
+        endif;
+        if($like):
+            $this->db->like(array('emp_name' => $like));
+        endif;
+        $query =  $this->db->get();
+        if($query):
+            return $query->result();
+        endif;  
+    }
+    
+    public function get_ms_info_admin($where=NULL, $like=NULL, $ms_init_start, $ms_init_end, $ms_appr_start, $ms_appr_end, $limit=NULL){
+        
+        $this->db->SELECT('
+            min_sheet.msr_id,
+            min_sheet.msr_diary_no,
+            min_sheet.msr_detail,
+            min_sheet.msr_cost,
+            min_sheet.msr_curr_status,
+            min_sheet.msr_date,
+            min_sheet.msr_approve_date,
+            min_sheet.msr_approve_id,
+            min_sheet_budget.msbg_chart_of_account,
+            hr_emp_record.emp_name,
+            department.title as deptt_name,
+            fn_coa_master_sub_child.fn_coa_mc_title,
+            fn_coa_master_sub_child.fn_coa_mc_code
+        ');
+        $this->db->FROM('min_sheet');
+        $this->db->join('hr_emp_record','hr_emp_record.emp_id=min_sheet.msr_emp_id', 'left outer');
+        $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
+        $this->db->join('min_sheet_details','min_sheet_details.msd_msr_id=min_sheet.msr_id', 'left outer');
+        $this->db->join('min_sheet_budget','min_sheet_budget.msbg_msr_id=min_sheet.msr_id', 'left outer');
+        $this->db->join('fn_coa_master_sub_child','fn_coa_master_sub_child.fn_coa_mc_id=min_sheet_budget.msbg_chart_of_account', 'left outer');
+        if($limit):
+            $this->db->limit($limit, 0);
+        endif;
+        if($like):
+            $this->db->like($like);
+        endif;
+        if($where):
+            $this->db->where($where);
+        endif;
+        if($ms_init_start && $ms_init_end):
+            $this->db->where('min_sheet.msr_date BETWEEN "'.date('Y-m-d', strtotime($ms_init_start)).'" AND "'.date('Y-m-d', strtotime($ms_init_end)).'"');
+        endif;
+        if($ms_appr_start && $ms_appr_end):
+            $this->db->where('min_sheet.msr_date BETWEEN "'.date('Y-m-d', strtotime($ms_appr_start)).'" AND "'.date('Y-m-d', strtotime($ms_appr_end)).'"');
+        endif;
+        $this->db->order_by('msr_id', 'desc');
+        $this->db->group_by('msr_id');
+        $query =  $this->db->get();
+        if($query):
+            return $query->result();
         endif;
     }
     

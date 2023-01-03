@@ -1,6 +1,6 @@
 <!-- ******CONTENT****** -->  
 <div class="content container">
-    <h2 align="left">Minute Sheet Principal Panel
+    <h2 align="left"><?php echo $ReportName?>
         <hr>
     </h2>
     <!-- ******BANNER****** -->
@@ -8,13 +8,59 @@
         <div class="col-md-12">
             <section class="course-finder" style="padding-bottom: 2%;">
                 <h1 class="section-heading text-highlight">
-                    <span class="line">Search in Minute Sheet</span>
+                    <span class="line">Search Form</span>
                 </h1>
+                <?php echo form_open('',array('class'=>'course-finder-form','method'=>'post')); ?>
                 <div class="section-content" >
-                    <?php echo form_open('',array('class'=>'course-finder-form','method'=>'post')); ?>
                     <div class="row">
-                        <div class="col-md-12 col-sm-12 form-group">
-                            <!--<label for="name">Search in Minute Sheet</label>-->
+                        <div class="col-md-3 col-sm-12 form-group">
+                            <label for="name">Process No</label>
+                            <?php
+                                echo form_input(
+                                    array(
+                                        'name'  => 'ms_diary_no',
+                                        'id'    => 'ms_diary_no',
+                                        'type'  => 'text',
+                                        'class' => 'form-control',
+                                    )
+                                );
+                            ?>
+                        </div>
+ 
+                        <div class="col-md-3 col-sm-12 form-group">
+                            <label for="name">Initiator</label>
+                            <?php
+                                echo form_input(
+                                    array(
+                                        'name'  => 'msb_name',
+                                        'id'    => 'msb_name',
+                                        'type'  => 'text',
+                                        'class' => 'form-control',
+                                    )
+                                );
+                                echo form_input(
+                                    array(
+                                        'name'  => 'msb_id',
+                                        'id'    => 'msb_id',
+                                        'type'  => 'hidden',
+                                        'class' => 'form-control',
+                                    )
+                                );
+                            ?>
+                        </div>
+ 
+<!--                        <div class="col-md-3 col-sm-12 form-group">
+                            <label for="name">Department</label>
+                            <?php // echo form_dropdown('dept_id', $department,'',  'class="form-control" id="dept_id"'); ?>
+                        </div>
+ 
+                        <div class="col-md-3 col-sm-12 form-group">
+                            <label for="name">Initiator</label>
+                            <?php // echo form_dropdown('msb_id', $min_sheet_by,'',  'class="form-control" id="msb_id"'); ?>
+                        </div>-->
+ 
+                        <div class="col-md-3 col-sm-12 form-group">
+                            <label for="name">Description</label>
                             <?php
                                 echo form_input(
                                     array(
@@ -26,17 +72,21 @@
                                 );
                             ?>
                         </div>
- 
+                        
+                        <div class="col-md-3 col-sm-12 form-group">
+                            <label for="name">Status</label>
+                            <?php echo form_dropdown('stts_id', $ms_status,'',  'class="form-control" id="stts_id"'); ?>
+                        </div>
+                        
+                        <div class="col-md-2 col-sm-12 form-group">
+                            <label for="name" style="visibility: hidden">Search Button</label>
+                            <button type="button" class="btn btn-theme" name="search_ms" id="search_ms"  value="search_ms" > Search</button>
+                        </div>
+                        
                     </div>
                 </div><!--//section-content-->
-                                 
-<!--                <div style="padding-top:1%;">
-                    <div class="col-md-12 right">
-                        <button type="button" class="btn btn-theme pull-right" name="search_ms" id="search_ms"  value="search_ms" > Search Minute Sheet</button>
-                    </div>
-                </div>-->
-                
-                <?php echo form_close(); ?>
+                              
+                <?php echo form_close(); ?>            
             </section>    
             <div id="result_grid"></div>
             
@@ -66,29 +116,56 @@
     
     $(document).ready(function(){
         
-        var data = { 'detail': $('#detail_search').val() };
         $.ajax({
             type    : 'post',
             url     : 'MinuteSheetController/prn_minute_sheet_grid',
-            data    : data,
             success :function(result){ 
                $('#result_grid').html(result);    
             }
         });
             
-        setInterval(function(){
+//        setInterval(function(){
+//            $.ajax({
+//                type    : 'post',
+//                url     : 'MinuteSheetController/prn_minute_sheet_grid',
+//                data    : data,
+//                success :function(result){ 
+//                   $('#result_grid').html(result);    
+//                }
+//            });
+//        }, 60000);
+//        
+//        $('#detail_search').on('keyup', function(){
+//            var data = { 'detail': $('#detail_search').val() };
+//            $.ajax({
+//                type    : 'post',
+//                url     : 'MinuteSheetController/prn_minute_sheet_grid',
+//                data    : data,
+//                success :function(result){ 
+//                   $('#result_grid').html(result);    
+//                }
+//            });
+//        });
+        
+        $('#dept_id').on('change', function(){
             $.ajax({
                 type    : 'post',
-                url     : 'MinuteSheetController/prn_minute_sheet_grid',
-                data    : data,
+                url     : 'MinuteSheetController/get_employ',
+                data    : { 'dept_id': $('#dept_id').val() },
                 success :function(result){ 
-                   $('#result_grid').html(result);    
+                   $('#msb_id').html(result);    
                 }
             });
-        }, 60000);
+        });
         
-        $('#detail_search').on('keyup', function(){
-            var data = { 'detail': $('#detail_search').val() };
+        $('#search_ms').on('click', function(){
+            var data = { 
+                'ms_diary_no'   : $('#ms_diary_no').val(),
+                'dept_id'       : $('#dept_id').val(),
+                'ms_by_id'      : $('#msb_id').val(),
+                'detail'        : $('#detail_search').val(),
+                'stts_id'       : $('#stts_id').val()
+            };
             $.ajax({
                 type    : 'post',
                 url     : 'MinuteSheetController/prn_minute_sheet_grid',
@@ -98,6 +175,18 @@
                 }
             });
         });
+        
+        $("#msb_name").autocomplete({  
+            minLength   : 0,
+            source      : "MinuteSheetController/initiator_autocomplete/"+$("#msb_name").val(),
+            autoFocus   : true,
+            scroll      : true,
+            dataType    : 'jsonp',
+            select      : function(event, ui){
+                $("#msb_name").val(ui.item.contactPerson);
+                $("#msb_id").val(ui.item.id);
+        }
+        }).focus(function() {  $(this).autocomplete("search", "");  }); 
         
     });
  

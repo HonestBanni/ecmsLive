@@ -21,46 +21,56 @@ class AdminController extends CI_Controller {
         
         public function __construct() {
              parent::__construct();
-                ini_set('max_execution_time', 0); 
-                ini_set('memory_limit','2048M');
+              ini_set('max_execution_time', 0); 
+              ini_set('memory_limit','2048M');
               
-                ini_set('query_cache_type','1');
-                ini_set('query_cache_size','10M');
-                ini_set('query_cache_limit','256K');
+              ini_set('query_cache_type','1');
+              ini_set('query_cache_size','10M');
+              ini_set('query_cache_limit','256K');
               
               
-                $this->db->query('RESET QUERY CACHE');
-                $this->db->query('FLUSH QUERY CACHE');
+              
+//              ini_set('query_cache_limit','256K');
+              
+// query_cache_type=1
+//
+//query_cache_size = 10M
+//
+//query_cache_limit=256k
+              
+              $this->db->query('RESET QUERY CACHE');
+              $this->db->query('FLUSH QUERY CACHE');
+//              $this->db->query('SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,"ONLY_FULL_GROUP_BY",""))');
+              
+             $session = $this->session->all_userdata();
+     
+                if(empty($session['userData']['loginStatus'])){
+                   redirect('login');
+                }
+ 
                 date_default_timezone_set('Asia/Karachi');
-                
-                $this->UserInfo             =  json_decode(json_encode($this->check_login_status()), FALSE);
-                $this->data['print_log']    = $this->current_log_info();
-                $this->url_security();
+       
+            $this->load->model('CRUDModel');
+            $this->load->model('DropdownModel');
+            $this->userInfo = json_decode(json_encode($this->getUser()), FALSE);
+            $this->data['print_log']    = $this->current_log_info();
+            $this->url_security();
         }
         
-        public function check_login_status(){
-                $session = $this->session->all_userdata();
-                if(empty($session[$this->config->config['session_name']])):
-                    redirect('Login');
-                else:
-                    return $session[$this->config->config['session_name']];
-                endif;
-        }
-        
-        
-        public function get_user(){
+        public function getUser(){
                     $session        = $this->session->all_userdata();
-                    return $session[$this->config->config['session_name']];
+                    return $session['userData'];
             }
         public function default_fee_bank(){
                     return  $this->db->get_where('bank',array('default_account'=>1))->row();
                     
             }
         public function current_log_info(){
-             
+                $session        = $this->session->all_userdata();
+                $user_id        = $session['userData']['user_id'];
                 $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId');
-                $user_details   =$this->db->get_where('users',array('id'=>$this->check_login_status()['user_id']))->row()->emp_name;
-                if($this->check_login_status()['user_id'] == 1):
+                $user_details   =$this->db->get_where('users',array('id'=>$user_id))->row()->emp_name;
+                if($user_id == 1):
                     return '';
                     else:
                     return '<span style="font-size:10px;">Print By : '.$user_details.'  Date : '.date('d-m-Y H:i:s').'</span>';
@@ -102,7 +112,7 @@ class AdminController extends CI_Controller {
                     
                 }
                
-                if($url === 'Dashboard'):
+                if($url === 'admin/admin_home' || $url === 'Admin/admin_home'):
                     
                else:
                 
@@ -119,7 +129,7 @@ class AdminController extends CI_Controller {
                     //  echo '<pre>';print_r($url_2_info);
                         $m2_id     = $url_2_info->m2_id;
                             $where = array(
-                                'upl2_urId'    => $this->UserInfo->user_roleId,  
+                                'upl2_urId'    => $this->userInfo->user_roleId,  
                                 'up2_m2Id'     => $m2_id 
                            );
                            
@@ -137,7 +147,7 @@ class AdminController extends CI_Controller {
                 if($url_3_info):
                     $m3_id     = $url_3_info->m3_id;
                         $where = array(
-                            'upl3_urId'    => $this->UserInfo->user_roleId,  
+                            'upl3_urId'    => $this->userInfo->user_roleId,  
                             'upl3_m3Id'     => $m3_id 
                        );
                            

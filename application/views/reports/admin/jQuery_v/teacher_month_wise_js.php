@@ -34,9 +34,10 @@
                             echo '<td>'.$rowEmp->emp_name.'</td>';
                              $total_count = ''; 
                             for($i=1 ;$i<=$days ; $i++):
-                                
+//                                $id= $this->db->get_where('users',array('user_empId'=>$rowEmp->emp_id))->row();
                                  $where = array(
-                                    'emp_id'            => $rowEmp->emp_id,
+//                                    'emp_id'            => $rowEmp->emp_id,
+                                     'student_attendance.user_id'    => $rowEmp->id,
                                     'attendance_date'   => $year.'-'.$month.'-'.$i,
                                      'timetable.day_id'=> date('N',strtotime($year.'-'.$month.'-'.$i))
                                 );

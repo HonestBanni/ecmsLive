@@ -23,11 +23,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
+//echo '<pre>';print_r($_SERVER);die;
  
-       $config['base_url'] = "http://172.16.0.111/Payroll/";
+//if((isset($_SERVER['HTTPS']) ? 'http' : 'http') .'://'.$_SERVER[HTTP_HOST] == 'http://116.58.106.5'):
+//if((isset($_SERVER['HTTPS']) ? "http" : "http") . "://$_SERVER[HTTP_HOST]" == 'http://116.58.106.5'):
  
+if($_SERVER['HTTP_HOST'] == '116.58.106.3'):
+       $config['base_url'] = "http://116.58.106.3/ecms/";
+  else:
+    $config['base_url'] = 'http://172.16.0.111/ecms/';  
+endif;
  
 
+//echo '<pre>';print_r($config);die;
+ //$config['base_url']     = 'http://116.58.106.3/ecms/';
 /*
 |--------------------------------------------------------------------------
 | Index File
@@ -514,4 +523,3 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
-$config['session_name'] = 'PayRoll_Data';

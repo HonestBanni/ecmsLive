@@ -10527,16 +10527,27 @@ public function student_practical_white_card_group()
                                       'attendance_date'               => $year.'-'.$month.'-'.$i,
                                       'ca_merge_id !='                => '0'
                                       );    
-                                                  $this->db->select('count(*) as total');   
-                                                  $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id');
-                                                  $this->db->group_by('class_alloted.ca_merge_id');
-                                  $return_merge = $this->db->get_where('student_attendance',$where_mer)->row();
+                                //                   $this->db->select('count(*) as total');   
+                                //                   $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id');
+                                //                   $this->db->group_by('class_alloted.ca_merge_id');
+                                //   $return_merge = $this->db->get_where('student_attendance',$where_mer)->row();
+                                
+                                // if(isset($return_merge) && !empty($return_merge)):
+                                //     // $data[$i]       = count($return_merge);
+                                //     $total_att_count  += $return_merge->total; 
+                                //     $total_count      += $return_merge->total;  
+                                // endif; 
+
+                                                    $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id');
+                                                    $this->db->group_by('class_alloted.ca_merge_id');                                                
+                                    $return_merge = $this->db->get_where('student_attendance',$where_mer)->result();
+                            
+                                    if(isset($return_merge) && !empty($return_merge)):
+                                        $total_att_count  += count($return_merge); 
+                                        $total_count      += count($return_merge);  
+                                    endif; 
+
                           
-                                  if(isset($return_merge) && !empty($return_merge)):
-                                      // $data[$i]       = count($return_merge);
-                                      $total_att_count  += $return_merge->total; 
-                                      $total_count      += $return_merge->total;  
-                                  endif; 
 
                                 //Get practical attendance 
                                   $where_pract= array(
@@ -10597,7 +10608,8 @@ public function student_practical_white_card_group()
                       'emp_status_id' => 1,
                       'cat_id'        => 1,
                        // 'user_status'   => 1
-                           'emp_id !='        =>'255'
+                        //    'emp_id'        =>'192'
+                        'emp_id !='        =>'255'
                       );
                           $this->db->join('users','users.user_empId=hr_emp_record.emp_id');
                           $this->db->order_by('emp_name','asc');
@@ -10611,7 +10623,7 @@ public function student_practical_white_card_group()
                           $data['$#']             = $return_dataCount;
                           $data['Teacher_Name']   = $rowEmp->emp_name;
                           for($i=1 ;$i<=$days ; $i++):
-                              $pricital_count = '';
+                           
                             //   $id= $this->db->get_where('users',array('user_empId'=>$rowEmp->emp_id))->row();
                               //Normal Class Count ------------------------------------------
                                 $where = array(
@@ -10619,17 +10631,14 @@ public function student_practical_white_card_group()
                                     'student_attendance.user_id'    => $rowEmp->id,
                                     'attendance_date'               => $year.'-'.$month.'-'.$i,
                                     'ca_merge_id'                   => '0'
-                                    // 'timetable.day_id'              => date('N',strtotime($year.'-'.$month.'-'.$i))
+                                    
                                 );
                                       $this->db->select('count(*) as total');  
                                       $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id');
-                                      // $this->db->join('timetable','timetable.class_id=class_alloted.class_id');
-                                      // $this->db->join('class_starting_time','class_starting_time.stime_id=timetable.stime_id','left outer'); 
-                                      // $this->db->order_by('class_starting_time.class_stime','asc');
-                                      // $this->db->group_by('class_starting_time.class_stime');
+                                      
                               $return_notmerge = $this->db->get_where('student_attendance',$where)->row();
                               $total_att_count ='';
-                              if(isset($return_notmerge->total) && !empty($return_notmerge->total)):
+                              if(isset($return_notmerge) && !empty($return_notmerge)):
                                   $total_att_count  += $return_notmerge->total;
                                   $total_count      += $return_notmerge->total;  
                               endif; 
@@ -10639,17 +10648,16 @@ public function student_practical_white_card_group()
                                       'student_attendance.user_id'    => $rowEmp->id,
                                        // 'emp_id'            => $rowEmp->emp_id,
                                       'attendance_date'               => $year.'-'.$month.'-'.$i,
-                                      'ca_merge_id !='                => '0'
+                                      'ca_merge_id >'                => '0'
                                       );    
-                                                  $this->db->select('count(*) as total');   
+                                                  
                                                   $this->db->join('class_alloted','class_alloted.class_id=student_attendance.class_id');
-                                                  $this->db->group_by('class_alloted.ca_merge_id');
-                                  $return_merge = $this->db->get_where('student_attendance',$where_mer)->row();
+                                                  $this->db->group_by('class_alloted.ca_merge_id');                                                
+                                  $return_merge = $this->db->get_where('student_attendance',$where_mer)->result();
                           
                                   if(isset($return_merge) && !empty($return_merge)):
-                                      // $data[$i]       = count($return_merge);
-                                      $total_att_count  += $return_merge->total; 
-                                      $total_count      += $return_merge->total;  
+                                      $total_att_count  += count($return_merge); 
+                                      $total_count      += count($return_merge);  
                                   endif; 
 
                                 //Get practical attendance 

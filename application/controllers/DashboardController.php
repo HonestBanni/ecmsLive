@@ -22,48 +22,19 @@ class DashboardController extends AdminController {
 	 */
      public function __construct() {
              parent::__construct();
-          }
-	public function index(){
-            
-                           
-            $this->data['Showmessage'] = $this->CRUDModel->get_where_result('message',array('status'=>'1'));
-//            $this->data['userInfo'] = $this->UserInfo;
-           
-            $this->data['page_title']        = 'Admin Home | ECMS';
-            $this->data['page']        =  'Dashboard/Index_v';
-            $this->load->view('common/common',$this->data);
-            
-
-//            $data['page']  = "admin/Dashboard";
-//            $data['title'] = 'Admin';
-//            $this->load->view('templatesadm/template', $data);
-	}
-       public function employee_login(){	
-        $where = array('id'=>$this->UserInfo->user_id);
-        $q = $this->CRUDModel->get_where_row('users',$where);
-        
-        $data = array(
-        'emp_id'=>$q->user_empId,
-        'in_date'=>date('Y-m-d'),   
-        'in_time'=>date('h:i:s a'),
-        'date_time'=>date('Y-d-m H:i:s')    
-        );
-        $this->CRUDModel->insert('teacher_attendance',$data);
-        redirect('Dashboard');    
-	}
-    
-    public function employee_logout(){
-            $t_attend_id = $this->uri->segment(3);
-            $where = array('t_attend_id'=>$t_attend_id);
-            $data = array(
-            'out_date'=>date('Y-m-d'),   
-            'out_time'=>date('h:i:s a')
-            );
-            $this->CRUDModel->update('teacher_attendance',$data,$where);
-        
-            redirect('Logout');
+             $this->load->model('CRUDModel');
+//             $this->load->model('ActivitesModel');
+             $this->load->library("pagination");
+             
         }
+	public function index()
+	{
 
+            $data['page']  = "admin/Dashboard";
+            $data['title'] = 'Admin';
+            $this->load->view('templatesadm/template', $data);
+	}
+       
         
         public function societiesAdmin(){
             

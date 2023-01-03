@@ -48,7 +48,8 @@
                 <select class="form-control" name="stime_id" id="stime_id">
                         <option value="">Start Time</option>
                         <?php 
-                        $d = $this->CRUDModel->getResults('class_starting_time');
+                            $this->db->order_by('order_stime', 'asc');
+                        $d = $this->db->get('class_starting_time')->result();
                         foreach($d as $rec):
                         ?>
                         <option value="<?php echo $rec->stime_id;?>"><?php echo $rec->class_stime;?></option>
@@ -59,7 +60,9 @@
                 <select class="form-control" name="etime_id" id="etime_id">
                         <option value="">End Time</option>
                         <?php 
-                        $d = $this->CRUDModel->getResults('class_ending_time');
+                        
+                            $this->db->order_by('order_etime', 'asc');
+                        $d = $this->db->get('class_ending_time')->result();
                         foreach($d as $rec):
                         ?>
                         <option value="<?php echo $rec->etime_id;?>"><?php echo $rec->class_etime;?></option>

@@ -1,6 +1,6 @@
 <!-- ******CONTENT****** --> 
 <div class="content container">
-    <? if($ms_detail): ?>
+    <?php if($ms_detail): ?>
     <!-- ******BANNER****** -->
     <div class="row cols-wrapper">
         <div class="col-md-12">
@@ -12,8 +12,8 @@
                         echo '<div class="col-md-12">
                             <table class="table" style="font-size: 15px;">
                                 <tr>
-                                    <th width="15%">Diary No.</th>
-                                    <td width="35%">'.$ms_detail->msr_diary_no.'</td>
+                                    <th width="15%">Process No.</th>
+                                    <td width="35%">'.$ms_detail->msr_id.'</td>
                                     <th width="15%">Date</th>
                                     <td width="35%">'.date('d-m-Y', strtotime($ms_detail->msr_date)).'</td>
                                 </tr>
@@ -33,8 +33,49 @@
                                     <th>(In Words)</th>
                                     <td>'. strtoupper($cm).'</td>
                                 </tr>
-                            </table>
-                        </div>';
+                            </table>';
+                        
+                            if($hod_rm_ado || $ao_remarks || $fwd_rm_ado):
+                                echo '<div style="border: 1px solid #000; margin-bottom: 5px;">
+                                    <table class="table" width="100%" cellspacing="0">
+                                        <tr>
+                                            <th colspan="3" style="border: 1px solid #000; background-color: #000; color: #fff; text-align:center">ADMINISTRATIVE DEPARTMENT</th>
+                                        </tr>';
+                                        if($fwd_rm_ado):
+                                            echo '<tr>
+                                                <td colspan="2"><strong>Forwarded to '.$fwd_rm_ado->emp_name.' ('.$fwd_rm_ado->designation.') for '.$fwd_rm_ado->msd_forwarded_for.'</strong></td>
+                                                <td>Date: '.date('d-m-Y', strtotime($fwd_rm_ado->msd_date)).'</td>
+                                            </tr>';
+                                        endif;
+                                        if($hod_rm_ado):
+                                            echo '<tr>
+                                                <td width="25%" style="border-bottom: 1px solid #000;"><strong>Remarks by '.$hod_rm_ado->emp_name.': </strong></td>
+                                                <td width="50%">'.$hod_rm_ado->msd_comments.'</td>
+                                                <td width="25%" style="border-bottom: 1px solid #000;">Date: '.date('d-m-Y', strtotime($hod_rm_ado->msd_date)).'</td>
+                                            </tr>';
+                                        endif;
+                                        if($ao_remarks):
+                                            if($ao_remarks->msd_recommend == 1):
+                                                $rec_des = 'RECOMMENDED';
+                                            elseif($ao_remarks->msd_recommend == 2):
+                                                $rec_des = 'NOT RECOMMENDED';
+                                            else:
+                                                $rec_des = '';
+                                            endif;
+                                            echo '<tr>
+                                                <td width="25%" style="vertical-align: top;" height="50"><strong>Remarks by Administrative Officer:</strong></td>
+                                                <td width="50%" style="vertical-align: top;">'.$ao_remarks->msd_comments.'</td>
+                                                <td width="25%" style="vertical-align: top;">Date: '.date( 'd-m-Y', strtotime($ao_remarks->msd_date)).'</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" style="vertical-align: top;text-align: center;"><strong><i>'.$rec_des.'</i></strong></td>
+                                            </tr>';
+                                        endif;
+                                    echo '</table>
+                                </div>';
+                            endif;
+                            
+                        echo '</div>';
                         
                         ?>
                     </div>
@@ -160,9 +201,9 @@
                                 </div>
                             </div>
                         </div>
-                        </div>
-                        
-                        <div class="row">
+                    </div>
+
+                    <div class="row">
                         <div class="col-md-4 col-sm-12 form-group">
                             <label for="name">Budget Allocation</label>
                             <?php
@@ -207,7 +248,7 @@
                 </div><!--//section-content-->
                            
                     <div class="col-md-12 right">
-                        <button type="button" class="btn btn-theme pull-right mt-2" name="update_fno_ms" id="update_fno_ms"  value="update_fno_ms" >Submit Minute Sheet</button>
+                        <button type="button" class="btn btn-theme pull-right mt-2" name="update_fno_ms" id="update_fno_ms"  value="update_fno_ms" >Submit</button>
                     </div>
                 
             </section>    
@@ -283,7 +324,7 @@
             
         </div><!--//col-md-12-->       
     </div><!--//cols-wrapper-->
-    <? endif; ?>
+    <?php endif; ?>
 </div><!--//content-->
         
 <script>
@@ -296,22 +337,22 @@
                 $('#code_id').focus();
                 return false;
             }
-            if($('#budget').val() === ''){
-                $('#budget').focus();
-                return false;
-            }
-            if($('#asset_type').val() === ''){
-                $('#asset_type').focus();
-                return false;
-            }
-            if($('#item_type').val() === ''){
-                $('#item_type').focus();
-                return false;
-            }
-            if($('#details').val() === ''){
-                $('#details').focus();
-                return false;
-            }
+//            if($('#budget').val() === ''){
+//                $('#budget').focus();
+//                return false;
+//            }
+//            if($('#asset_type').val() === ''){
+//                $('#asset_type').focus();
+//                return false;
+//            }
+//            if($('#item_type').val() === ''){
+//                $('#item_type').focus();
+//                return false;
+//            }
+//            if($('#details').val() === ''){
+//                $('#details').focus();
+//                return false;
+//            }
             var data = {
                 'min_sht_id': $('#min_sht_id').val(),
                 'coa_id'    : $('#code_id').val(),

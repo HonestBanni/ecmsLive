@@ -79,9 +79,9 @@ return false;
                                 <td>
                                 <?php
                                 $all = $this->ReportsModel->get_midterm_students(array('exbd_student_id'=>$rec->student_id, 'exb_class_id'=>$rec->class_id, 'exb_test_type !='=>1), 'result');
+                                $total_obt = 0;
+                                $grd_total = 0;
                                 if(!empty($all)):
-                                    $total_obt = 0;
-                                    $grd_total = 0;
                                     foreach($all as $all_row):
                                         $total_obt += $all_row->exbd_omarks;
                                         $grd_total += $all_row->exb_test_marks;

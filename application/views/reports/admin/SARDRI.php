@@ -179,6 +179,16 @@ return false;
                                                         echo 'A';
                                                     endif;
                                                 endif;
+                                                if($result->status == 2):
+                                                    if($flag->ca_classcount == 2):
+                                                        $a++;
+                                                        $a++;
+                                                        echo '2L';
+                                                    else:
+                                                        $a++;
+                                                        echo 'L';
+                                                    endif;
+                                                endif;
                                             endif;
                                         echo '</td>';    
                                         endfor;

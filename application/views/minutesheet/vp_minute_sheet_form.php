@@ -1,6 +1,6 @@
 <!-- ******CONTENT****** --> 
 <div class="content container">
-    <? if($ms_detail): ?>
+    <?php if($ms_detail): ?>
     <!-- ******BANNER****** -->
     <div class="row cols-wrapper">
         <div class="col-md-12">
@@ -12,8 +12,8 @@
                         echo '<div class="col-md-12">
                             <table class="table" style="font-size: 15px;">
                                 <tr>
-                                    <th width="15%">Diary No.</th>
-                                    <td width="35%">'.$ms_detail->msr_diary_no.'</td>
+                                    <th width="15%">Process No.</th>
+                                    <td width="35%">'.$ms_detail->msr_id.'</td>
                                     <th width="15%">Date</th>
                                     <td width="35%">'.date('d-m-Y', strtotime($ms_detail->msr_date)).'</td>
                                 </tr>
@@ -33,8 +33,131 @@
                                     <th>(In Words)</th>
                                     <td>'. strtoupper($cm).'</td>
                                 </tr>
-                            </table>
-                        </div>';
+                            </table>';
+                        
+                            if($hod_rm_ado || $ao_remarks || $fwd_rm_ado):
+                                echo '<div style="border: 1px solid #000; margin-bottom: 5px;">
+                                    <table class="table" width="100%" cellspacing="0">
+                                        <tr>
+                                            <th colspan="3" style="border: 1px solid #000; background-color: #000; color: #fff; text-align:center">ADMINISTRATIVE DEPARTMENT</th>
+                                        </tr>';
+                                        if($fwd_rm_ado):
+                                            echo '<tr>
+                                                <td colspan="2"><strong>Forwarded to '.$fwd_rm_ado->emp_name.' ('.$fwd_rm_ado->designation.') for '.$fwd_rm_ado->msd_forwarded_for.'</strong></td>
+                                                <td>Date: '.date('d-m-Y', strtotime($fwd_rm_ado->msd_date)).'</td>
+                                            </tr>';
+                                        endif;
+                                        if($hod_rm_ado):
+                                            echo '<tr>
+                                                <td width="25%" style="border-bottom: 1px solid #000;"><strong>Remarks by '.$hod_rm_ado->emp_name.': </strong></td>
+                                                <td width="50%">'.$hod_rm_ado->msd_comments.'</td>
+                                                <td width="25%" style="border-bottom: 1px solid #000;">Date: '.date('d-m-Y', strtotime($hod_rm_ado->msd_date)).'</td>
+                                            </tr>';
+                                        endif;
+                                        if($ao_remarks):
+                                            if($ao_remarks->msd_recommend == 1):
+                                                $rec_des = 'RECOMMENDED';
+                                            elseif($ao_remarks->msd_recommend == 2):
+                                                $rec_des = 'NOT RECOMMENDED';
+                                            else:
+                                                $rec_des = '';
+                                            endif;
+                                            echo '<tr>
+                                                <td width="25%" style="vertical-align: top;" height="50">Remarks by Administrative Officer:</td>
+                                                <td width="50%" style="vertical-align: top;">'.$ao_remarks->msd_comments.'</td>
+                                                <td width="25%" style="vertical-align: top;">Date: '.date( 'd-m-Y', strtotime($ao_remarks->msd_date)).'</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" style="vertical-align: top;text-align: center;"><strong><i>'.$rec_des.'</i></strong></td>
+                                            </tr>';
+                                        endif;
+                                    echo '</table>
+                                </div>';
+                            endif;
+
+                            if($fo_remarks):
+                                echo '<div style="border: 1px solid #000; margin-bottom: 5px;">
+                                    <table class="table" width="100%" cellspacing="0">
+                                        <tr>
+                                            <th colspan="4" style="border: 1px solid #000; background-color: #000; color: #fff; text-align:center">BUDGET SECTION FOR ALLOCATION OF BUDGET</th>
+                                        </tr>
+                                        <tr>
+                                            <td width="18%" style="border-bottom: 1px solid #000;">Chart of Account:</td>
+                                            <td width="35%" style="border-bottom: 1px solid #000;"><strong>'.$fo_remarks->fn_coa_mc_title.' ('.$fo_remarks->fn_coa_mc_code.')</strong></td>
+                                            <td width="19%" style="border-bottom: 1px solid #000;">Budget Allocation:</td>
+                                            <td width="28%" style="border-bottom: 1px solid #000;"><strong>'.$fo_remarks->msbg_budget.'</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="vertical-align: top;">Budget Report:</td>
+                                            <td style="vertical-align: top;" colspan="3"><strong>'.$fo_remarks->msbg_comments.'</strong></td>
+                                        </tr>
+                                    </table>
+                                </div>';
+                            endif;
+
+                            if($hod_rm_dfn || $df_remarks || $fwd_rm_dfn):
+                                echo '<div style="border: 1px solid #000; margin-bottom: 5px;">
+                                    <table class="table" width="100%" cellspacing="0">
+                                        <tr>
+                                            <th colspan="3" style="border: 1px solid #000; background-color: #000; color: #fff; text-align:center">FINANCE DEPARTMENT</th>
+                                        </tr>';
+                                        if($fwd_rm_dfn):
+                                            echo '<tr>
+                                                <td colspan="2"><strong>Forwarded to '.$fwd_rm_dfn->emp_name.' ('.$fwd_rm_dfn->designation.') for '.$fwd_rm_dfn->msd_forwarded_for.'</strong></td>
+                                                <td>Date: '.date('d-m-Y', strtotime($fwd_rm_dfn->msd_date)).'</td>
+                                            </tr>';
+                                        endif;
+                                        if($hod_rm_dfn):
+                                            echo '<tr>
+                                                <td><strong>Remarks by '.$hod_rm_dfn->emp_name.':</strong> </td>
+                                                <td>'.$hod_rm_dfn->msd_comments.'</td>
+                                                <td width="25%" style="border-bottom: 1px solid #000;">Date: '.date('d-m-Y', strtotime($hod_rm_dfn->msd_date)).'</td>
+                                            </tr>';
+                                        endif;
+                                        if($df_remarks):
+                                            if($df_remarks->msd_recommend == 1):
+                                                $rec_des = 'RECOMMENDED';
+                                            elseif($df_remarks->msd_recommend == 2):
+                                                $rec_des = 'NOT RECOMMENDED';
+                                            else:
+                                                $rec_des = '';
+                                            endif;
+                                            echo '<tr>
+                                                <td width="25%" style="vertical-align: top;">Director Finance Remarks:</td>
+                                                <td style="vertical-align: top;">'.$df_remarks->msd_comments.'</td>
+                                                <td width="25%" style="vertical-align: bottom;">Date: '.date( 'd-m-Y', strtotime($df_remarks->msd_date)).'</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" style="vertical-align: top; text-align: center;"><strong><i>'.$rec_des.'</i></strong></td>
+                                            </tr>';
+                                        endif;
+                                    echo '</table>
+                                </div>';
+                            endif;
+
+                            if($hod_rm_vp || $hod_rm_vp):
+                                echo '<div style="border: 1px solid #000; margin-bottom: 0px; padding-bottom:0px;">
+                                    <table class="table" width="100%" cellspacing="0">
+                                        <tr>
+                                            <th colspan="3" style="border: 1px solid #000; background-color: #000; color: #fff; text-align:center">VICE PRINCIPAL OFFICE</th>
+                                        </tr>';
+                                        if($fwd_rm_vp):
+                                            echo '<tr>
+                                                <td colspan="2"><strong>Forwarded to '.$fwd_rm_vp->emp_name.' ('.$fwd_rm_vp->designation.') for '.$fwd_rm_vp->msd_forwarded_for.'</strong></td>
+                                                <td>Date: '.date('d-m-Y', strtotime($fwd_rm_vp->msd_date)).'</td>
+                                            </tr>';
+                                        endif;
+                                        if($hod_rm_vp):
+                                            echo '<tr>
+                                                <td colspan="2" ><strong>Remarks by '.$hod_rm_vp->emp_name.':</strong> '.$hod_rm_vp->msd_comments.'</td>
+                                                <td width="25%">Date: '.date('d-m-Y', strtotime($hod_rm_vp->msd_date)).'</td>
+                                            </tr>';
+                                        endif;
+                                    echo '</table>
+                                </div>';
+                            endif;
+
+                        echo '</div>';
                         
                         ?>
                     </div>
@@ -49,22 +172,118 @@
                     <div class="row">
                         
                         <div class="col-md-4 col-sm-12 form-group">
-                            <label for="name">Purchase Type</label>
-                            <?php echo form_dropdown('purchase_type', $purchaseType,'',  'class="form-control" id="purchase_type"'); ?>
-                            <input type="hidden" name="curr_status" id="curr_status" class="form-control" value="<?php echo $ms_detail->msr_curr_status?>">
-                            <input type="hidden" name="min_sht_id" id="min_sht_id" class="form-control" value="<?php echo $ms_detail->msr_id?>">
+                            <label for="name">Case</label>
+                            <select class="form-control" name="case_id" id="case_id">
+                                <option value="">Select Case</option>
+                                <option value="13">Forward to Department for Recommendation</option>
+                                <option value="12">Forward to Principal</option>
+                                <option value="14">Reverted Back</option>
+                            </select>
                         </div>
+                        
+                        <div id="case_hod" class="hidden">
+                            <div class="col-md-4 col-sm-12 form-group">
+                                <label for="name">Select HOD</label>
+                                <?php echo form_dropdown('hod_id', $hod,'',  'class="form-control" id="hod_id"'); ?>
+                            </div>
 
-                        <div class="col-md-12 form-group">
-                            <label for="name">Details / Description:</label>
-                            <textarea type="text" class="form-control notes" maxlength="250" rows="2" name="details" id="details" style="resize: none;" required="required"></textarea>
+                            <div class="col-md-4 col-sm-12 form-group">
+                                <label for="name">Department</label>
+                                <?php
+                                    echo form_input(
+                                        array(
+                                            'name'      => 'department',
+                                            'id'        => 'department',
+                                            'type'      => 'text',
+                                            'value'     => '',
+                                            'class'     => 'form-control',
+                                            'readonly'  => 'readonly',
+                                        )
+                                    );
+                                    echo form_input(
+                                        array(
+                                            'name'      => 'department_id',
+                                            'id'        => 'department_id',
+                                            'type'      => 'hidden',
+                                            'value'     => '',
+                                            'class'     => 'form-control',
+                                            'readonly'  => 'readonly',
+                                        )
+                                    );
+                                    echo form_input(
+                                        array(
+                                            'name'      => 'min_sht_id',
+                                            'id'        => 'min_sht_id',
+                                            'type'      => 'hidden',
+                                            'value'     => $ms_detail->msr_id,
+                                            'class'     => 'form-control',
+                                            'readonly'  => 'readonly',
+                                        )
+                                    );
+                                ?>
+                            </div>
+                            
+                            <div class="col-md-4 col-sm-12 form-group">
+                                <label for="name">Designation</label>
+                                <?php
+                                    echo form_input(
+                                        array(
+                                            'name'      => 'curr_design',
+                                            'id'        => 'curr_design',
+                                            'type'      => 'text',
+                                            'value'     => '',
+                                            'class'     => 'form-control',
+                                            'readonly'  => 'readonly',
+                                        )
+                                    );
+                                    echo form_input(
+                                        array(
+                                            'name'      => 'curr_des_id',
+                                            'id'        => 'curr_des_id',
+                                            'type'      => 'hidden',
+                                            'value'     => '',
+                                            'class'     => 'form-control',
+                                            'readonly'  => 'readonly',
+                                        )
+                                    );
+                                ?>
+                            </div>
+                            
+                            <div class="col-md-4 col-sm-12 form-group">
+                                <label for="name">Forward to Deptt for</label>
+                                <input type="text" class="form-control" name="forw_for" id="forw_for">
+                            </div>
+                        </div>
+ 
+                        <div id="case_prn" class="hidden">
+                            <div class="col-md-4 col-sm-12 form-group">
+                                <label for="name">Decision</label>
+                                <select class="form-control" name="decision" id="decision">
+                                    <option value="">Decision</option>
+                                    <option value="1">Recommended</option>
+                                    <option value="2">Not Recommended</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 col-sm-12 form-group">
+                                <label for="name">Purchase Type</label>
+                                <?php echo form_dropdown('purchase_type', $purchaseType,'',  'class="form-control" id="purchase_type"'); ?>
+                                <input type="hidden" name="curr_status" id="curr_status" class="form-control" value="<?php echo $ms_detail->msr_curr_status?>">
+                                <input type="hidden" name="min_sht_id" id="min_sht_id" class="form-control" value="<?php echo $ms_detail->msr_id?>">
+                            </div>
+                        </div>
+ 
+                        <div id="case_revert" class="hidden">
+                            <div class="col-md-12 form-group">
+                                <label for="name">Details / Description:</label>
+                                <textarea type="text" class="form-control notes" maxlength="250" rows="2" name="details" id="details" style="resize: none;" required="required"></textarea>
+                            </div> 
                         </div> 
                         
                     </div>
                 </div><!--//section-content-->
                            
                     <div class="col-md-12 right">
-                        <button type="button" class="btn btn-theme pull-right mt-2" name="update_vp_ms" id="update_vp_ms"  value="update_vp_ms" >Recommend</button>
+                        <button type="button" class="btn btn-theme pull-right mt-2" name="update_vp_ms" id="update_vp_ms"  value="update_vp_ms" >Submit</button>
                     </div>
                 
             </section>    
@@ -81,43 +300,43 @@
 
                                 switch ($f_ext['extension']):
                                     case 'doc':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/doc.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
                                         break;
                                     case 'docx':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/doc.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
                                         break;
                                     case 'xls':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/xls.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
                                         break;
                                     case 'xlsx':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/xls.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
                                         break;
                                     case 'ppt':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/ppt.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
                                         break;
                                     case 'pptx':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/pptx.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
                                         break;
                                     case 'pdf':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/pdf.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
@@ -140,39 +359,105 @@
             
         </div><!--//col-md-12-->       
     </div><!--//cols-wrapper-->
-    <? endif; ?>
+    <?php endif; ?>
 </div><!--//content-->
         
 <script>
     
     $(document).ready(function(){
         
-        $('#update_vp_ms').on('click', function(){
-            if($('#purchase_type').val() === ''){
-                $('#purchase_type').focus();
-                return false;
+        $('#case_id').on('change', function(){
+            if($('#case_id').val() == 13){
+                $('#case_recomnd').addClass('hidden');
+                $('#case_prn').addClass('hidden');
+                $('#case_vp_2').addClass('hidden');
+                $('#case_hod').removeClass('hidden');
+                $('#case_revert').addClass('hidden');
             }
-            if($('#details').val() === ''){
-                $('#details').focus();
-                return false;
+            else if($('#case_id').val() == 12){
+                $('#case_recomnd').removeClass('hidden');
+                $('#case_prn').removeClass('hidden');
+                $('#case_vp_2').addClass('hidden');
+                $('#case_hod').addClass('hidden');
+                $('#case_revert').removeClass('hidden');
+            }
+            else if($('#case_id').val() == 14){
+                $('#case_recomnd').addClass('hidden');
+                $('#case_hod').addClass('hidden');
+                $('#case_prn').addClass('hidden');
+                $('#case_vp_2').addClass('hidden');
+                $('#case_revert').removeClass('hidden');
+            }
+            else {
+                $('#case_recomnd').addClass('hidden');
+                $('#case_hod').addClass('hidden');
+                $('#case_prn').addClass('hidden');
+                $('#case_vp_2').addClass('hidden');
+                $('#case_revert').addClass('hidden');
+            }
+        });
+        
+        $('#hod_id').on('change',function(){
+            //get sub program
+            $.ajax({
+                type   :'post',
+                url    :'MinuteSheetController/get_department',
+                dataType : 'json',
+                data   :{'empId' : $('#hod_id').val()},
+                success :function(result){
+                    $('#department_id').val(result['deptt_id']);
+                    $('#department').val(result['deptt_name']);
+                    $('#curr_design').val(result['designation']);
+                    $('#curr_des_id').val(result['design_id']);
+                }
+            });
+        });
+        
+        $('#update_vp_ms').on('click', function(){
+//            if($('#purchase_type').val() === ''){
+//                $('#purchase_type').focus();
+//                return false;
+//            }
+            if($('#case_id').val() == 13){
+                if($('#hod_id').val() === ''){
+                    $('#hod_id').focus();
+                    return false;
+                }
+                if($('#forw_for').val() === ''){
+                    $('#forw_for').focus();
+                    return false;
+                }
+            }
+            if($('#case_id').val() == 12 || $('#case_id').val() == 14){
+                if($('#details').val() === ''){
+                    $('#details').focus();
+                    alert('Please insert remarks');
+                    return false;
+                }
             }
             var data = {
                 'min_sht_id'    : $('#min_sht_id').val(),
+                'case_id'       : $('#case_id').val(),
+                'decision'      : $('#decision').val(),
+                'hod_id'        : $('#hod_id').val(),
+                'deptt_id'      : $('#department_id').val(),
+                'design_id'     : $('#curr_des_id').val(),
                 'purchase_type' : $('#purchase_type').val(),
                 'details'       : $('#details').val(),
-                'curr_status'   : $('#curr_status').val()
+                'curr_status'   : $('#curr_status').val(),
+                'forw_for'      : $('#forw_for').val()
             };
             $.ajax({
                 type    : 'post',
                 url     : 'MinuteSheetController/vp_update_minute_sheet',
                 data    : data,
                 success :function(result){ 
-                    if($('#curr_status').val() == '9'){
+//                    if($('#curr_status').val() == '9'){
                         window.location.href = 'MinuteSheetRecordVPAC';
-                    }
-                    else {
-                        window.location.href = 'MinuteSheetRecordVPAD';
-                    }
+//                    }
+//                    else {
+//                        window.location.href = 'MinuteSheetRecordVPAD';
+//                    }
                     
                 }
             });

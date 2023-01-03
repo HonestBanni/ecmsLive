@@ -176,23 +176,23 @@ return false;
                                                 $a=0;
                                             foreach($stdAtts as $stdAtt):
                                               
-                                            if($stdAtt->status == 1):
-                                                if($stdAtt->ca_classcount ==2):
-                                                        $p++;
-                                                        $p++;
+                                                if($stdAtt->status == 1):
+                                                    if($stdAtt->ca_classcount ==2):
+                                                            $p++;
+                                                            $p++;
+                                                        else:
+                                                            $p++;
+                                                    endif;
                                                     else:
-                                                        $p++;
+                                                    if($stdAtt->ca_classcount ==2):
+                                                            $a++;
+                                                            $a++;
+                                                        else:
+                                                            $a++;
+                                                    endif;
+                                                
                                                 endif;
-                                                else:
-                                                   if($stdAtt->ca_classcount ==2):
-                                                        $a++;
-                                                        $a++;
-                                                    else:
-                                                        $a++;
-                                                endif;
-                                            
-                                            endif;
-                                          endforeach;
+                                            endforeach;
                                           
                                            $total = $a+$p;
                                           
@@ -216,15 +216,15 @@ return false;
                                     </tr>';
                                         endforeach;
                                         
-                                        echo '<tr>
-                                    <td>% age</td>';
-                                        $montylyPresentGrand    = '';
-                                        $montylyApsentGrand     = '';
-                                        for($i=1;$i<=12;$i++):
-                                                $monthi     = '+'.$i.'month';
-                                                $month      = date("m", strtotime($monthi, $time));
-                                                $year       = date("Y", strtotime($monthi, $time));
-                                                $wheret = array(
+                                    echo '<tr>
+                                            <td>% age</td>';
+                                                $montylyPresentGrand    = '';
+                                                $montylyApsentGrand     = '';
+                                                    for($i=1;$i<=12;$i++):
+                                                        $monthi     = '+'.$i.'month';
+                                                        $month      = date("m", strtotime($monthi, $time));
+                                                        $year       = date("Y", strtotime($monthi, $time));
+                                                        $wheret = array(
 //                                                        'subject_id'                => $rowCS->subject_id,
 //                                                        'sec_id'                    => $secId,
                                                         'student_id'                =>$result->student_id,
@@ -323,6 +323,10 @@ return false;
                                 </tbody>
                             </table><!--//table-->
                         </div>
+                        
+                        
+                         <?php if($result->programe_id == 1 || $result->programe_id == 5):?>
+                        
                         <h5 class="has-divider text-highlight" style="margin-top: -10px; margin-bottom: 2px;"><strong><i>Monthly Test Record</i></strong></h5>
                         <div class="table-responsive">                      
                             <table class="table table-bordered">
@@ -343,6 +347,7 @@ return false;
                                       
                                       ?> 
                                         <th>Total</th>
+                                        <th>Pre Board</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -351,6 +356,9 @@ return false;
                                     if($classSubjects):
                                         $month      = date("m", strtotime($monthi, $time));
                                         $year       = date("Y", strtotime($monthi, $time));
+                                        
+                                        $ttl_obt_pb = '';
+                                        $ttl_tm_pb  = '';
                                         
                                         foreach($classSubjects as $rowCS):
                                             $totalOb = '';
@@ -396,6 +404,7 @@ return false;
                                          endfor;
                                         
                                         
+                                         
                                          if(!empty($totaltm)):
                                               $totalMarksPer = ($totalOb/$totaltm)*100;
                                               $totalOb_show = '';
@@ -409,6 +418,28 @@ return false;
                                                       
                                                  echo '<td></td>';
                                          endif;
+                                         
+                                         
+                                         
+                                        // Pre Board Marks
+                                                    $this->db->select('
+                                                        pre_board_test_details.omarks,
+                                                        pre_board_test_details.tmarks
+                                                    ');
+                                                    $this->db->join('pre_board_test', 'pre_board_test.test_id=pre_board_test_details.test_id', 'left outer');
+                                                    $this->db->join('class_alloted', 'class_alloted.class_id=pre_board_test.class_id', 'left outer');
+                                                    $this->db->where(array('class_alloted.subject_id' => $rowCS->subject_id, 'pre_board_test_details.student_id' => $result->student_id));
+                                        $pb_marks = $this->db->get('pre_board_test_details')->row();
+                                        
+                                        echo '<td>';
+                                        if(!empty($pb_marks)):
+                                            echo $pb_marks->omarks.'/'.$pb_marks->tmarks;
+                                            $ttl_obt_pb += $pb_marks->omarks;
+                                            $ttl_tm_pb  += $pb_marks->tmarks;
+                                        endif;
+                                        echo '</td>';
+                                         
+                                         
                                         echo '
                                         
                                        
@@ -450,6 +481,7 @@ return false;
 
                                        endfor;
                                        
+                                       
                                        if($TMTMG):
                                                $TMG_PER = ($TMOMG/$TMTMG)*100;       
                                                 echo '<td><strong>'.$TMOMG.'/'.$TMTMG.'='.round($TMG_PER,1).'</strong></td>';
@@ -457,7 +489,16 @@ return false;
                                            else:
                                            echo '<td></td>';
                                        endif;
-                                  
+                                       
+                                        //Pre Board Marks Total
+                                       if($ttl_tm_pb == 0):
+                                            $pb_age = '';
+                                            echo '<td></td>';
+                                       else:
+                                            $pb_age = $ttl_obt_pb / $ttl_tm_pb * 100;
+                                            echo '<td>'.$ttl_obt_pb.'/'.$ttl_tm_pb.' ('.round($pb_age,1).'%)</td>';
+                                       endif;
+                                       
                                    echo '</tr>';
                                         
                                         
@@ -466,6 +507,75 @@ return false;
                                 </tbody>
                                 
                             </table>
+                        </div>
+                        
+                        <?php 
+                        else:
+                        
+                            echo '<h5 class="has-divider text-highlight" style="margin-top: -10px; margin-bottom: 2px;"><strong><i>BS Exam Record</i></strong></h5>';
+                        ?>
+                        <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Subjects</th>
+                                      <?php
+                                        $test = $this->CRUDModel->getResults('exam_types');
+                                        foreach($test as $row):
+                                            echo '<th>'.$row->xt_title.'</th>';
+                                        endforeach;
+                                        ?>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $secId = $this->uri->segment(3);
+                                  
+                                        //flag == 1 group_allot
+                                        //flag == 2 subject allot
+                                    
+                                    $classSubjects = $this->ReportsModel->get_classSubjects(array('sec_id'=>$secId));
+                                         
+                                    if($classSubjects):
+                                        foreach($classSubjects as $rowCS):
+                                            echo '<tr>
+                                                <td>'.$rowCS->title.'</td>';
+                                                $t_ob = '';
+                                                $t_mr = '';
+                                                for($ex_id=1;$ex_id<=count($test);$ex_id++):
+                                                    
+                                                                    $this->db->join('exams_bs', 'exams_bs.exb_test_id=exams_bs_details.exbd_test_id', 'left outer');
+                                                    $test_result = $this->db->get_where('exams_bs_details', array('exbd_student_id'=>$result->student_id, 'exb_test_type'=>$ex_id, 'exb_subject_id'=>$rowCS->subject_id, 'exb_class_status'=>1))->row();
+                                                    if(!empty($test_result)):
+                                                        echo '<td>'.$test_result->exbd_omarks.' / '.$test_result->exb_test_marks.'</td>';
+                                                        $t_ob += $test_result->exbd_omarks;
+                                                        $t_mr += $test_result->exb_test_marks;
+                                                    else:
+                                                        echo '<td></td>';
+                                                    endif;
+                                                endfor;
+                                                if($t_mr > 0):
+                                                    $prcntage = $t_ob / $t_mr * 100;
+                                                    echo '<td>'.$t_ob.' / '.$t_mr.' ('.round($prcntage, 2).'%)</td>';
+                                                else:
+                                                    echo '<td></td>';
+                                                endif;
+                                                
+                                            echo'</tr>';
+                                        endforeach;
+                                    endif; 
+                                    ?>
+                                    
+                                </tbody>
+                        </table>
+                        <?php
+//                            echo '<pre>'; print_r(); echo'</pre>';
+                        
+                        endif;
+                        ?>
+                        
+                        
+                        
                              <div class="table-responsive"> 
                                  <h5 class="has-divider text-highlight" style="margin-top: -1px; margin-bottom: 2px;"><strong><i>Discipline Action (If Any) and Remarks</i></strong></h5>
                                     <table class="table table-bordered">
@@ -518,7 +628,7 @@ return false;
                             <?php echo $print_log;?>
                           
                             <!--//table-->
-                        </div>
+                        <!--</div>-->
  
                         </div>  
                     </div>

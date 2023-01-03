@@ -55,11 +55,12 @@ class DropdownModel extends CI_Model
     // Hostel student autocomplete    
     public function hostel_students($where,$like=NULL){
              if($like):
-            $this->db->like('student_name',$like);
-            $this->db->or_like('form_no',$like);
-            $this->db->or_like('college_no',$like);
-        endif;
-               $this->db->join('hostel_student_record','student_record.student_id=hostel_student_record.student_id'); 
+                    $this->db->like('student_name',$like);
+                    $this->db->or_like('form_no',$like);
+                    $this->db->or_like('college_no',$like);
+                endif;
+               $this->db->join('hostel_student_record','student_record.student_id=hostel_student_record.student_id');
+               $this->db->join('prospectus_batch','prospectus_batch.batch_id=student_record.batch_id','left outer');
        return  $this->db->where($where)->get('student_record')->result();
     }
         public function add_extra_heads($where_in,$like=NULL){
@@ -67,6 +68,7 @@ class DropdownModel extends CI_Model
             $this->db->like('student_name',$like);
             $this->db->or_like('form_no',$like);
             $this->db->or_like('college_no',$like);
+            $this->db->or_like('board_regno',$like);
         endif;
                    $this->db->join('student_status','student_status.s_status_id=student_record.s_status_id'); 
                    $this->db->order_by('student_record.student_id','desc');
@@ -250,8 +252,9 @@ class DropdownModel extends CI_Model
        $this->db->select('
                 hr_emp_record.emp_id as emp_id,
                 hr_emp_record.emp_name as emp_name,
+                hr_emp_designation.title as designation,
        '); 
-//            $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation', 'left outer');
+            $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation', 'left outer');
         if($like):
             $this->db->like('hr_emp_record.emp_name',$like);
         endif;
@@ -409,16 +412,17 @@ class DropdownModel extends CI_Model
          
             $this->db->select('
                     hr_emp_record.emp_name,
-                    hr_emp_record.emp_id,');
+                    hr_emp_record.emp_id,
+                    ');
             if($where):
                 $this->db->where($where);
             endif;
             if($like):
                 $this->db->like('hr_emp_record.emp_name',$like);
             endif;
-                $this->db->join('class_alloted','class_alloted.emp_id=hr_emp_record.emp_id');
-                $this->db->join('sections','sections.sec_id=class_alloted.sec_id');
-                $this->db->join('programes_info','programes_info.programe_id=sections.program_id');
+                $this->db->join('class_alloted','class_alloted.emp_id=hr_emp_record.emp_id','left outer');
+                $this->db->join('sections','sections.sec_id=class_alloted.sec_id','left outer');
+                $this->db->join('programes_info','programes_info.programe_id=sections.program_id','left outer');
                 $this->db->group_by('hr_emp_record.emp_id');
        return   $this->db->get('hr_emp_record')->result();
 //       return  $this->db->get('hr_emp_record')->result();
@@ -514,5 +518,29 @@ public function std_sec_allotment_alevel($table,$like=NULL){
         return $this->db->get('student_record')->result();
         
         
+    }    
+    
+    public function group_allotment_inter_1st($where=NULL, $like=NULL, $column=NULL, $array=NULL ){
+        $this->db->where($where);
+        if($column):
+            $this->db->where_in($column, $array);
+        endif;
+        if($like):
+            $this->db->like('college_no',$like);       
+            $this->db->or_like('student_name',$like);        
+        endif;   
+        return $this->db->get('student_record')->result();
+        
+        
+    }
+    public function auto_section_active($table,$like=NULL){
+        $this->db->SELECT('*');
+        $this->db->FROM($table);
+        if($like):
+            $this->db->like($like);  
+        endif;
+        $this->db->where('status','On');
+        $query = $this->db->get();
+        return $query->result();
     }    
 }

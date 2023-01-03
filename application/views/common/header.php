@@ -9,7 +9,12 @@
          else:
         echo $page_title;
      endif;
- ?></title>
+     
+     
+//     echo isset($page_title) ? $page_title : 'ECMS';
+     
+     
+     ?></title>
     <!-- Meta -->
     <!--<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />-->
     <meta charset="utf-8">
@@ -20,7 +25,10 @@
     <meta name="author" content="">    
     
     <link rel="shortcut icon" href="assets/images/logo.ico">
-
+    
+<!--    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>   -->
+<!--    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>   -->
+    <!-- Global CSS -->
     <link rel="stylesheet" href="assets/plugins/bootstrap/css/bootstrap.min.css">   
     <link rel="stylesheet" href="assets/css/google-fonts.css">   
     <!-- Plugins CSS -->    

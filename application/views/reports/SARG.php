@@ -1,4 +1,19 @@
-        <!-- ******CONTENT****** --> 
+<script language="javascript">
+  function printdiv(printpage)
+  {
+    var headstr = "<html><head><title></title></head><body>";
+//    var headstr = "<html><head><title></title></head><body><p><img  class='img-responsive' src='assets/images/logo.png' alt='Edwardes College Peshawar'></p>";
+    var footstr = "</body>";
+    var newstr = document.all.item(printpage).innerHTML;
+    var oldstr = document.body.innerHTML;
+    document.body.innerHTML = headstr+newstr+footstr;
+    window.print();
+    document.body.innerHTML = oldstr;
+    return false;
+  }
+</script>
+
+<!-- ******CONTENT****** --> 
         <div class="content container">
                <!-- ******BANNER****** -->
             
@@ -41,6 +56,8 @@
                                         <div class="form-group">
                                           <button type="submit" name="search" value="search" id="search" class="btn btn-theme">
                                             <i class="fa fa-search"></i> Search </button>
+                                            
+                                        <button type="button" name="print" value="print" onclick="printdiv('div_print');" class="btn btn-theme"><i class="fa fa-print"></i> Print</button>
  
                                       </div>
                                     </div>  
@@ -57,7 +74,7 @@
           
                     </div>  
                 
-                
+                <div id="div_print">
                 <div class="col-md-12">
                     <div class="table-responsive">
                        <table class="table table-hover table-boxed" id="table">
@@ -120,7 +137,7 @@
                    
                     
                 </div><!--//col-md-3-->
-                
+                </div>
             </div><!--//cols-wrapper-->
            
         </div><!--//content-->

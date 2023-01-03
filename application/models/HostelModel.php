@@ -963,7 +963,7 @@ public function hostel_head_wise_group_wise($where,$like,$date){
                        student_record.migration_status,
                        '); 
                $this->db->join('student_record','student_record.student_id=hostel_student_record.student_id'); 
-               $this->db->where_in('student_record.s_status_id',array(5,12));
+               $this->db->where_in('student_record.s_status_id',array(5,12,21,22)); //5 = Enrolled, 12 = Suspend (Fee),21 = Suspend (General), 22= Suspend (Migration)
 //               $this->db->join('hostel_student_bill','hostel_student_bill.hostel_std_id=hostel_student_record.hostel_id');
         return $this->db->where($where)->get('hostel_student_record')->result();
     }

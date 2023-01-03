@@ -2680,7 +2680,7 @@ $data  = array
         $this->data['current_month']    =  date("m",strtotime(date('d-m-y')));
           $this->data['current_year']     =  date("Y",strtotime(date('d-m-Y')));  
         $this->data['month']           = $this->CRUDModel->dropDown('month', 'Month', 'mth_id', 'mth_title');
-        $this->data['year']           = $this->CRUDModel->dropDown('year', 'Year', 'yr_title', 'yr_title');
+        $this->data['year']           = $this->CRUDModel->dropDown('year', 'Year', 'yr_title', 'yr_title', array('yr_status' => 1), array('column' => 'yr_title', 'order' => 'desc'));
         $this->data['result']       = $this->AttendanceModel->admin_getstudent_test('monthly_test');
         $this->data['page_title']   = 'Admin Monthly Test History | ECMS';
         $this->data['page']         = 'attendance/admin_monthly_test_history';
@@ -8312,7 +8312,7 @@ public function update_assign_practical_groups()
  public function search_admin_test_history(){
         
         $this->data['month']           = $this->CRUDModel->dropDown('month', 'Month', 'mth_id', 'mth_title');
-        $this->data['year']           = $this->CRUDModel->dropDown('year', 'Year', 'yr_title', 'yr_title');
+        $this->data['year']           = $this->CRUDModel->dropDown('year', 'Year', 'yr_title', 'yr_title', array('yr_status' => 1), array('column' => 'yr_title', 'order' => 'desc'));
         
         if($this->input->post('search')):
             $emp_id       =  $this->input->post('emp_id');

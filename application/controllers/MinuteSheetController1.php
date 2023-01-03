@@ -253,7 +253,7 @@ class MinuteSheetController extends AdminController {
 //                                    case 15: echo '<strong style="color: #ff7400; font-size:14px;">'.$cs->mss_title.'</strong>'; break;
 //                                    default: echo '<strong style="color: #428bca; font-size:14px;">'.$cs->mss_title.'</strong>';
 //                                endswitch;
-                                echo '<strong style="color: #428bca; font-size:14px;">In Process</strong>';
+                                echo '<strong style="color: #428bca; font-size:14px;">Pending</strong>';
                             echo '</th>
                             <th>';
                                 $att = $this->CRUDModel->get_where_result('min_sheet_attachments', array('msa_msr_id'=>$msrow->msr_id));
@@ -1259,11 +1259,7 @@ class MinuteSheetController extends AdminController {
         
         $ms_id = $this->uri->segment(2);
         
-        $this->data['fwd_rm_ado']   = array();
-        $this->data['hod_rm_ado']   = array();
-        
         $this->data['ms_detail']    = $this->MinuteSheetModel->get_ms_info_edit(array('msr_id'=>$ms_id));
-        $this->data['fwd_rm_ado']   = $this->MinuteSheetModel->get_hod_rec_remarks(array('msd_msr_id'=>$ms_id, 'msd_status'=> 3));
         $this->data['hod_rm_ado']   = $this->MinuteSheetModel->get_hod_remarks(array('msd_msr_id'=>$ms_id, 'msd_status'=> 4));
         $this->data['att_result']   = $this->CRUDModel->get_where_result('min_sheet_attachments', array('msa_msr_id'=>$ms_id));
         $this->data['hod']          = $this->CRUDModel->employee_dropdown('hr_emp_record', 'Select', 'emp_id', 'emp_name', array('hod_ms_flag'=>1, 'emp_id !='=>$this->data['ms_detail']->msr_emp_id), array('column'=>'emp_name','order'=>'asc'));
@@ -1364,8 +1360,7 @@ class MinuteSheetController extends AdminController {
         $this->data['department']   = $this->CRUDModel->dropDown_asc_title('department', 'Select', 'department_id', 'title');
         $this->data['min_sheet_by'] = $this->CRUDModel->dropDown_asc_title('hr_emp_record', 'Select', 'emp_id', 'emp_name');
         $this->data['COAP']         = $this->CRUDModel->get_where_result('fn_coa_parent',array('fn_coa_status'=>1,'fn_account_type_id'=>1));
-        $this->data['ms_status']    = $this->CRUDModel->dropDown_where_not_in('min_sheet_status', 'Select', 'mss_id', 'mss_title', 'mss_id', array(6,10,14), '');
-//        $this->data['ms_status']    = $this->CRUDModel->dropDown_where_in('min_sheet_status', 'Select', 'mss_id', 'mss_title', 'mss_id', array(7,8,9,10,11,12,13,14,15,16), '');
+        $this->data['ms_status']    = $this->CRUDModel->dropDown_where_in('min_sheet_status', 'Select', 'mss_id', 'mss_title', 'mss_id', array(7,8,9,10,11,12,13,14,15,16), '');
         $this->data['ReportName']   = 'Purchase Requisition Finance Officer Panel';
         $this->data['page_title']   = 'Purchase Requisition | ECP';
         $this->data['page']         = 'minutesheet/fno_minute_sheet_record';
@@ -1390,7 +1385,7 @@ class MinuteSheetController extends AdminController {
 
             $empty  = $m_diary_no.$dept_id.$ms_by_id.$detail.$stts_id.$coa_id.$approve_id;
             if(empty($empty)):
-                $result = $this->MinuteSheetModel->get_ms_info_where_in_fno_limit($where, $like, 'msr_curr_status', array(1,2,3,4,5,7,8,9,10,11,12,13,14,15,16));
+                $result = $this->MinuteSheetModel->get_ms_info_where_in_fno_limit($where, $like, 'msr_curr_status', array(7,8,9,10,11,12,13,14,15,16));
             else:
                 if(!empty($m_diary_no)): $where['msr_id']               = $m_diary_no;  endif;
                 if(!empty($dept_id)):    $where['msr_init_deptt']       = $dept_id;     endif;
@@ -1399,7 +1394,7 @@ class MinuteSheetController extends AdminController {
                 if(!empty($stts_id)):    $where['msr_curr_status']      = $stts_id;     endif;
                 if(!empty($coa_id)):     $where['msbg_chart_of_account'] = $coa_id;     endif;
                 if(!empty($approve_id)): $where['msr_approve_id']   = $approve_id;  endif;
-                $result = $this->MinuteSheetModel->get_ms_info_where_in_fno($where, $like, 'msr_curr_status', array(1,2,3,4,5,7,8,9,10,11,12,13,14,15,16));
+                $result = $this->MinuteSheetModel->get_ms_info_where_in_fno($where, $like, 'msr_curr_status', array(7,8,9,10,11,12,13,14,15,16));
             endif;
         endif;
         
@@ -1567,11 +1562,8 @@ class MinuteSheetController extends AdminController {
         
         $ms_id = $this->uri->segment(2);
         
-        $this->data['fwd_rm_ado']   = array();
-        $this->data['hod_rm_ado']   = array();
-        
         $this->data['ms_detail']    = $this->MinuteSheetModel->get_ms_info_edit(array('msr_id'=>$ms_id));
-        $this->data['fwd_rm_ado']   = $this->MinuteSheetModel->get_hod_rec_remarks(array('msd_msr_id'=>$ms_id, 'msd_status'=> 3));
+        
         $this->data['hod_rm_ado']   = $this->MinuteSheetModel->get_hod_remarks(array('msd_msr_id'=>$ms_id, 'msd_status'=> 4));
         $this->data['ao_remarks'] = $this->MinuteSheetModel->get_hod_remarks(array('msd_msr_id'=>$ms_id, 'msd_status'=> 5));
         
@@ -2783,187 +2775,4 @@ class MinuteSheetController extends AdminController {
                 echo  json_encode($matches); 
             endif;
     }
-    
-    public function minute_sheet_admin(){
-        
-        $this->data['department']   = $this->CRUDModel->dropDown_asc_title('department', 'Select', 'department_id', 'title');
-        $this->data['min_sheet_by'] = $this->CRUDModel->dropDown_asc_title('hr_emp_record', 'Select', 'emp_id', 'emp_name');
-        $this->data['COAP']         = $this->CRUDModel->get_where_result('fn_coa_parent',array('fn_coa_status'=>1,'fn_account_type_id'=>1));
-        $this->data['ms_status']    = $this->CRUDModel->dropDown('min_sheet_status', 'Select', 'mss_id', 'mss_title');
-        $this->data['ReportName']   = 'Purchase Requisition Admin';
-        $this->data['page_title']   = 'Purchase Requisition | ECP';
-        $this->data['page']         = 'minutesheet/minute_sheet_admin';
-        $this->load->view('common/common',$this->data);
-        
-    }
-    
-    public function admin_minute_sheet_grid(){
-        
-        $like       = array();
-        $where      = array();
-        $limit      = '';
-        $init_start = '';
-        $init_end   = '';
-        $appr_start = '';
-        $appr_end   = '';
-
-        if($this->input->post()):
-            $m_diary_no = $this->input->post('ms_diary_no');
-            $dept_id    = $this->input->post('dept_id');
-            $ms_by_id   = $this->input->post('ms_by_id');
-            $detail     = $this->input->post('detail');
-            $stts_id    = $this->input->post('stts_id');
-            $coa_id     = $this->input->post('coa_id');
-            $init_start = $this->input->post('init_start');
-            $init_end   = $this->input->post('init_end');
-            $appr_start = $this->input->post('appr_start');
-            $appr_end   = $this->input->post('appr_end');
-            $approve_id = $this->input->post('approve_id');
-
-            if(!empty($m_diary_no)): $where['msr_id']               = $m_diary_no;  endif;
-            if(!empty($dept_id)):    $where['msr_init_deptt']       = $dept_id;     endif;
-            if(!empty($ms_by_id)):   $where['msr_emp_id']           = $ms_by_id;    endif;
-            if(!empty($detail)):     $like['msr_detail']            = $detail;      endif;
-            if(!empty($stts_id)):    $where['msr_curr_status']      = $stts_id;     endif;
-            if(!empty($coa_id)):     $where['msbg_chart_of_account'] = $coa_id;     endif;
-            if(!empty($approve_id)): $where['msr_approve_id']       = $approve_id;  endif;
-        else:
-            $limit = 50;
-        endif;
-        $result = $this->MinuteSheetModel->get_ms_info_admin($where, $like, $init_start, $init_end, $appr_start, $appr_end, $limit);
-        
-        if(!empty($result)):    
-            echo '<table class="table table-bordered table-boxed display" width="100%" cellspacing="0" cellpadding="0" border="0">
-                <thead>
-                    <tr>
-                        <th width="5%">S No.</th>
-                        <th width="5%">Process No</th>
-                        <th width="10%">Initiator</th>
-                        <th width="10%">Department</th>
-                        <th width="35%">Details</th>
-                        <th width="10%">Estimated Cost</th>
-                        <th width="10%">Chart of Account</th>
-                        <th width="10%">Initiate Date</th>
-                        <th width="10%">Approve Date</th>
-                        <th width="10%">Approve ID</th>
-                        <th width="15%">Status</th>
-                        <th width="5%">Attachment</th>
-                        <th width="5%"></th>
-                    </tr>
-                </thead>
-                <tbody>';
-                 
-                $sno = '';
-                if($result):   
-                    foreach($result as $msrow):
-                        $sno++;
-                        if(!empty($msrow->msr_date)):         $idate = date('d-m-Y', strtotime($msrow->msr_date));          else: $idate = '';  endif;
-                        if(!empty($msrow->msr_approve_date)): $adate = date('d-m-Y', strtotime($msrow->msr_approve_date));  else: $adate = '';  endif;
-                        echo '<tr style="background-color:  #f3fbff  ">
-                            <th>'.$sno.'</th>
-                            <th>'.$msrow->msr_id.'</th>
-                            <th>'.$msrow->emp_name.'</th>
-                            <th>'.$msrow->deptt_name.'</th>
-                            <th>'.$msrow->msr_detail.'</th>
-                            <th>'.$msrow->msr_cost.'</th>
-                            <th>'.$msrow->fn_coa_mc_title.' ('.$msrow->fn_coa_mc_code.')</th>
-                            <th>'.$idate.'</th>
-                            <th>'.$adate.'</th>
-                            <th>'.$msrow->msr_approve_id.'</th>
-                            <th>';
-                                $cs = $this->CRUDModel->get_where_row('min_sheet_status', array('mss_id'=>$msrow->msr_curr_status));
-                                switch ($cs->mss_id):
-                                    case 15: echo '<strong style="color: #5cb85c; font-size:14px;">'.$cs->mss_title.'</strong>'; break;
-                                    case 16: echo '<strong style="color: #c00; font-size:14px;">'.$cs->mss_title.'</strong>'; break;
-                                    case 17: echo '<strong style="color: #ff7400; font-size:14px;">'.$cs->mss_title.'</strong>'; break;
-                                    default: echo '<strong style="color: #428bca; font-size:14px;">'.$cs->mss_title.'</strong>';
-                                endswitch; 
-                            echo '</th>
-                            <th>';
-                                $att = $this->CRUDModel->get_where_result('min_sheet_attachments', array('msa_msr_id'=>$msrow->msr_id));
-                                if(empty($att)):
-                                    echo '';
-                                else:
-                                    echo '<a href="" data-toggle="modal" data-target="#att_modal" class="att_ms_btn" id="'.$msrow->msr_id.'">'.count($att).' File(s)</a>';
-                                endif;
-                            echo '</th>
-                            <th>';
-                            echo '<a href="" data-toggle="modal" data-target="#view_modal" class="view_ms_btn" id="'.$msrow->msr_id.'">
-                                <button type="button" class="btn btn-theme form-control" style="margin:1px;">VIEW</button> 
-                            </a> ';
-                            echo '<a href="MinuteSheetEditAdmin/'.$msrow->msr_id.'">
-                                <button type="button" class="btn btn-primary form-control" style="margin:1px;">EDIT</button> 
-                            </a> ';
-                            echo '<a href="MinureSheetPrint/'.$msrow->msr_id.'" target="_blank" class="view_ms_btn">
-                                <button type="button" class="btn btn-danger form-control" style="margin:1px;">PRINT</button> 
-                            </a> 
-                            </th>
-                        </tr>';
-                    endforeach;
-                endif;
-                echo '</tbody>
-            </table>';
-        else:
-            echo '<h3 class="has-divider text-highlight" style="color:#c00;">No Result Found</h3>';  
-        endif;
-        
-        ?><script>
-        
-        $(document).ready(function(){
-            $('.view_ms_btn').on('click', function(){
-                var data = {
-                   'min_id' : $(this).attr('id')
-               };
-               $.ajax({
-                   type   : 'post',
-                   url    : 'MinuteSheetController/minute_sheet_preview',
-                   data   : data,
-                   success: function(result){
-                       $('#view_modal_content').html(result);
-                   }
-               });
-            });
-            $('.att_ms_btn').on('click', function(){
-                var data = {
-                   'min_id' : $(this).attr('id')
-               };
-               $.ajax({
-                   type   : 'post',
-                   url    : 'MinuteSheetController/minute_sheet_att_view',
-                   data   : data,
-                   success: function(result){
-                       $('#att_modal_content').html(result);
-                   }
-               });
-            });
-        });
-        
-        </script><?php
-        
-    }
-     
-    public function minute_sheet_edit_admin(){
-        
-        $minsht_id = $this->uri->segment(2);
-        
-        $this->data['msv']        = $this->MinuteSheetModel->get_ms_info_edit(array('msr_id'=>$minsht_id));
-        $this->data['fwd_rm_ado'] = $this->MinuteSheetModel->get_hod_rec_remarks(array('msd_msr_id'=>$minsht_id, 'msd_status'=> 3));
-        $this->data['hod_rm_ado'] = $this->MinuteSheetModel->get_hod_remarks(array('msd_msr_id'=>$minsht_id, 'msd_status'=> 4));
-        $this->data['ao_remarks'] = $this->MinuteSheetModel->get_hod_remarks(array('msd_msr_id'=>$minsht_id, 'msd_status'=> 5));
-        $this->data['fo_remarks'] = $this->MinuteSheetModel->get_fno_remarks(array('msbg_msr_id'=>$minsht_id));
-        $this->data['fwd_rm_dfn'] = $this->MinuteSheetModel->get_hod_rec_remarks(array('msd_msr_id'=>$minsht_id, 'msd_status'=> 8));
-        $this->data['hod_rm_dfn'] = $this->MinuteSheetModel->get_hod_remarks(array('msd_msr_id'=>$minsht_id, 'msd_status'=> 7));
-        $this->data['df_remarks'] = $this->CRUDModel->get_wherein_row('min_sheet_details', array('msd_msr_id'=>$minsht_id), 'msd_status', array(9,10));
-        $this->data['fwd_rm_vp']  = $this->MinuteSheetModel->get_hod_rec_remarks(array('msd_msr_id'=>$minsht_id, 'msd_status'=> 13));
-        $this->data['hod_rm_vp']  = $this->MinuteSheetModel->get_hod_remarks(array('msd_msr_id'=>$minsht_id, 'msd_status'=> 9, 'msd_fwd_hod_id !=' => 0));
-        $this->data['vp_remarks'] = $this->MinuteSheetModel->get_vp_remarks(array('msd_msr_id'=>$minsht_id, 'msd_status'=> 12));
-        $this->data['pr_remarks'] = $this->MinuteSheetModel->get_principal_remarks(array('msd_msr_id'=>$minsht_id), 'msd_status', array(15,16));
-        
-        $this->data['ReportName']   = 'Purchase Requisition Edit';
-        $this->data['page_title']   = 'Purchase Requisition Edit | ECP';
-        $this->data['page']         = 'minutesheet/minute_sheet_edit_admin';
-        $this->load->view('common/common',$this->data);
-         
-    }
-    
 }   

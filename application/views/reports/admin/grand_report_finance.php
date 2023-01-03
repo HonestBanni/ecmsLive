@@ -18,94 +18,89 @@ return false;
                 <h1 class="section-heading text-highlight">
                             <span class="line"><?php if(@$ReportName): echo $ReportName;endif;?></span>
                         </h1>
-               
-                     
-                     
-                    <form method="post">
+          <form method="post" action="ReportsController/fee_students_search">
                          <div class="col-md-12">
-                        <div class="form-group col-md-2">
+                        <div class="col-md-3">
                             <label for="name">College No</label>
                             <input type="text" name="college_no"  placeholder="College No." class="form-control college_no">
                         </div>
-                        <div class="form-group col-md-2">
+                        <div class="col-md-3">
                             <label for="name">Student Name</label>
                             <input type="text" name="student_name"   placeholder="Student Name" class="form-control student_name">
                         </div>
-                        <div class="form-group col-md-2">
+                        <div class="col-md-3">
                             <label for="name">Father Name</label>
                             <input type="text" name="father_name"   placeholder="Father Name" class="form-control father_name">
                         </div>
-                        <div class="form-group col-md-2">
+                        <div class="col-md-3">
                             <label for="name">Gender</label>
                                 <?php 
                                     echo form_dropdown('gender', $gender,'',  'class="form-control gender" id="gender"');
                                 ?>
                         </div>
-                         <div class="col-md-2 col-sm-5">
+                         <div class="col-md-3">
                             <label for="name">Select Shift</label>
-                                <div class="input-group" id="adv-search">
+                                 
                                     <?php
                                          echo form_dropdown('shift', $shift,'',  'class="form-control" id="shift"');
                                     ?>
-                                </div>
+                               
                             </div>     
-                        <div class="form-group col-md-2">
+                        <div class="col-md-3">
                             <label for="name">Program</label>
                                 <?php 
                                     echo form_dropdown('programe_id', $program,'',  'class="form-control programe_id" id="feeProgrameId"');
                                 ?>
                         </div>
                         
-                        <div class="form-group col-md-2">
+                        <div class="col-md-3">
                             <label for="name">Sub Program</label>
                                 <?php 
                                 $sub_program = array(''=>"Sub Program");
                                         echo form_dropdown('sub_pro_id', $sub_program,'',  'class="form-control sub_pro_id"  id="showFeeSubPro"');
                                 ?>
                         </div>
-                        <div class="form-group col-md-2">
+                        <div class="col-md-3">
                             <label for="name">Batch</label>
                                 <?php
                                     $batch = array(''=>"Batch");
-                                    echo form_dropdown('batch', $batch,'',  'class="form-control batch_id" id="batch_id"');
+                                    echo form_dropdown('batch_id', $batch,'',  'class="form-control batch_id" id="batch_id"');
                                 ?>
                         </div>     
-                        <div class="form-group col-md-2">
+                        <div class="col-md-3">
                             <label for="name">Section</label>
                                 <?php 
                                 $Section = array(''=>"Section");
-                                        echo form_dropdown('section', $Section,'',  'class="form-control section" required="required" id="showSections"');
+                                        echo form_dropdown('section', $Section,'',  'class="form-control section"  id="showSections"');
                                 ?>
                         </div>
-                        <div class="form-group col-md-2">
+                        <div class="col-md-3">
                             <label for="name">Student Status</label>
                                 <?php
-                                    echo form_dropdown('application_status', $student_status,'',  'class="form-control s_status_id" ');
+                                    echo form_dropdown('s_status_id', $student_status,'',  'class="form-control s_status_id" ');
 
                                 ?>
                         </div>
-                        <div class="form-group col-md-2">
+                        <div class="col-md-3">
                             <label for="name">Admission Date From</label>
-                            <input type="text" id="admission_date_from"  placeholder="Admission From" class="form-control datepicker">
+                            <input type="text" id="admission_date_from" name="date_from"  placeholder="Admission From" class="form-control datepicker">
                         </div>
-                        <div class="form-group col-md-2">
+                        <div class="col-md-3">
                             <label for="name">Admission Date To</label>
-                            <input type="text" id="admission_date_to"  placeholder="Admission To" class="form-control datepicker" value="<?php echo date('d-m-Y')?>">
+                            <input type="text" name="date_to" id="admission_date_to"  placeholder="Admission To" class="form-control datepicker" value="<?php echo date('d-m-Y')?>">
                         </div>
                         </div>
-                        <div style="padding-top:1%;">
+                         
                                 <div class="col-md-3 pull-right">
-                                    
+                                    <label for="name" style=" visibility: hidden ">Admission Dsdsdsdsdsate To</label>
                                     <input type="button" name="search" class="btn btn-theme" value="Search" id="search_std">
+                                    <button type="submit" name="Excel" class="btn btn-theme" value="Excel" id="Excel"><i class="fa fa-book"></i> Excel</button>
                                     <button type="button" name="print" value="print"  onClick="printdiv('div_print');" class="btn btn-theme"><i class="fa fa-print"></i> Print </button> 
                             
      
                                 </div>
-                            </div>
-               
-                    
                         
-                </form>
+               </form>
                 </div>   
           
           </section>
@@ -145,6 +140,7 @@ jQuery('#search_std').on('click',function(){
         'date_from'     : jQuery('#admission_date_from').val(),
         'date_to'       : jQuery('#admission_date_to').val(),
         'shift'         : jQuery('#shift').val(),
+        'Search'         : 'Search',
         };
         
        jQuery.ajax({
@@ -159,7 +155,7 @@ jQuery('#search_std').on('click',function(){
                
                html += '<h3 align="center">Grand Report Finance</h3>';
                html += '<h4>Result '+totalCount+'</h4>';
-               html += '<tr></tr><table class="table table-boxed table-bordered table-striped" id="table" style="font-size:12px">'+
+               html += '<tr></tr><table class="table table-boxed table-bordered table-striped" id="table" style="font-size:11px">'+
                         '<thead>'+
                           '<tr>'+
                               '<th>#</th>'+
@@ -174,6 +170,7 @@ jQuery('#search_std').on('click',function(){
                               '<th>Section</th>'+
                               '<th>O/T . Marks</th>'+
                               '<th>%age</th>'+
+                              '<th>Adm Date</th>'+
                               '<th>Status</th>'+
                           '</tr>';
             var i;
@@ -194,7 +191,8 @@ jQuery('#search_std').on('click',function(){
                         '<td>'+result[i].obtained_marks+'/'+result[i].total_marks+'</td>'+
                         '<td>'+result[i].percentage+'</td>'+
                         
-                        '<td><span class="label label-theme">'+result[i].student_statusName+'</span></td>'+
+                        '<td>'+result[i].admission_date+'</td>'+
+                        '<td>'+result[i].student_status+'</td>'+
                   '</tr>';
                     sn++;
              } 

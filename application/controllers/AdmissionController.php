@@ -3087,7 +3087,8 @@ class AdmissionController extends AdminController {
             $this->excel->getActiveSheet()->getStyle('K1')->getFont()->setBold(true);
             $this->excel->getActiveSheet()->getStyle('K1')->getFont()->setSize(16);
 
-            $this->excel->getActiveSheet()->setCellValue('L1','Shift');
+            
+            $this->excel->getActiveSheet()->setCellValue('L1','Reg. #');
             $this->excel->getActiveSheet()->getStyle('L1')->getFont()->setBold(true);
             $this->excel->getActiveSheet()->getStyle('L1')->getFont()->setSize(16);
 
@@ -3123,9 +3124,8 @@ class AdmissionController extends AdminController {
        for($col = ord('A'); $col <= ord('S'); $col++){
                 //set column dimension
                 $this->excel->getActiveSheet()->getColumnDimension(chr($col))->setAutoSize(true);
-                 //change the font size
+                //change the font size
                 $this->excel->getActiveSheet()->getStyle(chr($col))->getFont()->setSize(12);
-                  
                 $this->excel->getActiveSheet()->getStyle(chr($col))->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
         }
         

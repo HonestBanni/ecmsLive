@@ -122,7 +122,7 @@
                   <th>Sub program</th>
                   <th>Section</th>
                   <th>Status</th>
-                  <th>Print White Card</th>
+                  <th colspan="3">Print White Card</th>
                 </tr>
               </thead>
               <tbody>
@@ -140,7 +140,14 @@
                                 <td>'.$resRow->subprogram.'</td>
                                 <td>'.$resRow->sectionName.'</td>
                                 <td>'.$resRow->studentstatus.'</td>
-                               <td><a href="whiteCardPrint/'.$resRow->student_id.'/'.$resRow->sec_id.'">View WhiteCard</a></span>
+                                <td>
+                                    <a class="btn btn-success" target="_blank" href="whiteCardPrint/'.$resRow->student_id.'/'.$resRow->sec_id.'">White Card</a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-success" target="_blank" href="whiteCardTeacher/'.$resRow->student_id.'/'.$resRow->sec_id.'">T. White Card</a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-success" target="_blank" href="SARDRI/'.$resRow->student_id.'/'.$resRow->sec_id.'">Daily Attd</a>
                                 </td>
                               </tr>';
                    $sn++;

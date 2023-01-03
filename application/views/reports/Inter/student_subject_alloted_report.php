@@ -162,6 +162,7 @@
                             <th>Student Name</th>
                             <th>Father Name</th>
                             <th>Sub Program</th>
+                            <th>Section</th>
                             <th>Subjects</th>
                         </tr>
                     </thead>
@@ -187,7 +188,8 @@
                                         <td>'.$srRow->form_no.'</td>
                                         <td>'.$srRow->student_name.'</td>
                                         <td>'.$srRow->father_name.'</td>
-                                        <td>'.$srRow->sub_pro_name.'</td><td>';
+                                        <td>'.$srRow->sub_pro_name.'</td>
+                                        <td>'.$srRow->section_name.'</td><td>';
                                         foreach($assigned_subjects as $rowList):
                                             if($rowList->subject_id == $subjectId):
                                                 echo '<strong>'.$rowList->subject_name.'</strong>, ';

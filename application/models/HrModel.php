@@ -130,7 +130,8 @@ class HrModel extends CI_Model
         return $pro->result();
     }
     
-    public function profileEmployee($where){
+    public function profileEmployee($where)
+    {
        $query = $this->db->select('
             hr_emp_record.emp_id,
             hr_emp_record.picture,
@@ -146,10 +147,12 @@ class HrModel extends CI_Model
             hr_emp_record.contact1,
             hr_emp_record.contact2,
             hr_emp_record.emp_personal_no,
+            hr_emp_record.gp_fund_no,
             hr_emp_record.email,
             hr_emp_record.joining_date,
             hr_emp_record.account_no,
             hr_emp_record.comment,
+            hr_emp_record.additional_responsibilty,
             hr_emp_record.c_emp_scale_id,
             hr_emp_record.current_designation,
             department.title as department,
@@ -165,8 +168,8 @@ class HrModel extends CI_Model
             hr_emp_scale.title as joiningscale,
             hr_emp_designation.title as jdesignation,
             shift.name as shiftname,
+            bank.name as bankname,
             hr_emp_status.title as statustitle,
-            mobile_network.network as network_name,
         ')
     ->from('hr_emp_record')
     ->join('department','department.department_id=hr_emp_record.department_id','left outer')  
@@ -182,14 +185,37 @@ class HrModel extends CI_Model
     ->join('hr_emp_scale','hr_emp_scale.emp_scale_id=hr_emp_record.j_emp_scale_id','left outer')
     ->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.joining_designation','left outer')
     ->join('shift','shift.shift_id=hr_emp_record.shift_id','left outer')
+    ->join('bank','bank.bank_id=hr_emp_record.bank_id','left outer')
     ->join('hr_emp_status','hr_emp_status.emp_status_id=hr_emp_record.emp_status_id','left outer')
-    ->join('mobile_network','mobile_network.net_id=hr_emp_record.net_id','left outer')
      ->where($where)
      ->get();
-        return $query->row();  
+        return $query->result();  
     }
     
- 
+    public function getEmployee()
+    {
+            $query = $this->db->select('
+            hr_emp_record.emp_id,
+            hr_emp_record.picture,
+            hr_emp_record.emp_name,
+            hr_emp_record.father_name,
+            department.title as departmentTitle,
+            subject.title as subjectTitle,
+            hr_emp_designation.title as cdesignation,
+            hr_emp_contract_type.title as contracttitle,
+            hr_emp_category.title as categorytitle,
+        ')
+ ->from('hr_emp_record')
+ ->join('department','department.department_id=hr_emp_record.department_id','left outer')  
+ ->join('subject','subject.subject_id=hr_emp_record.subject_id','left outer')  
+ ->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation','left outer')  
+    ->join('hr_emp_contract_type','hr_emp_contract_type.contract_type_id=hr_emp_record.contract_type_id','left outer')
+    ->join('hr_emp_category','hr_emp_category.cat_id=hr_emp_record.cat_id','left outer')           
+                 ->get();
+        if($query):
+            return $query->result();
+        endif;
+    }
     
     public function getEmployeeRetire()
     {
@@ -338,13 +364,15 @@ class HrModel extends CI_Model
             return $query->result();
         endif;
     }
-     public function getcategory(){
-               $this->db->order_by('category_code','asc'); 
-        return $this->db->get("hr_emp_category")->result();
-        
+    
+    public function getcategory()
+    {
+        $pro = $this->db->get("hr_emp_category");
+        return $pro->result();
     }
-    public function getdesignation(){
-               $this->db->order_by('title','asc'); 
+    
+    public function getdesignation()
+    {
         $pro = $this->db->get("hr_emp_designation");
         return $pro->result();
     }
@@ -357,7 +385,7 @@ class HrModel extends CI_Model
     
     public function getscale()
     {
-        $this->db->order_by("hr_emp_scale.hr_scl_order","asc");
+        $this->db->order_by("hr_emp_scale.title","asc");
         $pro = $this->db->get("hr_emp_scale");
         return $pro->result();
     }
@@ -368,16 +396,10 @@ class HrModel extends CI_Model
         return $pro->result();
     }
     
-    public function getemp_contract(){
-              $this->db->select('
-                      hr_emp_contract_type.contract_type_id,
-                      hr_emp_contract_type.title as contract_type,
-                      hr_emp_category.title as category
-                      ');  
-              $this->db->join('hr_emp_category','hr_emp_category.cat_id=hr_emp_contract_type.hr_category_fk');
-              $this->db->order_by('hr_emp_category.cat_id','asc');
-       return $this->db->get("hr_emp_contract_type")->result();
-        
+    public function getemp_contract()
+    {
+        $pro = $this->db->get("hr_emp_contract_type");
+        return $pro->result();
     }
     
     public function emp_acr(){
@@ -393,7 +415,47 @@ class HrModel extends CI_Model
         return $query->result();
     }
     
-    
+    public function get_empData($table,$where=NULL,$like=NULL){
+       
+            $this->db->SELECT('
+                hr_emp_record.emp_id,
+                hr_emp_record.emp_name,
+                hr_emp_record.picture,
+                gender.title as genderName,
+                department.title as department,
+                hr_emp_designation.title as designation,
+                hr_emp_category.title as category,
+                hr_emp_scale.title as scale,
+                hr_emp_contract_type.title as contract,
+                subject.title as subject,
+                hr_emp_record.father_name,
+                hr_emp_status.title
+                ');
+        
+            $this->db->FROM($table);
+        $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
+        $this->db->join('hr_emp_status','hr_emp_status.emp_status_id=hr_emp_record.emp_status_id', 'left outer');
+        $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation', 'left outer');
+        $this->db->join('gender','gender.gender_id=hr_emp_record.gender_id', 'left outer');
+        $this->db->join('subject','subject.subject_id=hr_emp_record.subject_id', 'left outer');
+        $this->db->join('hr_emp_category','hr_emp_category.cat_id=hr_emp_record.cat_id', 'left outer');
+        $this->db->join('hr_emp_scale','hr_emp_scale.emp_scale_id=hr_emp_record.c_emp_scale_id', 'left outer');
+        $this->db->join('hr_emp_contract_type','hr_emp_contract_type.contract_type_id=hr_emp_record.contract_type_id', 'left outer');
+      //  $this->db->where('emp_status_id','1');
+            if($like):
+                $this->db->like($like);
+            endif;
+        
+            if($where):
+                $this->db->where($where);
+            endif;
+            
+            $query =  $this->db->get();
+            if($query):
+                return $query->result();
+            endif;
+            
+   }
     
     public function get_empretireData($table,$where=NULL,$like=NULL){
        
@@ -541,255 +603,6 @@ class HrModel extends CI_Model
          ->get();
         return $query->result();
     }
-
-
-//Pay Roll Queries
-    //Employee Details 
-    public function get_employee_details($where=NULL){
-        $this->db->select('
-            hr_emp_record.emp_id,
-            hr_emp_record.picture,
-            hr_emp_record.emp_name,
-            hr_emp_record.father_name,
-            hr_emp_record.dob,
-            hr_emp_record.joining_date,
-            hr_emp_record.retirement_date,
-
-            hr_emp_designation.emp_desg_name as Designation,
-            hr_emp_scale.scale_name as cscale,
-            hr_emp_status.emp_status_name as emp_status
-        ');
-         
-//        $this->db->join('hr_emp_departments','hr_emp_departments.emp_deprt_id=hr_emp_record.department_id', 'left outer');
-        $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation','left outer'); 
-        $this->db->join('hr_emp_scale','hr_emp_scale.emp_scale_id=hr_emp_record.c_emp_scale_id','left outer');
-           $this->db->join('hr_emp_status','hr_emp_status.emp_status_id=hr_emp_record.emp_status_id', 'left outer');
-        if($where):
-            $this->db->where($where);
-        endif;
-        return $this->db->get('hr_emp_record')->row();
-        
-    }
-    public function get_employee_detail_record($where=NULL,$like=NULL){
-
-              
-            
-            $this->db->join('hr_emp_status','hr_emp_status.emp_status_id=hr_emp_record.emp_status_id', 'left outer');
-//            $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation', 'left outer');
-            $this->db->join('gender','gender.gender_id=hr_emp_record.gender_id', 'left outer');
-//            $this->db->join('hr_emp_category','hr_emp_category.category_id=hr_emp_record.cat_id', 'left outer');
-            $this->db->join('hr_emp_scale','hr_emp_scale.emp_scale_id=hr_emp_record.c_emp_scale_id', 'left outer');
-//            $this->db->join('hr_emp_category_type','hr_emp_category_type.category_type_id=hr_emp_record.contract_type_id', 'left outer');
-
-          //  $this->db->where('emp_status_id','1');
-                if($like):
-                    $this->db->like($like);
-                endif;
-
-                if($where):
-                    $this->db->where($where);
-                endif;
-
-                $query =  $this->db->get('hr_emp_record');
-                if($query):
-                    return $query->result();
-                endif;
-
-       }
-    public function get_employee_detail_recordX($where=NULL,$like=NULL){
-
-                $this->db->SELECT('
-                    hr_emp_record.emp_id,
-                    hr_emp_record.retirement_date,
-                    hr_emp_record.picture,
-                    hr_emp_record.emp_personal_no,
-                    hr_emp_record.emp_name,
-                    hr_emp_record.father_name,
-                    hr_emp_designation.emp_desg_name as current_designation,
-                    hr_emp_scale.scale_name as current_scale,
-                    hr_emp_category_type.ctgy_type_name as contract_type,
-                    hr_emp_status.emp_status_name as status,
-                    gender.title as gender,
-                    hr_emp_departments.emp_deprt_name as department,
-                    ');
-            $this->db->join('hr_emp_departments','hr_emp_departments.emp_deprt_id=hr_emp_record.department_id', 'left outer');
-            $this->db->join('hr_emp_status','hr_emp_status.emp_status_id=hr_emp_record.emp_status_id', 'left outer');
-            $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation', 'left outer');
-            $this->db->join('gender','gender.gender_id=hr_emp_record.gender_id', 'left outer');
-            $this->db->join('hr_emp_category','hr_emp_category.category_id=hr_emp_record.cat_id', 'left outer');
-            $this->db->join('hr_emp_scale','hr_emp_scale.emp_scale_id=hr_emp_record.c_emp_scale_id', 'left outer');
-            $this->db->join('hr_emp_category_type','hr_emp_category_type.category_type_id=hr_emp_record.contract_type_id', 'left outer');
-
-          //  $this->db->where('emp_status_id','1');
-                if($like):
-                    $this->db->like($like);
-                endif;
-
-                if($where):
-                    $this->db->where($where);
-                endif;
-
-                $query =  $this->db->get('hr_emp_record');
-                if($query):
-                    return $query->result();
-                endif;
-
-       }
-   public function get_employee($where=NULL,$like=NULL){
-            $query = $this->db->select('
-            hr_emp_record.emp_id,
-            hr_emp_record.picture,
-            hr_emp_record.emp_name,
-            hr_emp_record.father_name,
-            department.title as departmentTitle,
-            subject.title as subjectTitle,
-            hr_emp_designation.title as cdesignation,
-            hr_emp_contract_type.title as contracttitle,
-            hr_emp_category.title as categorytitle,
-        ')
-        ->from('hr_emp_record')
-        ->join('department','department.department_id=hr_emp_record.department_id','left outer')  
-        ->join('subject','subject.subject_id=hr_emp_record.subject_id','left outer')  
-        ->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation','left outer')  
-        ->join('hr_emp_contract_type','hr_emp_contract_type.contract_type_id=hr_emp_record.contract_type_id','left outer')
-        ->join('hr_emp_category','hr_emp_category.cat_id=hr_emp_record.cat_id','left outer')->get();
-        if($query):
-            return $query->result();
-        endif;
-    }
-    public function employee_bank_details($where){
-                $this->db->join('bank','bank.bank_id=hr_emp_bank.heb_bank_id');  
-                $this->db->join('common_status','common_status.cs_id=hr_emp_bank.heb_status');  
-         return $this->db->get_where('hr_emp_bank',$where)->result();
-    }
-//    public function get_designations(){
-//                $this->db->join('hr_emp_category_type','hr_emp_category_type.category_type_id=hr_emp_designation.emp_desg_cat_type_id');  
-//                $this->db->join('hr_emp_category','hr_emp_category.category_id=hr_emp_designation.emp_desg_cat_id');  
-//                $this->db->order_by('emp_desg_code','asc');
-//         return $this->db->get_where('hr_emp_designation')->result();
-//    }
-//    public function get_department(){
-//                
-//                $this->db->join('hr_emp_category','hr_emp_category.category_id=hr_emp_departments.emp_deprt_cat_id');  
-////                $this->db->order_by('emp_desg_code','asc');
-//         return $this->db->get_where('hr_emp_departments')->result();
-//    }
-    public function get_bank(){
-        return $this->db->get_where('bank')->result();
-    }
-    public function get_branch(){
-                $this->db->join('bank','bank.bank_id= hr_bank_branch.branch_bank_id'); 
-        return  $this->db->get_where(' hr_bank_branch')->result();
-    }
-    public function get_scale(){
-                $this->db->order_by('scale_order','asc'); 
-        return  $this->db->get_where(' hr_emp_scale')->result();
-    }
-    public function get_status(){
-                $this->db->order_by('emp_status_name','asc'); 
-        return  $this->db->get_where(' hr_emp_status')->result();
-    }
-    public function employee_basic_info($where){
-                      $this->db->select('
-                        hr_emp_record.*,      
-                        district.name as distric_name,      
-                        district.district_id as district_id,      
-                        country.name as country_name,      
-                        country.country_id as country_id,      
-                        
-                      ');
-                      $this->db->join('district','district.district_id=hr_emp_record.district_id','left outer');   
-                      $this->db->join('country','country.country_id=hr_emp_record.country_id','left outer');   
-            return    $this->db->get_where('hr_emp_record',$where)->row();
-    }
-    public function get_employee_academics($where){
-                $this->db->join('hr_emp_education','hr_emp_education.edu_emp_id=hr_emp_record.emp_id');  
-                $this->db->join('degree','degree.degree_id=hr_emp_education.edu_degree_id','left outer');  
-                $this->db->join('board_university','board_university.bu_id=hr_emp_education.edu_bu_id','left outer');  
-                $this->db->join('hr_emp_division','hr_emp_division.devision_id=hr_emp_education.edu_div_id','left outer');  
-      return    $this->db->get_where('hr_emp_record',$where)->result();
-    }
-    public function get_employee_academic($where){
-//                      $this->db->join('hr_emp_education','hr_emp_education.edu_emp_id=hr_emp_record.emp_id');  
-                $this->db->join('degree','degree.degree_id=hr_emp_education.edu_degree_id','left outer');  
-                $this->db->join('board_university','board_university.bu_id=hr_emp_education.edu_bu_id','left outer');  
-                $this->db->join('hr_emp_division','hr_emp_division.devision_id=hr_emp_education.edu_div_id','left outer');  
-      return    $this->db->get_where('hr_emp_education',$where)->row();
-    }
-    public function get_employee_designations($where){
-//                $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_staff_designation.emp_staff_designation_id');   
-//                $this->db->join('hr_emp_category_type','hr_emp_category_type.category_type_id=hr_emp_designation.emp_desg_cat_type_id');   
-                $this->db->join('hr_emp_category','hr_emp_category.category_id=hr_emp_staff_designation.emp_staff_category_id');   
-                $this->db->join('hr_emp_departments','hr_emp_departments.emp_deprt_id=hr_emp_staff_designation.emp_staff_department_id');   
-     return    $this->db->get_where('hr_emp_staff_designation',$where)->result();
-    }
-    public function get_employee_designation($where){
-//                $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_staff_designation.emp_staff_designation_id');   
-//                $this->db->join('hr_emp_category_type','hr_emp_category_type.category_type_id=hr_emp_designation.emp_desg_cat_type_id');   
-//                $this->db->join('hr_emp_category','hr_emp_category.category_id=hr_emp_category_type.ctgy_type_cat_id');   
-//                $this->db->join('hr_emp_departments','hr_emp_departments.emp_deprt_id=hr_emp_staff_designation.emp_staff_department_id');  
-                $this->db->join('hr_emp_category','hr_emp_category.category_id=hr_emp_staff_designation.emp_staff_category_id');   
-                $this->db->join('hr_emp_departments','hr_emp_departments.emp_deprt_id=hr_emp_staff_designation.emp_staff_department_id');  
-                $this->db->order_by('emp_staff_design_id','desc');
-     return    $this->db->get_where('hr_emp_staff_designation',$where)->row();
-    }
-    public function get_employee_fund($where){
-               $this->db->join('hr_emp_fund_status','hr_emp_fund_status.fund_status_id=hr_emp_staff_fund_status.emf_emp_fund_id');   
-     return    $this->db->get_where('hr_emp_staff_fund_status',$where)->result();
-    }
-    public function get_employee_shifts($where){
-               $this->db->join('hr_emp_staff_shift','hr_emp_staff_shift.ess_shift_id=shift.shift_id');   
-     return    $this->db->get_where('shift',$where)->result();
-    }
-    public function get_employee_shift($where){
-               $this->db->order_by('ess_date','desc');
-               $this->db->join('hr_emp_staff_shift','hr_emp_staff_shift.ess_shift_id=shift.shift_id');   
-     return    $this->db->get_where('shift',$where)->row();
-    }
-    public function get_employee_banks($where){
-               $this->db->join('bank','bank.bank_id=hr_emp_bank.heb_bank_id');   
-               $this->db->join('hr_bank_branch','hr_bank_branch.branch_id=hr_emp_bank.heb_branch_id');   
-               $this->db->join('yesno','yesno.yn_id=hr_emp_bank.heb_default_account');
-               $this->db->order_by('heb_id','desc');
-     return    $this->db->get_where('hr_emp_bank',$where)->result();
-    }
-    public function get_employee_bank($where){
-               $this->db->join('bank','bank.bank_id=hr_emp_bank.heb_bank_id');   
-               $this->db->join('hr_bank_branch','hr_bank_branch.branch_id=hr_emp_bank.heb_branch_id');   
-               $this->db->join('yesno','yesno.yn_id=hr_emp_bank.heb_default_account');   
-     return    $this->db->get_where('hr_emp_bank',$where)->row();
-    }
-    public function get_employee_allowances($where){
-               $this->db->join('hr_allowance','hr_allowance.ha_id=hr_staff_allowance.hsa_allowanc_id');
-               $this->db->join('yesno','yesno.yn_id=hr_staff_allowance.hsa_default_allowanc');
-               $this->db->order_by('hsa_date','desc');
-     return    $this->db->get_where('hr_staff_allowance',$where)->result();
-    }
-    public function get_employee_responsibilities($where){
-               
-               $this->db->join('common_status','common_status.cs_id=hr_emp_responsibility.resp_status');
-               $this->db->order_by('resp_id','desc');
-     return    $this->db->get_where('hr_emp_responsibility',$where)->result();
-    }
-    public function get_employee_letters($where){
- 
-               $this->db->join('hr_contract_status','hr_contract_status.contract_status_id=hr_contract_reneval.c_renewal_contract_status_id','left outer');
-               $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_contract_reneval.c_renewal_designation_id','left outer');
-               $this->db->join('hr_emp_scale','hr_emp_scale.emp_scale_id=hr_contract_reneval.c_renwal_scale','left outer');
-               $this->db->order_by('contract_id','desc');
-     return    $this->db->get_where('hr_contract_reneval',$where)->result();
-    }
-    public function get_employee_letter($where){
- 
-               $this->db->join('hr_contract_status','hr_contract_status.contract_status_id=hr_contract_reneval.c_renewal_contract_status_id','left outer');
-               $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_contract_reneval.c_renewal_designation_id','left outer');
-               $this->db->join('hr_emp_scale','hr_emp_scale.emp_scale_id=hr_contract_reneval.c_renwal_scale','left outer');
-               $this->db->join('hr_emp_category_type','hr_emp_category_type.category_type_id=hr_contract_reneval.c_renwal_category_type_id','left outer');
-               $this->db->join('hr_emp_category','hr_emp_category.category_id=hr_contract_reneval.c_renwal_category_id','left outer');
-               $this->db->order_by('contract_id','desc');
-     return    $this->db->get_where('hr_contract_reneval',$where)->row();
-    }
- 
-  
+    
+    
 }
-  

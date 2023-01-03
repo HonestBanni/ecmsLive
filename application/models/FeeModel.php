@@ -332,9 +332,8 @@ class FeeModel extends CI_Model
                 $this->db->join('student_status','student_status.s_status_id=student_record.s_status_id','left outer');
                 $this->db->join('board_university','applicant_edu_detail.bu_id=board_university.bu_id','left outer') ;    
                 $this->db->join('religion','student_record.religion_id=religion.religion_id','left outer') ; 
-                $this->db->where_in('student_status.s_status_id',array('5','12')); // 5 = Enrolled, 12 = Suspended
-//                 $this->db->where('student_status.s_status_id',5);
-//                 $this->db->where('student_status.s_status_id',12);
+                $this->db->where_in('student_status.s_status_id',array('5','12','21','22')); // 5 = Enrolled, 12 = Suspended (Fee) , 21 = Suspended (General), 22 = Suspended (Migration)
+
                 if($where):
                     $this->db->where($where);
                 endif;

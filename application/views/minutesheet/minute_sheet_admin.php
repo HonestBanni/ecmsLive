@@ -266,7 +266,7 @@
         
         $.ajax({
             type    : 'post',
-            url     : 'MinuteSheetController/dfn_minute_sheet_grid',
+            url     : 'MinuteSheetController/admin_minute_sheet_grid',
             success :function(result){ 
                $('#result_grid').html(result);    
             }
@@ -311,7 +311,7 @@
             };
             $.ajax({
                 type    : 'post',
-                url     : 'MinuteSheetController/dfn_minute_sheet_grid',
+                url     : 'MinuteSheetController/admin_minute_sheet_grid',
                 data    : data,
                 success :function(result){ 
                    $('#result_grid').html(result);    

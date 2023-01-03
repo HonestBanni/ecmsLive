@@ -4,6 +4,18 @@
     <!-- ******BANNER****** -->
     <div class="row cols-wrapper">
         <div class="col-md-12">
+            
+            <?php
+            if(!empty($revert_cmnts)):
+            echo '<section class="course-finder" style="background-color: #fff; border: 1px solid #eee; padding-top: 15px;">
+                <div class="section-content" >
+                    <h3 class="text-center" style="color:#c00; font-family: Arial; font-weight: bold;">
+                        <i>'.strtoupper($revert_cmnts->mss_title).' FOR '.strtoupper($revert_cmnts->msd_comments).'</i>
+                    </h3>
+                </div>
+            </section>';
+            endif;
+            ?>
             <section class="course-finder" style="padding-bottom: 2%;">
                 <h1 class="section-heading text-highlight">
                     <span class="line"><?php echo $ReportName?> Form</span>
@@ -143,7 +155,7 @@
                 
                     <div class="col-md-4 right">
                         <label for="name" style="visibility: hidden">Add Attachments Add Attachments</label>
-                        <button type="button" class="btn btn-theme pull-right" name="update_ms" id="update_ms"  value="update_ms" style="margin-left: 3px;"> Update Minute Sheet</button>  &nbsp;
+                        <button type="button" class="btn btn-theme pull-right" name="update_ms" id="update_ms"  value="update_ms" style="margin-left: 3px;"> Update Requisition</button>  &nbsp;
                         <a href="MinuteSheetRecord"><button type="button" class="btn btn-danger pull-right" name="back_btn" id="back_btn" value="back_btn" style="margin-left: 3px;">Cancel</button></a> &nbsp;
                     </div>
                 

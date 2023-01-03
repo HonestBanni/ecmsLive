@@ -1,4 +1,4 @@
-    <script type="text/javascript">
+<script type="text/javascript">
     function date_time(id)
 {
         date = new Date;
@@ -44,10 +44,13 @@ animation:blinkingText 1.2s infinite;
     <header class="header">  
         <div class="header-main container">
             <h1 class="logo col-md-5 col-sm-6">
-                <a href="Dashboard"><img id="logo" class="img-responsive" src="assets/images/logo.png" alt="Edwardes College Peshawar"></a>
+                <a href="admin/admin_home"><img id="logo" class="img-responsive" src="assets/images/logo.png" alt="Edwardes College Peshawar"></a>
             </h1><!--//logo-->  
             <?php
-                $whereUsers = array('id'=>$this->UserInfo->user_id);
+                
+                $session    = $this->session->all_userdata();
+                $userEmail  = $session['userData'];
+                $whereUsers = array('id'=>$userEmail['user_id']);
 
                 $userInfo = $this->CRUDModel->get_where_row('users',$whereUsers);
 
@@ -59,15 +62,17 @@ animation:blinkingText 1.2s infinite;
                 $this->db->SELECT('
                     users.*,
                     hr_emp_record.*,
-                      
-                    
+                    hr_emp_designation.title as designation,
+                    hr_emp_scale.title as scale,
+                    department.title as department, 
+                    hr_emp_contract_type.title as contract 
                 '); 
                 $this->db->FROM('users');
                 $this->db->join('hr_emp_record','hr_emp_record.emp_id=users.user_empId', 'left outer');
-//                $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation', 'left outer');
-//                $this->db->join('hr_emp_scale','hr_emp_scale.emp_scale_id=hr_emp_record.c_emp_scale_id', 'left outer');
-//                $this->db->join('hr_emp_contract_type','hr_emp_contract_type.contract_type_id=hr_emp_record.contract_type_id', 'left outer');
-//                $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
+                $this->db->join('hr_emp_designation','hr_emp_designation.emp_desg_id=hr_emp_record.current_designation', 'left outer');
+                $this->db->join('hr_emp_scale','hr_emp_scale.emp_scale_id=hr_emp_record.c_emp_scale_id', 'left outer');
+                $this->db->join('hr_emp_contract_type','hr_emp_contract_type.contract_type_id=hr_emp_record.contract_type_id', 'left outer');
+                $this->db->join('department','department.department_id=hr_emp_record.department_id', 'left outer');
                 $this->db->where($whereUsers);
                 $employeeinfo  = $this->db->get();  
                 
@@ -75,12 +80,17 @@ animation:blinkingText 1.2s infinite;
                     $picture = $row->picture;
                                 ?>
             <div class="info col-md-5 col-sm-4"> 
-              <strong style="font-size:14px;color:#208e4c">
+              <strong style="font-size:14px;color:#208e4c">Designation: <?php echo $row->designation;?> 
+ <?php
  
-                 
+ if($row->contract):
+     echo '('.$row->contract.')';
+ endif;
+  ?><br>
+                Bps: <?php echo $row->scale;?><br>
                 Contact # <span style="color:red">(Used for Official SMS)</span>: <?php echo $row->contact1;?></strong><br><br>               
                <span id="date_time"></span>
-                  <?php
+                <?php
                 $where = array('emp_id'=>$row->emp_id);
                 $this->db->select('*');
                 $this->db->from('teacher_attendance');
@@ -93,13 +103,13 @@ animation:blinkingText 1.2s infinite;
                 ?>
                     <span>Logged In Time: <?php echo $res->in_time;?> 
                         <strong style="margin-left:30px;font-size:16px;">
-                            <a href="DashboardController/employee_logout/<?php echo $res->t_attend_id;?>">
+                            <a href="admin/teacher_logout/<?php echo $res->t_attend_id;?>">
                                 <button type="button" class="btn btn-danger"><i class="fa fa-check-circle"></i>Logout</button>
                             </a> 
-                            <input type="hidden" value="<?php echo $this->UserInfo->user_id; ?>" id="userId">
-                            <input type="hidden" value="<?php echo $this->UserInfo->user_roleId; ?>" id="groupId">
+                            <input type="hidden" value="<?php echo $userEmail['user_id']; ?>" id="userId">
+                            <input type="hidden" value="<?php echo $userEmail['user_roleId']; ?>" id="groupId">
                             <input type="hidden" value="<?php echo $row->emp_id; ?>" id="empId">
-                           
+                            <span id="notify"></span>
 <!--                            <a href="">
                                 <button type="button" class="btn btn-danger"><i class="fa fa-check-circle"></i><?php// echo $userEmail['user_roleId'];?></button>
                             </a>-->
@@ -108,9 +118,6 @@ animation:blinkingText 1.2s infinite;
                 <?php
                 endif;
                 ?>
- 
-                   
-           
 <!--                <script type="text/javascript">window.onload = date_time('date_time');</script>-->
             </div>
             <div class="col-md-2 col-sm-2">
@@ -198,4 +205,31 @@ animation:blinkingText 1.2s infinite;
             </div><!--//container-->
         </nav><!--//main-nav-->
         
-  
+        <script>
+        
+        $(document).ready(function(){
+            var data = { 
+                'user_id' : $('#userId').val(), 
+                'grp_id'  : $('#groupId').val(), 
+                'emp_id'  : $('#empId').val() 
+            }; 
+            $.ajax({
+                type   : 'post',
+                url    : 'MinuteSheetController/notification_in_header',
+                data   : data,
+                success :function(result){
+                    $('#notify').html(result)
+               }
+            });
+            setInterval(function(){
+                $.ajax({
+                    type   : 'post',
+                    url    : 'MinuteSheetController/notification_in_header',
+                    data   : data,
+                    success :function(result){
+                        $('#notify').html(result)
+                   }
+                });
+            }, 10000);
+        });
+        </script>

@@ -74,50 +74,96 @@ endif;
                <!-- ******BANNER****** --> 
             <div class="row cols-wrapper">
                 <div class="col-md-12" style="min-height:450px;">
-                   <div class="contact pull-center">
-                       <?php
-    if($Showmessage):
-        foreach($Showmessage as $message):
-                
-//            echo '<pre>';print_r($this->userInfo);
-           
-            switch ($message->message_category):
-                case 0:
-                    echo '<div class="alert alert-danger alert-dismissable">
-                            <strong>'.$message->details.'</strong>
-                        </div>';
-                    break;
-                case 1:
-                    $check_emp_cat = $this->db->get_where('hr_emp_record',array('emp_id'=>$this->userInfo->emp_id,'cat_id'=>1))->row();
-                    if($check_emp_cat):
-                        echo '<div class="alert alert-danger alert-dismissable">
-                            <strong>'.$message->details.'</strong>
-                        </div>'; 
-                    endif;
-                   
-                    break;
-                case 2:
-                    $check_emp_cat = $this->db->get_where('hr_emp_record',array('emp_id'=>$this->userInfo->emp_id,'cat_id'=>2))->row();
-                    if($check_emp_cat):
-                        echo '<div class="alert alert-danger alert-dismissable">
-                            <strong>'.$message->details.'</strong>
-                        </div>'; 
-                    endif;
-                   
-                    break;
-            endswitch;
+                    <div class="home-pc">
+                        <div class="contact pull-center">
+                            <?php
+                             if($Showmessage):
+                                 foreach($Showmessage as $message):
 
-    ?>                   
-        
-    <?php  
-        endforeach;    
-    else:
-            echo "";           
-    endif;
-        ?>  
-                        <p style="font-size:27px; margin-top:150px; text-align:center"><strong>Welcome to <br>Edwardes College Management System (ECMS)</strong></p> <br>
-                  
-                    </div><!--//contact-->
+                         //            echo '<pre>';print_r($this->userInfo);
+
+                                     switch ($message->message_category):
+                                         case 0:
+                                             echo '<div class="alert alert-danger alert-dismissable">
+                                                     <strong>'.$message->details.'</strong>
+                                                 </div>';
+                                             break;
+                                         case 1:
+                                             $check_emp_cat = $this->db->get_where('hr_emp_record',array('emp_id'=>$this->userInfo->emp_id,'cat_id'=>1))->row();
+                                             if($check_emp_cat):
+                                                 echo '<div class="alert alert-danger alert-dismissable">
+                                                     <strong>'.$message->details.'</strong>
+                                                 </div>'; 
+                                             endif;
+
+                                             break;
+                                         case 2:
+                                             $check_emp_cat = $this->db->get_where('hr_emp_record',array('emp_id'=>$this->userInfo->emp_id,'cat_id'=>2))->row();
+                                             if($check_emp_cat):
+                                                 echo '<div class="alert alert-danger alert-dismissable">
+                                                     <strong>'.$message->details.'</strong>
+                                                 </div>'; 
+                                             endif;
+
+                                             break;
+                                     endswitch;
+
+                             ?>                   
+                             <?php  
+                                 endforeach;    
+                             else:
+                                     echo "";           
+                             endif;
+                             ?>  
+                             <p style="font-size:27px; margin-top:150px; text-align:center"><strong>Welcome to <br>Edwardes College Management System (ECMS)</strong></p> <br>
+
+                         </div><!--//contact-->
+                    </div>
+                    <div class="home-mob" style="display: none">
+                        <div class="contact pull-center">
+                            <?php
+                             if($Showmessage):
+                                 foreach($Showmessage as $message):
+
+                         //            echo '<pre>';print_r($this->userInfo);
+
+                                     switch ($message->message_category):
+                                         case 0:
+                                             echo '<div class="alert alert-danger alert-dismissable">
+                                                     <strong>'.$message->details.'</strong>
+                                                 </div>';
+                                             break;
+                                         case 1:
+                                             $check_emp_cat = $this->db->get_where('hr_emp_record',array('emp_id'=>$this->userInfo->emp_id,'cat_id'=>1))->row();
+                                             if($check_emp_cat):
+                                                 echo '<div class="alert alert-danger alert-dismissable">
+                                                     <strong>'.$message->details.'</strong>
+                                                 </div>'; 
+                                             endif;
+
+                                             break;
+                                         case 2:
+                                             $check_emp_cat = $this->db->get_where('hr_emp_record',array('emp_id'=>$this->userInfo->emp_id,'cat_id'=>2))->row();
+                                             if($check_emp_cat):
+                                                 echo '<div class="alert alert-danger alert-dismissable">
+                                                     <strong>'.$message->details.'</strong>
+                                                 </div>'; 
+                                             endif;
+
+                                             break;
+                                     endswitch;
+
+                             ?>                   
+                             <?php  
+                                 endforeach;    
+                             else:
+                                     echo "";           
+                             endif;
+                             ?>  
+                             <p style="font-size:27px; margin-top:150px; text-align:center"><strong>Welcome to <br>Edwardes College Management System (ECMS)</strong></p> <br>
+
+                         </div><!--//contact-->
+                    </div>
                 </div><!--//col-md-3-->
                 
             </div><!--//cols-wrapper-->

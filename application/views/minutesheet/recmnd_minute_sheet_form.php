@@ -12,8 +12,8 @@
                         echo '<div class="col-md-12">
                             <table class="table" style="font-size: 15px;">
                                 <tr>
-                                    <th width="15%">Diary No.</th>
-                                    <td width="35%">'.$ms_detail->msr_diary_no.'</td>
+                                    <th width="15%">Process No.</th>
+                                    <td width="35%">'.$ms_detail->msr_id.'</td>
                                     <th width="15%">Date</th>
                                     <td width="35%">'.date('d-m-Y', strtotime($ms_detail->msr_date)).'</td>
                                 </tr>
@@ -41,6 +41,18 @@
                 </div>
             </section>
             
+            <?php
+            if(!empty($ms_recom_dtl)):
+            echo '<section class="course-finder" style="background-color: #fff; border: 1px solid #eee; padding-top: 15px;">
+                <div class="section-content" >
+                    <h3 class="text-center" style="color:#c00; font-family: Arial; font-weight: bold;">
+                        <i>FORWARDED BY '.strtoupper($ms_recom_dtl->emp_name).' FOR '.strtoupper($ms_recom_dtl->msd_forwarded_for).'</i>
+                    </h3>
+                </div>
+            </section>';
+            endif;
+            ?>
+            
             <section class="course-finder" style="padding-bottom: 2%;">
                 <h1 class="section-heading text-highlight">
                     <span class="line"><?php echo $ReportName?> Form</span>
@@ -59,7 +71,7 @@
                 </div><!--//section-content-->
                            
                     <div class="col-md-12 right">
-                        <button type="button" class="btn btn-theme pull-right mt-2" name="update_hod_ms" id="update_hod_ms"  value="update_hod_ms" >Recommend</button>
+                        <button type="button" class="btn btn-theme pull-right mt-2" name="update_hod_ms" id="update_hod_ms"  value="update_hod_ms" >Submit</button>
                     </div>
                 
             </section>    

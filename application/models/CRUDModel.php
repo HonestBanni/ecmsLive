@@ -242,15 +242,38 @@ class CRUDModel extends CI_Model{
 			return $data;
 		}
 	}  
-	function DropDown_Code($table,$option=NULL,$value,$show,$code,$where=NULL,$order=NULL){
+	function dropDown_batch_program_wise($option=NULL, $value,$show,$where=NULL,$order=NULL){
 		
                 if($where):
                     $this->db->where($where);
                 endif;
-                 
-                    $this->db->order_by($code,'asc');
-           
-//                 $this->db->order_by($show,'asc');
+                  if($order):
+                    $this->db->order_by($order['column'],$order['order']);
+                endif;
+                            $this->db->join('programes_info','programes_info.programe_id=prospectus_batch.programe_id');
+                $query =    $this->db->get('prospectus_batch');
+		
+		if($query->num_rows() > 0) 
+		{
+                    if($option):
+                        $data[''] = $option;
+                    endif;
+			
+			foreach($query->result() as $row) 
+			{
+				$data[$row->$value] = $row->$show;
+			}
+			return $data;
+		}
+	}  
+	function dropDown_class_start_time($table, $option=NULL, $value,$show,$where=NULL){
+		
+                if($where):
+                    $this->db->where($where);
+                endif;
+  
+                    $this->db->order_by('order_stime','asc');
+//                    $this->db->order_by('class_stime','asc');
                 $query = $this->db->get($table);
 		
 		if($query->num_rows() > 0) 
@@ -261,7 +284,30 @@ class CRUDModel extends CI_Model{
 			
 			foreach($query->result() as $row) 
 			{
-				$data[$row->$value] = '['.$row->$code.'] '.$row->$show;
+				$data[$row->$value] = $row->$show;
+			}
+			return $data;
+		}
+	}  
+	function dropDown_class_end_time($table, $option=NULL, $value,$show,$where=NULL){
+		
+                if($where):
+                    $this->db->where($where);
+                endif;
+  
+                    $this->db->order_by('order_etime','asc');
+//                    $this->db->order_by('class_etime','asc');
+                $query = $this->db->get($table);
+		
+		if($query->num_rows() > 0) 
+		{
+                    if($option):
+                        $data[''] = $option;
+                    endif;
+			
+			foreach($query->result() as $row) 
+			{
+				$data[$row->$value] = $row->$show;
 			}
 			return $data;
 		}
@@ -438,6 +484,30 @@ class CRUDModel extends CI_Model{
 			return $data;
 		}
 	} 
+        function dropDown_where_in_order($table, $option=NULL, $value,$show,$column=NULL,$array=NULL,$where=NULL, $order=NULL)
+	{
+            
+                $this->db->where_in($column,$array);
+                if($where):
+                   $this->db->where($where); 
+                endif;
+                
+                $this->db->order_by($order,'asc');
+                $query = $this->db->get($table);
+		
+		if($query->num_rows() > 0) 
+		{
+                    if($option):
+                        $data[''] = $option;
+                    endif;
+			
+			foreach($query->result() as $row) 
+			{
+				$data[$row->$value] = $row->$show;
+			}
+			return $data;
+		}
+	} 
         function dropDown_where_not_in($table, $option=NULL, $value,$show,$column=NULL,$array=NULL,$where=NULL)
 	{
             
@@ -544,7 +614,7 @@ class CRUDModel extends CI_Model{
     {
         $config = array(
             'upload_path'=> $dir.'/',
-            'allowed_types'=>'jpg|jpeg|png|gif|mp4|3gp|flv|mp3|doc|docx|rar|jfif',
+            'allowed_types'=>'jpg|jpeg|png|gif|mp4|3gp|flv|mp3|doc|docx|rar',
             'max_size'=>'900000000000',
             'encrypt_name'=> TRUE,
         );
@@ -576,12 +646,14 @@ public function do_resize($file_name,$dir){
     
         $this->load->library( array('image_lib') );
         $configUp['upload_path']    = $dir.'/';
-        $configUp['allowed_types']  = 'jpg|jpeg|png|gif|jfif';
+        $configUp['allowed_types']  = 'jpg|jpeg|png|gif';
+//        $configUp['allowed_types']  = 'jpg|jpeg|png|gif|mp4|3gp|flv|mp3|doc|docx|rar';
         $configUp['max_size']       = '900000000000';
         $configUp['encrypt_name'] = TRUE;
         $this->load->library('upload', $configUp);
         $this->upload->do_upload($file_name);
         $data                       = $this->upload->data();
+         
         $imageName                  = $data['file_name'];
         $path                       = $dir.'/'.$imageName;
          
@@ -590,6 +662,7 @@ public function do_resize($file_name,$dir){
         $config['source_image']     = $path;
         $config['create_thumb']     = TRUE;
         $config['thumb_marker']     = '_'.date('dmY_His').'_thumb';
+//        $config['thumb_marker']     = '_thumb';
         $config['maintain_ratio']   = TRUE; 
         $config['width']            = 250;
         $config['height']           = 300;
@@ -597,14 +670,16 @@ public function do_resize($file_name,$dir){
         $this->image_lib->initialize($config);
         $this->image_lib->resize();
         $this->image_lib->resize();
-        
-        //Unlink Orignal Picture and Save just Thumnail picture
-        unlink($path);
+         
+//        unlink($path);
 
         $result = array(
-                'file_name'=>$data['raw_name'].$config['thumb_marker'].$data['file_ext']
+//            'file_name'=>$data['file_name']
+            'file_name'=>$data['raw_name'].$config['thumb_marker'].$data['file_ext']
+//            'file_name'=>date('YmdHis').$data['raw_name'].$config['thumb_marker'].$data['file_ext']
         );
-     return  $result;
+     
+        return  $result;
         
     }
     
@@ -612,7 +687,7 @@ public function do_resize_test($file_name,$dir){
     
         $this->load->library( array('image_lib') );
         $configUp['upload_path']    = $dir.'/';
-        $configUp['allowed_types']  = 'jpg|jpeg|png|gif|jfif';
+        $configUp['allowed_types']  = 'jpg|jpeg|png|gif';
 //        $configUp['allowed_types']  = 'jpg|jpeg|png|gif|mp4|3gp|flv|mp3|doc|docx|rar';
         $configUp['max_size']       = '900000000000';
         $configUp['encrypt_name'] = TRUE;
@@ -657,7 +732,7 @@ public function do_resize_test($file_name,$dir){
         $this->load->library( array('image_lib') );
         $configUp['upload_path']    = $dir.'/';
 //        $configUp['allowed_types']  = 'jpg|jpeg|png|gif';
-        $configUp['allowed_types']  = 'jpg|jpeg|png|gif|mp4|3gp|flv|mp3|doc|docx|rar|jfif';
+        $configUp['allowed_types']  = 'jpg|jpeg|png|gif|mp4|3gp|flv|mp3|doc|docx|rar';
         $configUp['max_size']       = '900000000000';
             
         if(!empty($file_name)):
@@ -1818,7 +1893,7 @@ public function student_all_detailsdd($where=NULL){
                     $classSubjects = $this->ReportsModel->get_classSubjects(array('sec_id'=>$section_id));
                 endif;
                  if($flag == 2):
-                     $classSubjects = $this->ReportsModel->get_subject_list('student_subject_alloted',array('student_id'=>$result->student_id));
+                     $classSubjects = $this->ReportsModel->get_subject_list('student_subject_alloted',array('student_id'=>$student_id));
                 endif;
             
                 
@@ -1839,7 +1914,7 @@ public function student_all_detailsdd($where=NULL){
                     $year       = date("Y", strtotime($monthi,$time));
                      $where     = array(
                         'class_alloted.subject_id'=>$rowCS->subject_id,
-                        'monthly_test_details.student_id'=>$result->student_id,
+                        'monthly_test_details.student_id'=>$student_id,
                         'month(test_date)'=>$month,
                         'year(test_date)'=>$year,
 
@@ -1864,7 +1939,7 @@ public function student_all_detailsdd($where=NULL){
                     $year       = date("Y", strtotime($monthi, $time));
                     $where     = array(
 //                                                    'class_alloted.subject_id'=>$rowCS->subject_id,
-                        'monthly_test_details.student_id'=>$result->student_id,
+                        'monthly_test_details.student_id'=>$student_id,
                         'month(test_date)'=>$month,
                         'year(test_date)'=>$year,
 
@@ -2274,7 +2349,7 @@ public function student_all_detailsdd($where=NULL){
         return $rettxt;
         
     }
-    public function date_convert($date,$format=NULL){
+      public function date_convert($date,$format=NULL){
         
         //if date null,0000 or 1970 then return empty
         if($date === '0000-00-00' || $date == '1970-01-01' || $date == ''|| $date == '--'):
@@ -2287,12 +2362,45 @@ public function student_all_detailsdd($where=NULL){
                     return  $cvrtdate->format('d-m-Y');     
             endif;      
         endif;      
-         
-        
-        
-                                              
-        
     }
     
+    public function student_contact_details($student_id){
+                                   $this->db->join('mobile_network','mobile_network.net_id=student_record.std_mobile_network'); 
+        $student_contact_details = $this->db->get_where('student_record',array('student_id'=>$student_id))->row();
+        
+                                   $this->db->join('mobile_network','mobile_network.net_id=student_record.net_id'); 
+        $father_contact_details  = $this->db->get_where('student_record',array('student_id'=>$student_id))->row();
+        
+        $return_array = array();
+        
+        if(empty($student_contact_details->applicant_mob_no1) && $student_contact_details->applicant_mob_no1 == '0'):
+            $return_array['Student_Mobile_no'] = '';
+            $return_array['Student_Mobile_Net'] = '';
+            
+        else:
+            if(empty($student_contact_details->applicant_mob_no1)):
+                $return_array['Student_Mobile_no'] = $student_contact_details->applicant_mob_no1;
+            else:
+               $return_array['Student_Mobile_no'] =  $this->CRUDModel->clean_number($student_contact_details->applicant_mob_no1);
+            endif;
+            $return_array['Student_Mobile_Net'] = $student_contact_details->send_format;
+            
+        endif;
+        
+        if(empty($father_contact_details->applicant_mob_no1) && $father_contact_details->applicant_mob_no1 == '0'):
+            $return_array['Father_Mobile_no'] = '';
+            $return_array['Father_Mobile_Net'] = '';
+        else:
+            if(empty($father_contact_details->mobile_no)):
+             $return_array['Father_Mobile_no'] = $father_contact_details->mobile_no;
+                 else:
+                 $return_array['Father_Mobile_no'] = $this->CRUDModel->clean_number($father_contact_details->mobile_no);
+             endif;
+            
+            $return_array['Father_Mobile_Net'] = $father_contact_details->send_format;
+        endif;
+        return json_decode(json_encode($return_array), FALSE);
+        
+    }
      
 }

@@ -1871,6 +1871,129 @@ class SmsController extends AdminController {
             endif;
             
         }
+        
+        
+    public function fee_sms_report(){
+       
+        $this->data['sub_program']  = $this->CRUDModel->dropDown('sub_programes', 'Sub Program ', 'sub_pro_id', 'name');
+        $this->data['program']      = $this->CRUDModel->dropDown('programes_info', 'Program ', 'programe_id', 'programe_name');
+        $this->data['section']      = $this->CRUDModel->dropDown('sections', 'Section', 'sec_id', 'name',array('status'=>'On'));
+        $this->data['sms_type']      = $this->CRUDModel->dropDown('fee_defaulter_type', 'Select', 'id', 'title');
+//        $this->data['pc']           = $this->FeeModel->payment_Cat_DropDown('fee_payment_category', 'Payment Category', 'pc_id', 'title');
+//        $this->data['challan']      = $this->CRUDModel->dropDown('fee_challan_status', 'Challan Status', 'ch_status_id', 'fcs_title');
+        $this->data['gender']       = $this->CRUDModel->dropDown('gender', 'Challan Status', 'gender_id', 'title');
+        $this->data['batch']        = $this->CRUDModel->dropDown('prospectus_batch', 'Batch Name', 'batch_id', 'batch_name',array('status'=>'on'));
+        $this->data['student_status']  = $this->CRUDModel->dropDown('student_status', ' Select Status ', 's_status_id', 'name');
+        
+        $this->data['collegeNo']    = '';
+        $this->data['batchId']      = '';
+        $this->data['gender_id']    = '';
+        $this->data['pc_id']        = '';
+        $this->data['fatherName']   = '';
+        $this->data['stdName']      = '';
+        $this->data['programe_id']  = '';
+        $this->data['sec_id']       = '';
+        $this->data['sub_pro_id']   = '';
+        $this->data['sms_type_id']  = '';
+        $this->data['form_no']      = '';
+        $this->data['challan_no']   = '';
+        $this->data['sms_type_id']  = '';
+        $this->data['from']         = '';
+        $this->data['status_id'] = '';
+        $this->data['to']           = date('d-m-Y');
+        
+        if($this->input->post('search')):
+            
+            $collegeNo      = $this->input->post("collegeNo");
+            $batch              = $this->input->post("batch");
+            $form_no        = $this->input->post("form_no");
+            $stdName        = $this->input->post("stdName");
+            $fatherName     = $this->input->post("fatherName");
+            $programe_id    = $this->input->post("programe_id");
+            $sub_pro_id     = $this->input->post("sub_pro_id");
+            $section        = $this->input->post("section");
+            $gender         = $this->input->post("gender");
+            $from           = $this->input->post("from");
+            $to             = $this->input->post("to");
+            $sms_type       = $this->input->post("sms_type");
+            $student_status       = $this->input->post("student_status");
+  
+            if($from == ''):
+                $date['from']       = ''; 
+                $date['to']         = $to;
+                $this->data['from'] = '';
+                $this->data['to']   = $to;
+                else:
+                
+                $date['from']       = $from;
+                $date['to']         = $to;
+                $this->data['from'] = $from;
+                $this->data['to']   = $to;
+            endif;
+            
+            $where      = '';
+            $like       = '';
+            if($student_status):
+                $where['student_record.s_status_id']    = $student_status;
+                $this->data['status_id']         = $student_status;
+            endif;
+            if($gender):
+                $where['student_record.gender_id'] = $gender;
+                $this->data['gender_id'] = $gender;
+            endif;
+            if($gender):
+                $where['student_record.gender_id'] = $gender;
+                $this->data['gender_id'] = $gender;
+            endif;
+            if($batch):
+                $where['prospectus_batch.batch_id'] = $batch;
+                $this->data['batchId']        =   $batch;
+            endif;
+            if($form_no):
+                $where['student_record.form_no'] = $form_no;
+                $this->data['form_no'] = $form_no;
+            endif;
+            if($collegeNo):
+                $where['student_record.college_no'] = $collegeNo;
+                $this->data['collegeNo'] = $collegeNo;
+            endif;
+            if(!empty($stdName)):
+                $like['student_record.student_name'] = $stdName;
+                $this->data['stdName']           = $stdName;
+            endif;
+            if(!empty($fatherName)):
+                $like['student_record.father_name'] = $fatherName;
+                $this->data['fatherName']           = $fatherName;
+            endif;
+            if($programe_id):
+                $where['programes_info.programe_id'] = $programe_id;
+                $this->data['programe_id'] = $programe_id;
+            endif;
+            if(!empty($sub_pro_id)):
+                 $where['sub_programes.sub_pro_id'] = $sub_pro_id;
+                $this->data['sub_pro_id']           = $sub_pro_id;
+            endif;
+            if(!empty($section)):
+                $where['sections.sec_id'] = $section;
+                $this->data['sec_id']     = $section;
+            endif;
+            if(!empty($sms_type)):
+                $where['fee_message.fee_msg_type_flag'] = $sms_type;
+                $this->data['sms_type_id']     = $sms_type;
+            endif;
+            
+            
+            
+            $this->data['result'] = $this->SmsModel->fee_sms_report($where,$like,$date);
+           
+        endif;
+        
+        $this->data['page']         = 'sms/reports/fee_sms_report';
+        $this->data['page_header']  = 'Fee SMS Report';
+        $this->data['page_title']   = 'Fee SMS Report | ECMS';
+        $this->load->view('common/common',$this->data);
+    }      
+        
     public function attendance_message_date_wise(){
 
         $this->data['sub_program']  = $this->CRUDModel->dropDown('sub_programes', 'Sub Program ', 'sub_pro_id', 'name');

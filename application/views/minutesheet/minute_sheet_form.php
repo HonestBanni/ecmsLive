@@ -100,7 +100,7 @@
                     </div>
                 </div><!--//section-content-->
                                  
-                    <div class="col-md-9 right">
+                    <div class="col-md-10 right">
                         <?php echo form_open_multipart('MinuteSheetController/add_minute_sheet_attachment',array('class'=>'course-finder-form','method'=>'post', 'id'=>'image_form')); ?>
                         
                         <label for="name">Attachment</label>
@@ -130,9 +130,9 @@
                         <?php echo form_close(); ?>
                     </div>
                 
-                    <div class="col-md-3 right">
+                    <div class="col-md-2 right">
                         <label for="name" style="visibility: hidden">Add Attachments</label>
-                        <button type="button" class="btn btn-theme pull-right" name="save_ms" id="save_ms"  value="save_ms" > Submit Minute Sheet</button>
+                        <button type="button" class="btn btn-theme pull-right" name="save_ms" id="save_ms"  value="save_ms" > Submit Requisition</button>
                     </div>
                 
             </section>    

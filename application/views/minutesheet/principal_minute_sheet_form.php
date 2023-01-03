@@ -13,7 +13,7 @@
                             <table class="table" style="font-size: 15px;">
                                 <tr>
                                     <th width="15%">Diary No.</th>
-                                    <td width="35%">'.$ms_detail->msr_diary_no.'</td>
+                                    <td width="35%">'.$ms_detail->msr_id.'</td>
                                     <th width="15%">Date</th>
                                     <td width="35%">'.date('d-m-Y', strtotime($ms_detail->msr_date)).'</td>
                                 </tr>
@@ -48,14 +48,38 @@
                 <div class="section-content" >
                     <div class="row">
                         
+                        <?php
+                                  $this->db->order_by('msr_approve_id', 'desc');
+                        $number = $this->db->get('min_sheet')->row();
+//                        echo '<pre>'; print_r($number); die;
+                        if(!empty($number->msr_approve_id)): $apId = $number->msr_approve_id+1; else: $apId = 1101; endif;
+                        ?>
+                        
+                        <div class="col-md-4 col-sm-12 form-group">
+                            <label for="name">Approve ID</label>
+                            <?php
+                                echo form_input(
+                                    array(
+                                        'name'      => 'approve_id',
+                                        'id'        => 'approve_id',
+                                        'type'      => 'text',
+                                        'value'     => $apId,
+                                        'class'     => 'form-control',
+                                        'readonly'  => 'readonly',
+                                        'style'     => 'font-size:20px; font-weight: bolder; color:#c00;',
+                                    )
+                                );
+                            ?>
+                        </div>
+ 
                         <div class="col-md-4 col-sm-12 form-group">
                             <label for="name">Change Status</label>
-                            <?php echo form_dropdown('status_id', $Status,'',  'class="form-control" id="status_id"'); ?>
+                            <?php echo form_dropdown('status_id', $ms_status,'',  'class="form-control" id="status_id"'); ?>
                             <input type="hidden" name="curr_status" id="curr_status" class="form-control" value="<?php echo $ms_detail->msr_curr_status?>">
                             <input type="hidden" name="min_sht_id" id="min_sht_id" class="form-control" value="<?php echo $ms_detail->msr_id?>">
                         </div>
-
-                        <div class="col-md-4 col-sm-12 col-md-offset-4 form-group">
+                        
+                        <div class="col-md-4 col-sm-12form-group">
                             <label for="name">Date</label>
                             <?php
                                 echo form_input(
@@ -65,6 +89,7 @@
                                         'type'      => 'text',
                                         'value'     => date('d-m-Y'),
                                         'class'     => 'form-control datepicker',
+                                        'readonly'  => 'readonly',
                                     )
                                 );
                             ?>
@@ -72,14 +97,14 @@
  
                         <div class="col-md-12 form-group">
                             <label for="name">Principal Comments:</label>
-                            <textarea type="text" class="form-control notes" maxlength="250" rows="2" name="details" id="details" style="resize: none;" required="required"></textarea>
+                            <textarea type="text" class="form-control notes" maxlength="250" rows="2" name="details" id="details" style="resize: none;"></textarea>
                         </div> 
                         
                     </div>
                 </div><!--//section-content-->
                            
                     <div class="col-md-12 right">
-                        <button type="button" class="btn btn-theme pull-right mt-2" name="update_prn_ms" id="update_prn_ms"  value="update_prn_ms" >Save Minute Sheet</button>
+                        <button type="button" class="btn btn-theme pull-right mt-2" name="update_prn_ms" id="update_prn_ms"  value="update_prn_ms" >Submit</button>
                     </div>
                 
             </section>    
@@ -96,43 +121,43 @@
 
                                 switch ($f_ext['extension']):
                                     case 'doc':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/doc.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
                                         break;
                                     case 'docx':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/doc.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
                                         break;
                                     case 'xls':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/xls.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
                                         break;
                                     case 'xlsx':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/xls.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
                                         break;
                                     case 'ppt':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/ppt.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
                                         break;
                                     case 'pptx':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/pptx.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
                                         break;
                                     case 'pdf':
-                                        echo '<div style="height: 200px;text-align:center">
+                                        echo '<div style="height: 200px;text-align:center; overflow-wrap: break-word;">
                                             <img src="assets/images/file_icons/pdf.png" style="max-width: 200px; max-height:150px; margin-bottom: 10px;" class="center">
                                             <p style=" text-align:center"><strong>'.$rec->msa_file.'</strong></p>
                                         </div>';
@@ -171,14 +196,15 @@
                 $('#ms_date').focus();
                 return false;
             }
-            if($('#details').val() === ''){
-                $('#details').focus();
-                return false;
-            }
+//            if($('#details').val() === ''){
+//                $('#details').focus();
+//                return false;
+//            }
             var data = {
                 'min_sht_id'    : $('#min_sht_id').val(),
                 'status_id'     : $('#status_id').val(),
                 'details'       : $('#details').val(),
+                'approve_id'    : $('#approve_id').val(),
                 'ms_date'       : $('#ms_date').val()
             };
             $.ajax({

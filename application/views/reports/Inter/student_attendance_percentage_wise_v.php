@@ -14,6 +14,9 @@
     return false;
   }
 </script>
+<?php 
+// echo error_reporting(0)
+?>
 <!-- ******CONTENT****** --> 
 <div class="content container">
   <div class="page-wrapper">
@@ -38,7 +41,7 @@
     <div class="page-content">
       <div class="row">
         <article class="contact-form col-md-12 col-sm-7  page-row">                            
-          <?php echo form_open('',array('class'=>'form-inline')); ?>
+          <?php echo form_open('',array('class'=>'course-finder-form')); ?>
             <div class="row">
             <div class="col-md-12 ">
                 
@@ -51,51 +54,51 @@
                                 <div class="row">
                                   
                                 <div class="col-md-3 col-sm-5">
-                                    <div class="input-group" id="adv-search">
                                     <label for="name">Program</label>
-                                        
-                                            <?php
+                                        <?php
                                             echo form_dropdown('program', $program, $programId,  'class="form-control" id="feeProgrameId"');
                                                   ?>
-                                        </div>
+                                </div>
+                                <div class="col-md-3 col-sm-5">
+                                    
+                                    <label for="name">Gender</label>
+                                        
+                                            <?php
+                                            echo form_dropdown('gender', $gender, $genderId,  'class="form-control" ');
+                                                  ?>
+                                       
                                 </div>
                            
                                 <div class="col-md-3 col-sm-5">
-                                   
-                                        <div class="input-group" id="adv-search">
                                              <label for="name">Sub Program</label>
                                             <?php
-                                          echo form_dropdown('sub_program', $subprogrames, $subprogramId,  'class="form-control" id="showFeeSubPro" required="required"');
+                                          echo form_dropdown('sub_program', $subprogrames, $subprogramId,  'class="form-control" id="showFeeSubPro"');
                                                   ?>
-                                        </div>
                                 </div>
                                   <div class="col-md-3 col-sm-5">
                                    
-                                        <div class="input-group" id="adv-search">
+                                
                                              <label for="name">Batch</label>
                                             <?php
                                                 echo form_dropdown('batch', $batch, $batchId,  'class="form-control" id="batch_id"');
                                             ?>
-                                        </div>
+                                
                                     </div>
                                    
                                   <div class="col-md-3 col-sm-5">
                                     
-                                        <div class="input-group" id="adv-search">
+                                
                                             <label for="name">Sections</label>
                                             <?php
                                                  echo form_dropdown('sections_name', $sections, $sectionId,  'class="form-control" id="showSections"');
                                             ?>
-                                        </div>
-                                    </div> 
                                 
-                            </div>
-                          
-                                <div class="row">
+                                    </div> 
+                             
                                   
                                 <div class="col-md-3 col-sm-5">
                                    
-                                        <div class="input-group" id="adv-search">
+                                        
                                              <label for="name">Attendance From</label>
                                             <?php
                                               echo  form_input( array( 
@@ -105,12 +108,12 @@
                                                     'placeholder'   =>'Attendance From'
                                                              ));
                                             ?>
-                                        </div>
+                                        
                                 </div>
                            
                                 <div class="col-md-3 col-sm-5">
                                     
-                                        <div class="input-group" id="adv-search">
+                                         
                                              <label for="name">Attendance To</label>
                                                  <?php
                                               echo  form_input( array( 
@@ -120,11 +123,11 @@
                                                     'placeholder'   =>'Attendance To'
                                                              ));
                                             ?>
-                                        </div>
+                                       
                                 </div>
                                   <div class="col-md-3 col-sm-5">
                                    
-                                        <div class="input-group" id="adv-search">
+                                         
                                          
                                             <label for="name">Percentage From (%)</label>   
                                                 <?php
@@ -138,12 +141,12 @@
                                                     'placeholder'   => 'Percentage From'
                                                              ));
                                             ?>
-                                        </div>
+                                         
                                     </div>
                                    
                                   <div class="col-md-3 col-sm-5">
                                     
-                                        <div class="input-group" id="adv-search">
+                                         
                                             <label for="name">Percentage To (%)</label>
                                             <?php
                                                   
@@ -157,7 +160,7 @@
                                                     'placeholder'   => 'Percentage To'
                                                              ));
                                             ?>
-                                        </div>
+                                       
                                     </div> 
                                 
                             </div>
@@ -189,6 +192,7 @@
             
             <?php
             if(@$result):
+              // if(isset($result) && !empty($result)):
             ?>
             <div id="div_print">
                 
@@ -198,14 +202,14 @@
               <thead>
                    <tr>
                     <th colspan="4"><?php echo form_dropdown('sub_program', $subprogrames, $subprogramId,  'class="form-control" disabled="disabled" ');?></th>
-                    <th colspan="4"><?php echo form_dropdown('sections_name', $sections, $sectionId,  'class="form-control" disabled="disabled" ');?></th>
+                    <th colspan="6"><?php echo form_dropdown('sections_name', $sections, $sectionId,  'class="form-control" disabled="disabled" ');?></th>
                 </tr>
                 <tr>
          
                   <th colspan="2"><?php echo  form_input( array( 'disabled'          => 'disabled','value'         => $attendance_from,));?></th>
                   <th colspan="2"><?php echo  form_input( array( 'disabled'          => 'disabled','value'         => $attendance_to,));?></th>
-                  <th colspan="2"><?php echo  form_input( array( 'disabled'          => 'disabled','value'         => $percentage_from));?></th>
-                  <th colspan="2"><?php echo  form_input( array( 'disabled'          => 'disabled','value'         => $percentage_to));?></th>
+                  <th colspan="3"><?php echo  form_input( array( 'disabled'          => 'disabled','value'         => $percentage_from));?></th>
+                  <th colspan="3"><?php echo  form_input( array( 'disabled'          => 'disabled','value'         => $percentage_to));?></th>
                   
                 </tr>
                 <tr>
@@ -214,6 +218,8 @@
                   <th>College #</th>
                   <th>Name</th>
                   <th>F-name</th>
+                  <th>F-mobile</th>
+                  <th>Section</th>
                   <th>Attd(A + P = T)</th>
                   <th>Attd %</th>
                   <th>Marks %</th>
@@ -244,6 +250,8 @@
                                 <td><?php echo $resRow->college_no; ?></td>
                                 <td><?php echo $resRow->student_name; ?></td>
                                 <td><?php echo $resRow->father_name; ?></td>
+                                <td><?php echo $resRow->mobile_no; ?></td>
+                                <td><?php echo $resRow->sectionName; ?></td>
                                 <td><?php echo $resRow->Total_Classes; ?></td>
                                 <td><?php echo $resRow->Percentage; ?> %</td>
                                 <td><?php echo $resRow->marks; ?> %</td>

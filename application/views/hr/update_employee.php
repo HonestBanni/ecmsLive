@@ -600,7 +600,7 @@ echo '<option type="text" value=""></option>';
     ?>
 </select> 
         </div>
-        <div class="form-group col-md-3">
+    <div class="form-group col-md-3">
     <label for="usr">Retirement Date:</label>
             <?php
         $rdate = $result->retirement_date;
@@ -610,10 +610,20 @@ echo '<option type="text" value=""></option>';
             $rdate = date("d-m-Y", strtotime($rdate));
             }
                         ?>
-<input class="form-control date_format_d_m_yy" type="text" name="retirement_date" value="<?php echo $rdate; ?>">    
-        </div>
-  </div>
-      <div class="form-group">
+            <input class="form-control date_format_d_m_yy" type="text" name="retirement_date" value="<?php echo $rdate; ?>">    
+    </div>
+    <div class="form-group col-md-3">
+    <label for="usr">HoD Flag</label>
+        <select class="form-control" type="text" name="hod_ms_flag">
+        <option value="0" <?php if($result->hod_ms_flag == '0') {echo 'selected';}?> >No</option>        
+        <option value="1" <?php if($result->hod_ms_flag == '1') {echo 'selected';}?>>Yes</option>        
+        
+    </select>
+             
+    </div>
+ 
+      <div class="form-group col-md-3">
+      <label for="usr" style="visibility:hidden">HoD Flag sdfasd</label>
             <input style="margin-left:30px;" type="submit" class="btn btn-primary" name="submit" value="Update Employee">
       </div>                      
                         </div>
@@ -631,7 +641,7 @@ echo '<option type="text" value=""></option>';
     <span style="folat:left">
     <a href="HrController/grant_in_aid/<?php echo $emp_id;?>" class="btn btn-large btn-success">Grant in Add</a></span>
 </h3>
-<div class="col-md-12">
+
              
     <div class="courses-wrapper col-md-12 col-sm-7">           
                 <div class="featured-courses tabbed-info page-row">             
@@ -820,4 +830,5 @@ echo '<option type="text" value=""></option>';
 
         </div>
         
+ 
 </div>

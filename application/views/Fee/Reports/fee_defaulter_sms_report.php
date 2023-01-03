@@ -122,7 +122,7 @@
                                             <?php  echo form_dropdown('std_status', $student_status,'',  'class="form-control" '); ?>
                                     </div>
                                     <div class="col-md-2 col-sm-5">
-                                          <label for="name">Date From</label>
+                                          <label for="name">Date From Send</label>
                                          
                                                 <?php
                                                     echo  form_input(
@@ -134,7 +134,7 @@
                                             ?>
                                      </div>
                                     <div class="col-md-2 col-sm-5">
-                                          <label for="name">Date To</label>
+                                          <label for="name">Date To Send</label>
                                          
                                                 <?php
                                                     echo  form_input(

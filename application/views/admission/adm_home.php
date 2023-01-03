@@ -88,23 +88,42 @@ endif;
                <!-- ******BANNER****** --> 
             <div class="row cols-wrapper">
                 <div class="col-md-12" style="min-height:450px;">
-                   <div class="contact pull-center">
-                       <?php
-    if($Showmessage):
-        foreach($Showmessage as $message): 
-    ?>                   
-        <div class="alert alert-danger alert-dismissable">
-            <strong><?php echo $message->details;?></strong>
-        </div>
-    <?php  
-        endforeach;    
-    else:
-            echo "";           
-    endif;
-        ?>  
-                        <p style="font-size:27px; margin-top:150px; text-align:center"><strong>Welcome to <br>Edwardes College Management System (ECMS)</strong></p> <br>
-                  
-                    </div><!--//contact-->
+                    <div class="home-pc">
+                        <div class="contact pull-center">
+                           <?php
+                            if($Showmessage):
+                                foreach($Showmessage as $message): 
+                                ?>                   
+                                <div class="alert alert-danger alert-dismissable">
+                                    <strong><?php echo $message->details;?></strong>
+                                </div>
+                                <?php  
+                                endforeach;    
+                            else:
+                                echo "";           
+                            endif;
+                            ?>  
+                            <p style="font-size:27px; margin-top:150px; text-align:center"><strong>Welcome to <br>Edwardes College Management System (ECMS)</strong></p> <br>
+                        </div><!--//contact-->
+                    </div>
+                    <div class="home-mob">
+                        <div class="contact pull-center">
+                           <?php
+                            if($Showmessage):
+                                foreach($Showmessage as $message): 
+                                ?>                   
+                                <div class="alert alert-danger alert-dismissable">
+                                    <strong><?php echo $message->details;?></strong>
+                                </div>
+                                <?php  
+                                endforeach;    
+                            else:
+                                echo "";           
+                            endif;
+                            ?>  
+                            <p style="font-size:27px; margin-top:150px; text-align:center"><strong>Welcome to <br>Edwardes College Management System (ECMS)</strong></p> <br>
+                        </div><!--//contact-->
+                    </div>
                 </div><!--//col-md-3-->
                 
             </div><!--//cols-wrapper-->

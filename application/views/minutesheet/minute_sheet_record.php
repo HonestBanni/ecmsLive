@@ -1,6 +1,6 @@
 <!-- ******CONTENT****** -->  
 <div class="content container">
-    <h2 align="left">Minute Sheet HOD Panel
+    <h2 align="left"><?php echo $ReportName?>
         <span  style="float:right"><a href="MinuteSheetInitiate" class="btn btn-large btn-theme">New Minute Sheet</a></span>
         <hr>
     </h2>
@@ -9,7 +9,7 @@
         <div class="col-md-12">
             <section class="course-finder" style="padding-bottom: 2%;">
                 <h1 class="section-heading text-highlight">
-                    <span class="line">Search in Minute Sheet</span>
+                    <span class="line">Search Form</span>
                 </h1>
                 <div class="section-content" >
                     <?php echo form_open('',array('class'=>'course-finder-form','method'=>'post')); ?>

@@ -2570,6 +2570,9 @@ table th[class*=col-] {
     .table-responsive>.table-bordered>tfoot>tr:last-child>th {
         border-bottom: 0
     }
+
+    .home-pc { display: none}
+    .home-mob { display: block}
 }
 fieldset {
     min-width: 0;
